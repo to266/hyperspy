@@ -61,8 +61,8 @@ class inverse_cosh(Component):
         a = self.A.value
         b = self.width.value
         x0 = self.centre.value
-        tmp = np.cosh(b*(x-x0))
-        return a/(tmp*tmp)
+        tmp = np.cosh(b * (x - x0))
+        return a / (tmp * tmp)
 
     # Optionally define the gradients of each parameter
 
@@ -70,21 +70,21 @@ class inverse_cosh(Component):
         a = self.A.value
         b = self.width.value
         c = self.centre.value
-        tmp1 = b*(x-c)
+        tmp1 = b * (x - c)
         tmp2 = np.cosh(tmp1)
-        return 2*a*b*np.tanh(tmp1) /(tmp2*tmp2)
+        return 2 * a * b * np.tanh(tmp1) / (tmp2 * tmp2)
 
-    def grad_A(self,x):
+    def grad_A(self, x):
         a = self.A.value
         b = self.width.value
         c = self.centre.value
-        tmp2 = np.cosh(b*(x-c))
-        return 1.0 / (tmp2*tmp2)
+        tmp2 = np.cosh(b * (x - c))
+        return 1.0 / (tmp2 * tmp2)
 
     def grad_width(self, x):
         a = self.A.value
         b = self.width.value
         c = self.centre.value
-        tmp1 = b*(x-c)
+        tmp1 = b * (x - c)
         tmp2 = np.cosh(tmp1)
-        return 2.0*a*(c-x)*np.tanh(tmp1) /(tmp2*tmp2)
+        return 2.0 * a * (c - x) * np.tanh(tmp1) / (tmp2 * tmp2)
