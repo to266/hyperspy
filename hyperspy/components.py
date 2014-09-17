@@ -53,4 +53,3 @@ from hyperspy._components.polynomial import Polynomial
 from hyperspy._components.pes_core_line_shape import PESCoreLineShape
 from hyperspy._components.volume_plasmon_drude import VolumePlasmonDrude
 from hyperspy._components.qpc_step import qpc_step
-

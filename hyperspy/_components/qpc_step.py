@@ -25,9 +25,16 @@ class qpc_step(Component):
     """
     """
 
-    def __init__(self, offset=1.0, gradient=1.0, amplitude=1.0, steepness = 1.0, step = 1.0):
+    def __init__(
+            self, offset=1.0, gradient=1.0, amplitude=1.0, steepness=1.0, step=1.0):
         # Define the parameters
-        Component.__init__(self, ('offset', 'gradient', 'amplitude', 'steepness', 'step'))
+        Component.__init__(
+            self,
+            ('offset',
+             'gradient',
+             'amplitude',
+             'steepness',
+             'step'))
         # Define the identification name of the component
         self.offset.value = offset
         self.gradient.value = gradient
@@ -55,7 +62,7 @@ class qpc_step(Component):
         # And we set the boundaries
 #        self.parameter_1.bmin = 0.
 #        self.parameter_1.bmax = None
-        
+
         # Optionally, to boost the optimization speed we can define also define
         # the gradients of the function we the syntax:
         # self.parameter.grad = function
@@ -72,7 +79,7 @@ class qpc_step(Component):
         c = self.amplitude.value
         d = self.steepness.value
         e = self.step.value
-        return a+b*x + c/(1 + np.exp(d*(x-e)))
+        return a + b * x + c / (1 + np.exp(d * (x - e)))
 
     # Optionally define the gradients of each parameter
     def grad_offset(self, x):
@@ -84,24 +91,24 @@ class qpc_step(Component):
     def grad_amplitude(self, x):
         d = self.steepness.value
         e = self.step.value
-        return 1/(1 + np.exp(d*(x-e)))
+        return 1 / (1 + np.exp(d * (x - e)))
 
     def grad_steepness(self, x):
         c = self.amplitude.value
         d = self.steepness.value
         e = self.step.value
 
-        ede = np.exp(d*e)
-        edx = np.exp(d*x)
-        temp = (ede + edx)*(ede+edx)
-        return (c*(e-x)*ede*edx)/temp
+        ede = np.exp(d * e)
+        edx = np.exp(d * x)
+        temp = (ede + edx) * (ede + edx)
+        return (c * (e - x) * ede * edx) / temp
 
     def grad_step(self, x):
         c = self.amplitude.value
         d = self.steepness.value
         e = self.step.value
 
-        ede = np.exp(d*e)
-        edx = np.exp(d*x)
-        temp = (ede+edx)*(ede+edx)
-        return (c*d*ede*edx)/temp
+        ede = np.exp(d * e)
+        edx = np.exp(d * x)
+        temp = (ede + edx) * (ede + edx)
+        return (c * d * ede * edx) / temp
