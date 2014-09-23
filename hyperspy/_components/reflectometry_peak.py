@@ -67,7 +67,7 @@ class Reflectometry_peak(Component):
         #Zreal = R / (1 + omega*omega*C*C*R*R)
         Gamma = (np.abs(Z) - Z0) / (np.abs(Z) + Z0)
 
-        return A * np.log(Gamma)
+        return A * Gamma
 
     # Optionally define the gradients of each parameter
 #    def grad_parameter_1(self, x):
