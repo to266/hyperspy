@@ -25,7 +25,7 @@ class Reflectometry_peak(Component):
     """
     """
 
-    def __init__(self, Z0=50., R=2, C = 1., L = 1., A = 20.):
+    def __init__(self, Z0=50., R=2, C=1., L=1., A=20.):
         # Define the parameters
         Component.__init__(self, ('Z0', 'R', 'C', 'L', 'A'))
         # Define the identification name of the component
@@ -63,11 +63,11 @@ class Reflectometry_peak(Component):
         C = self.C.value
         L = self.L.value
         A = self.A.value
-        Z = L*w*1j + R / (1 + 1j*w*C*R)
+        Z = L * w * 1j + R / (1 + 1j * w * C * R)
         #Zreal = R / (1 + omega*omega*C*C*R*R)
         Gamma = (np.abs(Z) - Z0) / (np.abs(Z) + Z0)
 
-        return A*np.log(Gamma)
+        return A * np.log(Gamma)
 
     # Optionally define the gradients of each parameter
 #    def grad_parameter_1(self, x):
