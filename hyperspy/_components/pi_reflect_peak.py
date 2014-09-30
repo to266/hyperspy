@@ -25,7 +25,7 @@ class Pi_Reflectometry_peak(Component):
     """
     """
 
-    def __init__(self, Z0=50., R=2, C=1., L=1., A=20., D = 1.):
+    def __init__(self, Z0=50., R=2, C=1., L=1., A=20., D=1.):
         # Define the parameters
         Component.__init__(self, ('Z0', 'R', 'C', 'L', 'A', 'D'))
         # Define the identification name of the component
@@ -67,7 +67,8 @@ class Pi_Reflectometry_peak(Component):
         A = self.A.value
         D = self.D.value * 1e-12
         # Z = L * w * 1j + R / (1 + 1j * w * C * R)
-        Z = (R + 1j * w * L - w*w*D*R*L) / (1j * w * C * R - w*w*L*C - 1j*w*w*w*C*D*R*L + 1 + 1j*w*D*R)
+        Z = (R + 1j * w * L - w * w * D * R * L) / (1j * w * C * R - w *
+                                                    w * L * C - 1j * w * w * w * C * D * R * L + 1 + 1j * w * D * R)
         #Zreal = R / (1 + omega*omega*C*C*R*R)
         Gamma = (np.abs(Z) - Z0) / (np.abs(Z) + Z0)
 
