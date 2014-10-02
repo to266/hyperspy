@@ -25,7 +25,7 @@ class Double_linear(Component):
     """
     """
 
-    def __init__(self, inter=1, height=2, grad1 = 1, grad2 = 1.5):
+    def __init__(self, inter=1, height=2, grad1=1, grad2=1.5):
         # Define the parameters
         Component.__init__(self, ('inter', 'height', 'grad1', 'grad2'))
 
@@ -58,8 +58,8 @@ class Double_linear(Component):
         b = self.grad2.value
 
         ans = np.empty_like(x)
-        ans[x<=inter] = h + (x[x<=inter]-inter)*a
-        ans[x>inter] = h + (x[x>inter]-inter)*b
+        ans[x <= inter] = h + (x[x <= inter] - inter) * a
+        ans[x > inter] = h + (x[x > inter] - inter) * b
         return ans
 
     # Optionally define the gradients of each parameter
