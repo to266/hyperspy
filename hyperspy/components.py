@@ -56,3 +56,4 @@ from hyperspy._components.qpc_step import qpc_step
 from hyperspy._components.inv_cosh import inverse_cosh
 from hyperspy._components.reflectometry_peak import Reflectometry_peak
 from hyperspy._components.pi_reflect_peak import Pi_Reflectometry_peak
+from hyperspy._components.pi_reflect_peak_angle import Pi_Reflectometry_peak_angle
