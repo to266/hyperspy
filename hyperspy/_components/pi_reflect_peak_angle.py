@@ -25,9 +25,9 @@ class Pi_Reflectometry_peak_angle(Component):
     """
     """
 
-    def __init__(self, Z0=50., R=2, C=1., L=1., A=20., D=1.):
+    def __init__(self, Z0=50., R=2, C=1., L=1., A=20., D=1., a= 0.):
         # Define the parameters
-        Component.__init__(self, ('Z0', 'R', 'C', 'L', 'A', 'D'))
+        Component.__init__(self, ('Z0', 'R', 'C', 'L', 'A', 'D','a'))
         # Define the identification name of the component
         self.Z0.value = Z0
         self.R.value = R
@@ -35,6 +35,7 @@ class Pi_Reflectometry_peak_angle(Component):
         self.L.value = L
         self.A.value = A
         self.D.value = D
+        self.a.value = a
 
         self.Z0.units = 'Ohm'
         self.R.units = 'MOhm'
@@ -66,13 +67,14 @@ class Pi_Reflectometry_peak_angle(Component):
         L = self.L.value * 1e-9
         A = self.A.value
         D = self.D.value * 1e-12
+        a = self.a.value
         # Z = L * w * 1j + R / (1 + 1j * w * C * R)
         Z = (R + 1j * w * L - w * w * D * R * L) / (1j * w * C * R - w *
                                                     w * L * C - 1j * w * w * w * C * D * R * L + 1 + 1j * w * D * R)
         #Zreal = R / (1 + omega*omega*C*C*R*R)
-        Gamma = (np.angle(Z, deg=True) - Z0) / (np.angle(Z, deg=True) + Z0)
+        Gamma = (Z - Z0) / (Z + Z0)
 
-        return A * Gamma
+        return A * np.angle(Gamma * np.exp(1j * a * w), deg=True)
 
     # Optionally define the gradients of each parameter
 #    def grad_parameter_1(self, x):

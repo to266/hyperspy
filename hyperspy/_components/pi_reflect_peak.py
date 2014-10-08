@@ -70,9 +70,9 @@ class Pi_Reflectometry_peak(Component):
         Z = (R + 1j * w * L - w * w * D * R * L) / (1j * w * C * R - w *
                                                     w * L * C - 1j * w * w * w * C * D * R * L + 1 + 1j * w * D * R)
         #Zreal = R / (1 + omega*omega*C*C*R*R)
-        Gamma = (np.abs(Z) - Z0) / (np.abs(Z) + Z0)
+        Gamma = (Z - Z0) / (Z + Z0)
 
-        return A * Gamma
+        return A * np.abs(Gamma)
 
     # Optionally define the gradients of each parameter
 #    def grad_parameter_1(self, x):
