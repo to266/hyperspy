@@ -36,9 +36,9 @@ class Reflectometry_peak(Component):
         self.A.value = A
 
         self.Z0.units = 'Ohm'
-        self.R.units = 'Ohm'
-        self.C.units = 'F'
-        self.L.units = 'H'
+        self.R.units = 'MOhm'
+        self.C.units = 'pF'
+        self.L.units = 'nH'
 
         # Once defined we can give default values to the attribute is we want
         # For example we fix the attribure_1
@@ -56,16 +56,14 @@ class Reflectometry_peak(Component):
     def function(self, x):
         """
         """
-        omega = 2. * np.pi * x
-        w = omega
+        w = 2. * np.pi * x
         R = self.R.value * 1e6
         Z0 = self.Z0.value
         C = self.C.value * 1e-12
         L = self.L.value * 1e-9
         A = self.A.value
         Z = L * w * 1j + R / (1 + 1j * w * C * R)
-        #Zreal = R / (1 + omega*omega*C*C*R*R)
-        Gamma = (Z - Z0) / (Z + Z0)
+        Gamma = Z / (Z + 2*Z0)
 
         return A * np.abs(Gamma)
 
