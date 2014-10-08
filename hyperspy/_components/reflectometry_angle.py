@@ -69,7 +69,7 @@ class Reflectometry_angle(Component):
         #Zreal = R / (1 + omega*omega*C*C*R*R)
         Gamma = (Z - Z0) / (Z + Z0)
 
-        return A * np.angle(Gamma* np.exp(1j*a*w), deg=True) 
+        return A * np.angle(Gamma * np.exp(1j * a * w), deg=True)
 
     # Optionally define the gradients of each parameter
 #    def grad_parameter_1(self, x):
