@@ -58,16 +58,16 @@ class Reflectometry_peak(Component):
         """
         omega = 2. * np.pi * x
         w = omega
-        R = self.R.value
+        R = self.R.value * 1e6
         Z0 = self.Z0.value
-        C = self.C.value
-        L = self.L.value
+        C = self.C.value * 1e-12
+        L = self.L.value * 1e-9
         A = self.A.value
         Z = L * w * 1j + R / (1 + 1j * w * C * R)
         #Zreal = R / (1 + omega*omega*C*C*R*R)
-        Gamma = (np.abs(Z) - Z0) / (np.abs(Z) + Z0)
+        Gamma = (Z - Z0) / (Z + Z0)
 
-        return A * Gamma
+        return A * np.abs(Gamma)
 
     # Optionally define the gradients of each parameter
 #    def grad_parameter_1(self, x):
