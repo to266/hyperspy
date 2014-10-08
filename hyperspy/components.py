@@ -55,3 +55,4 @@ from hyperspy._components.volume_plasmon_drude import VolumePlasmonDrude
 from hyperspy._components.qpc_step import qpc_step
 from hyperspy._components.inv_cosh import inverse_cosh
 from hyperspy._components.reflectometry_peak import Reflectometry_peak
+from hyperspy._components.reflectometry_angle import Reflectometry_angle
