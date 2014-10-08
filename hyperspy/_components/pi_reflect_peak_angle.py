@@ -25,9 +25,9 @@ class Pi_Reflectometry_peak_angle(Component):
     """
     """
 
-    def __init__(self, Z0=50., R=2, C=1., L=1., A=20., D=1., a= 0.):
+    def __init__(self, Z0=50., R=2, C=1., L=1., A=20., D=1., a=0.):
         # Define the parameters
-        Component.__init__(self, ('Z0', 'R', 'C', 'L', 'A', 'D','a'))
+        Component.__init__(self, ('Z0', 'R', 'C', 'L', 'A', 'D', 'a'))
         # Define the identification name of the component
         self.Z0.value = Z0
         self.R.value = R
