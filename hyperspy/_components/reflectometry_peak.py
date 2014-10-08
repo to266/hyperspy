@@ -63,7 +63,7 @@ class Reflectometry_peak(Component):
         L = self.L.value * 1e-9
         A = self.A.value
         Z = L * w * 1j + R / (1 + 1j * w * C * R)
-        Gamma = Z / (Z + 2*Z0)
+        Gamma = Z / (Z + 2 * Z0)
 
         return A * np.abs(Gamma)
 
