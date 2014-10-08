@@ -20,20 +20,21 @@ from hyperspy.component import Component
 import numpy as np
 
 
-class Reflectometry_peak(Component):
+class Reflectometry_angle(Component):
 
     """
     """
 
-    def __init__(self, Z0=50., R=2, C=1., L=1., A=20.):
+    def __init__(self, Z0=50., R=2, C=1., L=1., A=20., a=0.):
         # Define the parameters
-        Component.__init__(self, ('Z0', 'R', 'C', 'L', 'A'))
+        Component.__init__(self, ('Z0', 'R', 'C', 'L', 'A', 'a'))
         # Define the identification name of the component
         self.Z0.value = Z0
         self.R.value = R
         self.C.value = C
         self.L.value = L
         self.A.value = A
+        self.a.value = a
 
         self.Z0.units = 'Ohm'
         self.R.units = 'Ohm'
@@ -63,11 +64,12 @@ class Reflectometry_peak(Component):
         C = self.C.value * 1e-12
         L = self.L.value * 1e-9
         A = self.A.value
+        a = self.a.value
         Z = L * w * 1j + R / (1 + 1j * w * C * R)
         #Zreal = R / (1 + omega*omega*C*C*R*R)
         Gamma = (Z - Z0) / (Z + Z0)
 
-        return A * np.abs(Gamma)
+        return A * np.angle(Gamma * np.exp(1j * a * w), deg=True)
 
     # Optionally define the gradients of each parameter
 #    def grad_parameter_1(self, x):
