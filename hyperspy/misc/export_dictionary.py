@@ -57,10 +57,8 @@ def check_that_flags_make_sense(flags):
             do_error('id', 'init')
     # all sig cases already covered
 
-
 def parse_flag_string(flags):
     return flags.replace(' ', '').split(',')
-
 
 def export_to_dictionary(target, whitelist, dic, picklable=False):
     """ Exports attributes of target from whitelist.keys() to dictionary dic
