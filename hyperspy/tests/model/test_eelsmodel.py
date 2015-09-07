@@ -47,7 +47,7 @@ class TestCreateEELSModel:
     def test_low_loss(self):
         ll = self.s.deepcopy()
         ll.axes_manager[-1].offset = -20
-        m = self.s.create_model(ll=ll)
+        m = self.s.create_model(low_loss=ll)
         nose.tools.assert_is(m.low_loss, ll)
 
 

@@ -1222,13 +1222,13 @@ class EELSSpectrum(Spectrum):
         else:
             return eps, output
 
-    def create_model(self, ll=None, auto_background=True, auto_add_edges=True,
+    def create_model(self, low_loss=None, auto_background=True, auto_add_edges=True,
                      GOS=None):
         """Create a model for the current EELS data.
 
         Parameters
         ----------
-        ll : EELSSpectrum, optional
+        low_loss : EELSSpectrum, optional
             If an EELSSpectrum is provided, it will be assumed that it is
             a low-loss EELS spectrum, and it will be used to simulate the
             effect of multiple scattering by convolving it with the EELS
@@ -1256,7 +1256,7 @@ class EELSSpectrum(Spectrum):
         """
         from hyperspy.models.eelsmodel import EELSModel
         model = EELSModel(self,
-                          ll=ll,
+                          low_loss=low_loss,
                           auto_background=auto_background,
                           auto_add_edges=auto_add_edges,
                           GOS=GOS)

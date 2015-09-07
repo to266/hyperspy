@@ -55,7 +55,7 @@ class EELSModel(Model):
         Spectrum instance. Adding a new element to the spectrum using
         the components.EELSSpectrum.add_elements method automatically
         add the corresponding ionisation edges to the model.
-    ll : {None, EELSSpectrum}
+    low_loss : {None, EELSSpectrum}
         If an EELSSPectrum is provided, it will be assumed that it is
         a low-loss EELS spectrum, and it will be used to simulate the
         effect of multiple scattering by convolving it with the EELS
@@ -68,12 +68,13 @@ class EELSModel(Model):
     """
 
     def __init__(self, spectrum, auto_background=True,
-                 auto_add_edges=True, ll=None,
+                 auto_add_edges=True, low_loss=None,
                  GOS=None):
         Model.__init__(self, spectrum)
+        self._whitelist['GOS'] = ('init', GOS)
         self._suspend_auto_fine_structure_width = False
         self.convolved = False
-        self.low_loss = ll
+        self.low_loss = low_loss
         self.GOS = GOS
         self.edges = list()
         if auto_background is True:

@@ -5,15 +5,17 @@ from hyperspy.misc.export_dictionary import parse_flag_string
 import numpy as np
 
 
-def slice_thing(thing, dims, both_slices=None, issignal=False):
+def slice_thing(thing, dims, both_slices=None, isnav=False, issignal=False):
     nav_dims, sig_dims = dims
     slices, array_slices = both_slices
     if thing is None:
         return None
-    if issignal:
-        return thing.inav[slices]
-    if isinstance(thing, np.ndarray):
-        return np.atleast_1d(thing[tuple(array_slices[:nav_dims])])
+    if isnav:
+        if issignal:
+            return thing.inav[slices]
+        if isinstance(thing, np.ndarray):
+            return np.atleast_1d(thing[tuple(array_slices[:nav_dims])])
+    return thing
 
 
 def copy_slice_from_whitelist(_from, _to, dims, both_slices, isNav):
@@ -32,7 +34,12 @@ def copy_slice_from_whitelist(_from, _to, dims, both_slices, isNav):
             continue
         if 'inav' in flags:
             thing = attrgetter(key)(_from)
-            thing = slice_thing(thing, dims, both_slices, 'sig' in flags)
+            thing = slice_thing(
+                thing,
+                dims,
+                both_slices,
+                isNav,
+                'sig' in flags)
             attrsetter(_to, key, thing)
 
 
