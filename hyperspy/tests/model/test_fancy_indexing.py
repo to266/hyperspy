@@ -66,6 +66,11 @@ class TestModelIndexing:
                 m1.chisq.data,
                 self.model.chisq.data))
 
+        self.model.channel_switches[0] = False
+        m = self.model.isig[:-100.]
+        assert_true(m.channel_switches[0] == False)
+        assert_true(np.all(m.channel_switches[1:] == True))
+
     def test_model_navigation_indexer_slice(self):
         m = self.model.inav[0::2]
         assert_true((m.chisq.data == self.model.chisq.data[:, 0::2]).all())
