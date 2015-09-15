@@ -93,11 +93,12 @@ class EELSCLEdge(Component):
                             'fine_structure_coeff',
                             'effective_angle',
                             'onset_energy'])
-
-        self._whitelist['element_subshell'] = ('init', element_subshell)
-        self._whitelist['GOS'] = ('init', GOS)
-        self.name = element_subshell
-        self.element, self.subshell = element_subshell.split('_')
+        if isinstance(element_subshell, dict):
+            self.element = element_subshell['element']
+            self.subshell = element_subshell['subshell']
+        else:
+            self.element, self.subshell = element_subshell.split('_')
+        self.name = "_".join([self.element, self.subshell])
         self.energy_scale = None
         self.effective_angle.free = False
         self.fine_structure_active = preferences.EELS.fine_structure_active
@@ -131,6 +132,14 @@ class EELSCLEdge(Component):
         self.intensity.value = 1
         self.intensity.bmin = 0.
         self.intensity.bmax = None
+
+        self._whitelist['GOS'] = ('init', GOS)
+        if GOS == 'Hartree-Slater':
+            self._whitelist['element_subshell'] = (
+                'init',
+                self.GOS.as_dictionary(True))
+        elif GOS == 'hydrogenic':
+            self._whitelist['element_subshell'] = ('init', element_subshell)
 
     # Automatically fix the fine structure when the fine structure is
     # disable.

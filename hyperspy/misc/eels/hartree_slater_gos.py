@@ -9,6 +9,7 @@ from hyperspy.defaults_parser import preferences
 from hyperspy.misc.physical_constants import R, a0
 from hyperspy.misc.eels.base_gos import GOSBase
 from hyperspy.misc.elements import elements
+from hyperspy.misc.export_dictionary import export_to_dictionary, load_from_dictionary
 
 
 class HartreeSlaterGOS(GOSBase):
@@ -60,15 +61,38 @@ class HartreeSlaterGOS(GOSBase):
         """
         # Check if the Peter Rez's Hartree Slater GOS distributed by
         # Gatan are available. Otherwise exit
-        if not os.path.isdir(preferences.EELS.eels_gos_files_path):
-            raise IOError(
-                "The parametrized Hartree-Slater GOS files could not "
-                "found in %s ." % preferences.EELS.eels_gos_files_path +
-                "Please define a valid location for the files "
-                "in the preferences.")
-        self.element, self.subshell = element_subshell.split('_')
-        self.read_elements()
-        self.readgosfile()
+        self._whitelist = {'gos_array': None,
+                           'rel_energy_axis': None,
+                           'qaxis': None,
+                           'element': None,
+                           'subshell': None
+                           }
+        if isinstance(element_subshell, dict):
+            self.element = element_subshell['element']
+            self.subshell = element_subshell['subshell']
+            self.read_elements()
+            self._load_dictionary(element_subshell)
+        else:
+            if not os.path.isdir(preferences.EELS.eels_gos_files_path):
+                raise IOError(
+                    "The parametrized Hartree-Slater GOS files could not "
+                    "found in %s ." % preferences.EELS.eels_gos_files_path +
+                    "Please define a valid location for the files "
+                    "in the preferences.")
+            self.element, self.subshell = element_subshell.split('_')
+            self.read_elements()
+            self.readgosfile()
+
+    def _load_dictionary(self, dictionary):
+        load_from_dictionary(self, dictionary)
+        self.energy_axis = self.rel_energy_axis + self.onset_energy
+
+    def as_dictionary(self, picklable=False):
+        """Export the GOS as dictionary
+        """
+        dic = {}
+        export_to_dictionary(self, self._whitelist, dic, picklable)
+        return dic
 
     def readgosfile(self):
         print "\nHartree-Slater GOS"
