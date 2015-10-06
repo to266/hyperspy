@@ -69,9 +69,9 @@ class EELSModel(Model):
 
     def __init__(self, spectrum, auto_background=True,
                  auto_add_edges=True, low_loss=None,
-                 GOS=None):
-        Model.__init__(self, spectrum)
-        self._whitelist['GOS'] = ('init', GOS)
+                 GOS=None, dictionary=None):
+        Model.__init__(self, spectrum, dictionary=dictionary)
+        self._whitelist['GOS'] = None
         self._suspend_auto_fine_structure_width = False
         self.convolved = False
         self.low_loss = low_loss
@@ -163,17 +163,12 @@ class EELSModel(Model):
     def _active_background_components(self):
         return [bc for bc in self._background_components if bc.active]
 
-    def _add_edges_from_subshells_names(self, e_shells=None,
-                                        copy2interactive_ns=True):
+    def _add_edges_from_subshells_names(self, e_shells=None):
         """Create the Edge instances and configure them appropiately
         Parameters
         ----------
         e_shells : list of strings
-        copy2interactive_ns : bool
-            If True, variables with the format Element_Shell will be
-            created in IPython's interactive shell
         """
-        interactive_ns = get_interactive_ns()
         if e_shells is None:
             e_shells = list(self.spectrum.subshells)
         e_shells.sort()
@@ -182,18 +177,7 @@ class EELSModel(Model):
         # we reassing the value of self.GOS
         self.GOS = master_edge.GOS._name
         self.append(master_edge)
-        interactive_ns[self[-1].name] = self[-1]
-        warnings.warn("Adding \"%s\" to the user namespace. "
-                      "This feature will be removed in HyperSpy 0.9." % self[
-                          -1].name,
-                      VisibleDeprecationWarning)
         element = master_edge.element
-        interactive_ns[element] = []
-        warnings.warn(
-            "Adding \"%s\" to the user namespace. "
-            "This feature will be removed in HyperSpy 0.9." % element,
-            VisibleDeprecationWarning)
-        interactive_ns[element].append(self[-1])
         while len(e_shells) > 0:
             next_element = e_shells[-1].split('_')[0]
             if next_element != element:
@@ -219,14 +203,6 @@ class EELSModel(Model):
                 edge.onset_energy.twin = master_edge.onset_energy
                 edge.free_onset_energy = False
                 self.append(edge)
-                if copy2interactive_ns is True:
-                    interactive_ns[edge.name] = edge
-                    warnings.warn(
-                        "Adding \"%s\" to the user namespace. "
-                        "This feature will be removed in HyperSpy 0.9." %
-                        edge.name,
-                        VisibleDeprecationWarning)
-                    interactive_ns[element].append(edge)
 
     def resolve_fine_structure(
             self,
@@ -547,7 +523,6 @@ class EELSModel(Model):
             edge.onset_energy.free = True
             self.fit(**kwargs)
             edge.onset_energy.free = False
-            print "onset_energy = ", edge.onset_energy.value
             self._touch()
         elif edge.intensity.free is True:
             self.enable_fine_structure(to_activate_fs)
@@ -890,8 +865,8 @@ class EELSModel(Model):
         for edge in edges_list:
             if edge.isbackground is False:
                 edge.intensity.free = True
-                #edge.onset_energy.free = True
-                #edge.fine_structure_coeff.free = True
+                # edge.onset_energy.free = True
+                # edge.fine_structure_coeff.free = True
 
     def fix_fine_structure(self, edges_list=None):
         """Fixes all the parameters of the edges given in edges_list.

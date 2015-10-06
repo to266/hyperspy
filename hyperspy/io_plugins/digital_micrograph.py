@@ -544,8 +544,8 @@ class ImageObject(object):
         dimensions = self.imdict.ImageData.Calibrations.Dimension
         len_diff = len(self.shape) - len(dimensions)
         return (tuple([dimension[1].Units
-                       if dimension[1].Units else ""
-                       for dimension in dimensions]) + ('',) * len_diff)[::-1]
+                      if dimension[1].Units else ""
+                      for dimension in dimensions]) + ('',) * len_diff)[::-1]
 
     @property
     def names(self):
