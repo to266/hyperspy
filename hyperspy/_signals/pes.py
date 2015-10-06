@@ -17,7 +17,7 @@
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#from hyperspy import Signal
+# from hyperspy import Signal
 #
 #
 # class PESSignal(Signal):

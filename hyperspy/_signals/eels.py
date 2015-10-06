@@ -47,7 +47,6 @@ class EELSSpectrum(Spectrum):
         self.edges = list()
         if hasattr(self.metadata, 'Sample') and \
                 hasattr(self.metadata.Sample, 'elements'):
-            print('Elemental composition read from file')
             self.add_elements(self.metadata.Sample.elements)
         self.metadata.Signal.binned = True
 
@@ -118,7 +117,6 @@ class EELSSpectrum(Spectrum):
             start_energy = 0.
         end_energy = Eaxis[-1]
         for element in self.elements:
-            e_shells = list()
             for shell in elements_db[element][
                     'Atomic_properties']['Binding_energies']:
                 if shell[-1] != 'a':
@@ -128,10 +126,8 @@ class EELSSpectrum(Spectrum):
                             <= end_energy:
                         subshell = '%s_%s' % (element, shell)
                         if subshell not in self.subshells:
-                            print "Adding %s subshell" % subshell
                             self.subshells.add(
                                 '%s_%s' % (element, shell))
-                            e_shells.append(subshell)
 
     def estimate_zero_loss_peak_centre(self, mask=None):
         """Estimate the posision of the zero-loss peak.
@@ -1223,7 +1219,7 @@ class EELSSpectrum(Spectrum):
             return eps, output
 
     def create_model(self, low_loss=None, auto_background=True, auto_add_edges=True,
-                     GOS=None):
+                     GOS=None, dictionary=None):
         """Create a model for the current EELS data.
 
         Parameters
@@ -1247,6 +1243,8 @@ class EELSSpectrum(Spectrum):
             The generalized oscillation strenght calculations to use for the
             core-loss EELS edges. If None the Hartree-Slater GOS are used if
             available, otherwise it uses the hydrogenic GOS.
+        dictionary : dictionary, optional
+            The dictionary, generated using Model.to_dictionary()
 
         Returns
         -------
@@ -1256,6 +1254,7 @@ class EELSSpectrum(Spectrum):
         """
         from hyperspy.models.eelsmodel import EELSModel
         model = EELSModel(self,
+                          dictionary=dictionary,
                           low_loss=low_loss,
                           auto_background=auto_background,
                           auto_add_edges=auto_add_edges,

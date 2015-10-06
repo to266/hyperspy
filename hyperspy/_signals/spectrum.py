@@ -136,7 +136,7 @@ class Spectrum(Signal):
         sr.configure_traits()
         return sr
 
-    def create_model(self):
+    def create_model(self, dictionary=None):
         """Create a model for the current data.
 
         Returns
@@ -146,5 +146,5 @@ class Spectrum(Signal):
         """
 
         from hyperspy.model import Model
-        model = Model(self)
+        model = Model(self, dictionary=dictionary)
         return model
