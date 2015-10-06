@@ -25,6 +25,24 @@ from hyperspy.io import load
 from hyperspy.components import Gaussian, Lorentzian
 
 
+def assert_dict_equal(d1, d2):
+# the one from nose.tools does not work with arrays directly inside for
+# some reason...
+    d2_keys = d2.keys()
+    for k in d1.iterkeys():
+        try:
+            d2_keys.remove(k)
+        except ValueError:
+            return False
+    if len(d2_keys):
+        return False
+
+    # here we know all keys are the same
+    truths = [d2[k] == v for k, v in d1.iteritems()]
+    truths = [np.all(t) if isinstance(t, np.ndarray) else t for t in truths]
+    return np.all(truths)
+
+
 class TestModelStash:
 
     def setUp(self):
@@ -38,9 +56,11 @@ class TestModelStash:
         m = self.m
         m.stash.save()
         d = m.as_dictionary(True)
-        nt.assert_dict_equal(
+        nt.assert_true(assert_dict_equal(
+            # nt.assert_dict_equal( # this one does not work with arrays
+            # directly inside for some reason...
             d,
-            m.spectrum.metadata.Analysis.models.a._dict.as_dictionary())
+            m.spectrum.metadata.Analysis.models.a._dict.as_dictionary()))
         m.append(Lorentzian())
         m.stash.apply('a')
         nt.assert_equal(m[0].name, 'Gaussian')
@@ -160,6 +180,7 @@ class TestModelSaving:
 
     def test_save_and_load_model(self):
         m = self.m
+        m.channel_switches[:10] = False
         s = m.spectrum
         m.stash.save()
         s.save('tmp.hdf5')
@@ -169,6 +190,8 @@ class TestModelSaving:
         nt.assert_equal(len(n.stash), 1)
         n.stash.apply()
         nt.assert_equal(n.components.something.A.value, 13)
+        nt.assert_true(np.all(n.channel_switches[:10] == False))
+        nt.assert_true(np.all(n.channel_switches[10:] == True))
 
     def tearDown(self):
         remove('tmp.hdf5')
