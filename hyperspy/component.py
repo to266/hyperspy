@@ -136,6 +136,7 @@ class Parameter(t.HasTraits):
                            'ext_force_positive': None,
                            'twin_function': ('fn', None),
                            'twin_inverse_function': ('fn', None),
+                           '_number_of_elements': None,
                            }
 
     def _load_dictionary(self, dictionary):
@@ -1013,7 +1014,8 @@ class Component(t.HasTraits):
         """
         dic = {
             'parameters': [
-                p.as_dictionary(picklable) for p in self.parameters]}
+                p.as_dictionary(picklable) for p in self.parameters],
+            'active_is_multidimensional': self.active_is_multidimensional}
         export_to_dictionary(self, self._whitelist, dic, picklable)
         return dic
 
@@ -1043,6 +1045,10 @@ class Component(t.HasTraits):
 
         """
         if dic['_id_name'] == self._id_name:
+            if not dic['active_is_multidimensional'] == self.active_is_multidimensional:
+                self.active_is_multidimensional = dic[
+                    'active_is_multidimensional']
+            load_from_dictionary(self, dic)
             id_dict = {}
             for p in dic['parameters']:
                 idname = p['_id_name']
@@ -1053,7 +1059,6 @@ class Component(t.HasTraits):
                 else:
                     raise ValueError(
                         "_id_name of parameters in component and dictionary do not match")
-            load_from_dictionary(self, dic)
             return id_dict
         else:
             raise ValueError( "_id_name of component and dictionary do not match, \ncomponent._id_name = %s\
