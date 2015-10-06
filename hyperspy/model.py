@@ -21,6 +21,8 @@ import os
 import tempfile
 import warnings
 import numbers
+import math
+
 import numpy as np
 import scipy.odr as odr
 from scipy.optimize import (leastsq,
@@ -55,8 +57,8 @@ from hyperspy.misc.export_dictionary import (export_to_dictionary,
                                              parse_flag_string,
                                              reconstruct_object)
 from hyperspy.misc.utils import slugify, shorten_name
-from hyperspy.misc.slicing import copy_slice_from_whitelist
 from datetime import datetime
+from hyperspy.misc.slicing import copy_slice_from_whitelist
 
 
 class ModelStash(object):
@@ -258,6 +260,8 @@ class ModelStash(object):
             backup = preferences.Model.stash_save
         name = self._get_name(name)
         m = self._configure_metadata(False)
+        if m.get_item(name + '.dimensions') != self._model.axes_manager._get_dimension_str():
+            raise KeyError('The stash and spectrum dimensions do not match')
         d = m.get_item(name + '._dict').as_dictionary()
         if backup and len(self._model):
             self.save('backup')
@@ -448,13 +452,15 @@ class Model(list):
         return id(self)
 
     def __init__(self, spectrum, dictionary=None):
-
+        if dictionary is None:
+            dictionary = {}
         self._plot = None
         self._position_widgets = []
         self._adjust_position_all = None
         self._plot_components = False
         self._suspend_update = False
         self._model_line = None
+
         self._adjust_position_all = None
         self._plot_components = False
         self._whitelist = {
@@ -484,12 +490,14 @@ class Model(list):
         self.free_parameters_boundaries = None
         self._low_loss = None
         self.convolved = False
-	self.components = ModelComponents(self)
+        self.components = ModelComponents(self)
+
         if dictionary is not None:
             self._load_dictionary(dictionary)
+
+        self.stash = ModelStash(self)
         self.inav = ModelSpecialSlicers(self, True)
         self.isig = ModelSpecialSlicers(self, False)
-        self.stash = ModelStash(self)
 
     def _load_dictionary(self, dic):
         """Load data from dictionary.
@@ -497,6 +505,7 @@ class Model(list):
         Parameters
         ----------
         dic : dictionary
+            The dictionary can contain the following items:
             _whitelist : dictionary
                 a dictionary with keys used as references of  save attributes, for more information, see
                 :meth:`hyperspy.misc.export_dictionary.load_from_dictionary`
@@ -552,6 +561,16 @@ class Model(list):
 
     def insert(self, **kwargs):
         raise NotImplementedError
+
+    @property
+    def axes_manager(self):
+        return self._axes_manager
+
+    @axes_manager.setter
+    def axes_manager(self, value):
+        for component in self:
+            component._axes_manager = value
+        self._axes_manager = value
 
     @property
     def spectrum(self):
@@ -1365,6 +1384,15 @@ class Model(list):
             ' reduced chi-squared'
         return tmp
 
+    def _std_correlation_correction(self, std):
+        if ("Signal.Noise_properties."
+            "Variance_linear_model.correlation_factor" in
+                self.spectrum.metadata):
+            cf = self.spectrum.metadata.Signal.Noise_properties.\
+                Variance_linear_model.correlation_factor
+            std /= math.sqrt(cf)
+        return std
+
     def fit(self, fitter=None, method='ls', grad=False,
             bounded=False, ext_bounding=False, update_plot=False,
             **kwargs):
@@ -1506,6 +1534,7 @@ class Model(list):
                 pcov *= ((self._errfunc(self.p0, *args) ** 2).sum() /
                          (len(args[0]) - len(self.p0)))
                 self.p_std = np.sqrt(np.diag(pcov))
+                self.p_std = self._std_correlation_correction(self.p_std)
             self.fit_output = output
 
         elif fitter == "odr":
@@ -1520,6 +1549,7 @@ class Model(list):
             myoutput = myodr.run()
             result = myoutput.beta
             self.p_std = myoutput.sd_beta
+            self.p_std = self._std_correlation_correction(self.p_std)
             self.p0 = result
             self.fit_output = myoutput
 
@@ -1541,6 +1571,7 @@ class Model(list):
                 self.p_std = m.perror * np.sqrt(
                     (self._errfunc(self.p0, *args) ** 2).sum() /
                     (len(args[0]) - len(self.p0)))
+            self.p_std = self._std_correlation_correction(self.p_std)
             self.fit_output = m
         else:
             # General optimizers (incluiding constrained ones(tnc,l_bfgs_b)
@@ -1626,8 +1657,12 @@ class Model(list):
             self._connect_parameters2update_plot()
             self.update_plot()
 
-    def multifit(self, mask=None, fetch_only_fixed=False,
-                 autosave=False, autosave_every=10, show_progressbar=None,
+    def multifit(self,
+                 mask=None,
+                 fetch_only_fixed=False,
+                 autosave=False,
+                 autosave_every=10,
+                 show_progressbar=None,
                  **kwargs):
         """Fit the data to the model at all the positions of the
         navigation dimensions.
@@ -1785,7 +1820,7 @@ class Model(list):
 
         self.fetch_stored_values()
 
-    def plot(self, plot_components=False):
+    def plot(self, plot_components=False, **kwargs):
         """Plots the current spectrum to the screen and a map with a
         cursor to explore the SI.
 
@@ -1797,8 +1832,9 @@ class Model(list):
         """
 
         # If new coordinates are assigned
-        self.spectrum.plot()
+        self.spectrum.plot(**kwargs)
         _plot = self.spectrum._plot
+        _plot.axes_manager.connect(self.fetch_stored_values)
         l1 = _plot.signal_plot.ax_lines[0]
         color = l1.line.get_color()
         l1.set_line_properties(color=color, type='scatter')
@@ -1868,6 +1904,7 @@ class Model(list):
             self.disable_plot_components()
         self._disconnect_parameters2update_plot()
         self._model_line = None
+        self.axes_manager = self.spectrum.axes_manager
 
     def enable_plot_components(self):
         if self._plot is None or self._plot_components:
@@ -2114,7 +2151,7 @@ class Model(list):
         enable_adjust_position
 
         """
-        self._adjust_position_all = False
+        self._adjust_position_all = None
         while self._position_widgets:
             pw = self._position_widgets.pop()
             if hasattr(pw, 'component'):
@@ -2416,7 +2453,7 @@ class Model(list):
                 else:
                     _component._active_array.fill(value)
 
-    def __getitem__(self, value):
+    def __getitem__(self, value, not_components=False):
         """x.__getitem__(y) <==> x[y]"""
         if isinstance(value, basestring):
             component_list = []
@@ -2440,6 +2477,10 @@ class Model(list):
         else:
             return list.__getitem__(self, value)
 
+    def create_samfire(self, marker=None, workers=None):
+        from hyperspy.samfire import Samfire
+        return Samfire(self, marker=marker, workers=workers)
+
 
 class ModelSpecialSlicers:
 
@@ -2460,12 +2501,6 @@ class ModelSpecialSlicers:
             _model = _spectrum.create_model()
 
         dims = self.model.axes_manager.navigation_dimension, self.model.axes_manager.signal_dimension
-        if self.isNavigation:
-            _model.channel_switches[:] = self.model.channel_switches
-        else:
-            _model.channel_switches[:] = \
-                np.atleast_1d(
-                    self.model.channel_switches[tuple(array_slices[-dims[1]:])])
         from hyperspy import components
         for _ in xrange(len(_model)):
             _model.remove(0)
