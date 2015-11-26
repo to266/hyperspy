@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import math
 
 import numpy as np
@@ -28,7 +29,7 @@ sqrt2pi = np.sqrt(2 * np.pi)
 
 class Erf(Component):
 
-    """Error function component
+    u"""Error function component
 
     Attributes
     ----------
@@ -38,7 +39,7 @@ class Erf(Component):
     """
 
     def __init__(self):
-        Component.__init__(self, ['A', 'sigma', 'origin'])
+        Component.__init__(self, [u'A', u'sigma', u'origin'])
 
         # Boundaries
         self.A.bmin = 0.

@@ -1,4 +1,4 @@
-"""reST directive for syntax-highlighting ipython interactive sessions.
+u"""reST directive for syntax-highlighting ipython interactive sessions.
 
 XXX - See what improvements can be made based on the new (as of Sept 2009)
 'pycon' lexer for the python console.  At the very least it will give better
@@ -21,7 +21,7 @@ from sphinx import highlighting
 
 #-----------------------------------------------------------------------------
 # Global constants
-line_re = re.compile('.*?\n')
+line_re = re.compile(u'.*?\n')
 
 #-----------------------------------------------------------------------------
 # Code begins - classes and functions
@@ -29,7 +29,7 @@ line_re = re.compile('.*?\n')
 
 class IPythonConsoleLexer(Lexer):
 
-    """
+    u"""
     For IPython console output or doctests, such as:
 
     .. sourcecode:: ipython
@@ -51,26 +51,26 @@ class IPythonConsoleLexer(Lexer):
       - It assumes the default IPython prompts, not customized ones.
     """
 
-    name = 'IPython console session'
-    aliases = ['ipython']
-    mimetypes = ['text/x-ipython-console']
-    input_prompt = re.compile("(In \[[0-9]+\]: )|(   \.\.\.+:)")
-    output_prompt = re.compile("(Out\[[0-9]+\]: )|(   \.\.\.+:)")
-    continue_prompt = re.compile("   \.\.\.+:")
-    tb_start = re.compile("\-+")
+    name = u'IPython console session'
+    aliases = [u'ipython']
+    mimetypes = [u'text/x-ipython-console']
+    input_prompt = re.compile(u"(In \[[0-9]+\]: )|(   \.\.\.+:)")
+    output_prompt = re.compile(u"(Out\[[0-9]+\]: )|(   \.\.\.+:)")
+    continue_prompt = re.compile(u"   \.\.\.+:")
+    tb_start = re.compile(u"\-+")
 
     def get_tokens_unprocessed(self, text):
         pylexer = PythonLexer(**self.options)
         tblexer = PythonTracebackLexer(**self.options)
 
-        curcode = ''
+        curcode = u''
         insertions = []
         for match in line_re.finditer(text):
             line = match.group()
             input_prompt = self.input_prompt.match(line)
             continue_prompt = self.continue_prompt.match(line.rstrip())
             output_prompt = self.output_prompt.match(line)
-            if line.startswith("#"):
+            if line.startswith(u"#"):
                 insertions.append((len(curcode),
                                    [(0, Comment, line)]))
             elif input_prompt is not None:
@@ -93,7 +93,7 @@ class IPythonConsoleLexer(Lexer):
                     for item in do_insertions(insertions,
                                               pylexer.get_tokens_unprocessed(curcode)):
                         yield item
-                        curcode = ''
+                        curcode = u''
                         insertions = []
                 yield match.start(), Generic.Output, line
         if curcode:
@@ -103,7 +103,7 @@ class IPythonConsoleLexer(Lexer):
 
 
 def setup(app):
-    """Setup as a sphinx extension."""
+    u"""Setup as a sphinx extension."""
 
     # This is only a lexer, so adding it below to pygments appears sufficient.
     # But if somebody knows that the right API usage should be to do that via
@@ -113,4 +113,4 @@ def setup(app):
 
 #-----------------------------------------------------------------------------
 # Register the extension as a valid pygments lexer
-highlighting.lexers['ipython'] = IPythonConsoleLexer()
+highlighting.lexers[u'ipython'] = IPythonConsoleLexer()

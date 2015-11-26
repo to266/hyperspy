@@ -24,7 +24,7 @@ from nose.tools import (assert_true,
 from hyperspy.component import Parameter
 
 
-class Dummy:
+class Dummy(object):
 
     def __init__(self):
         self.value = 1
@@ -33,7 +33,7 @@ class Dummy:
         self.value += 1
 
 
-class DummyAxesManager:
+class DummyAxesManager(object):
     navigation_shape = ()
     indices = ()
 
@@ -42,7 +42,7 @@ class DummyAxesManager:
         return self.navigation_shape[::-1]
 
 
-class TestParameterLen1:
+class TestParameterLen1(object):
 
     def setUp(self):
         self.par = Parameter()
@@ -108,9 +108,9 @@ class TestParameterLen1:
         self.par.value = 1
         self.par.std = 0.1
         self.par.store_current_value_in_array()
-        assert_equal(self.par.map['values'][0], 1)
-        assert_true(self.par.map['is_set'][0])
-        assert_equal(self.par.map['std'][0], 0.1)
+        assert_equal(self.par.map[u'values'][0], 1)
+        assert_true(self.par.map[u'is_set'][0])
+        assert_equal(self.par.map[u'std'][0], 0.1)
 
     def test_map_size1(self):
         self.par._axes_manager = DummyAxesManager()
@@ -119,9 +119,9 @@ class TestParameterLen1:
         self.par.value = 1
         self.par.std = 0.1
         self.par.store_current_value_in_array()
-        assert_equal(self.par.map['values'][0], 1)
-        assert_true(self.par.map['is_set'][0])
-        assert_equal(self.par.map['std'][0], 0.1)
+        assert_equal(self.par.map[u'values'][0], 1)
+        assert_true(self.par.map[u'is_set'][0])
+        assert_equal(self.par.map[u'std'][0], 0.1)
 
     def test_map_size2(self):
         self.par._axes_manager = DummyAxesManager()
@@ -131,12 +131,12 @@ class TestParameterLen1:
         self.par.value = 1
         self.par.std = 0.1
         self.par.store_current_value_in_array()
-        assert_equal(self.par.map['values'][1], 1)
-        assert_true(self.par.map['is_set'][1])
-        assert_equal(self.par.map['std'][1], 0.1)
+        assert_equal(self.par.map[u'values'][1], 1)
+        assert_true(self.par.map[u'is_set'][1])
+        assert_equal(self.par.map[u'std'][1], 0.1)
 
 
-class TestParameterLen2:
+class TestParameterLen2(object):
 
     def setUp(self):
         self.par = Parameter()
@@ -198,9 +198,9 @@ class TestParameterLen2:
         self.par.value = (1, 1)
         self.par.std = (0.1, 0.1)
         self.par.store_current_value_in_array()
-        assert_equal(tuple(self.par.map['values'][0]), (1, 1))
-        assert_true(self.par.map['is_set'][0])
-        assert_equal(tuple(self.par.map['std'][0]), (0.1, 0.1))
+        assert_equal(tuple(self.par.map[u'values'][0]), (1, 1))
+        assert_true(self.par.map[u'is_set'][0])
+        assert_equal(tuple(self.par.map[u'std'][0]), (0.1, 0.1))
 
     def test_map_size1(self):
         self.par._axes_manager = DummyAxesManager()
@@ -209,9 +209,9 @@ class TestParameterLen2:
         self.par.value = (1, 1)
         self.par.std = (0.1, 0.1)
         self.par.store_current_value_in_array()
-        assert_equal(tuple(self.par.map['values'][0]), (1, 1))
-        assert_true(self.par.map['is_set'][0])
-        assert_equal(tuple(self.par.map['std'][0]), (0.1, 0.1))
+        assert_equal(tuple(self.par.map[u'values'][0]), (1, 1))
+        assert_true(self.par.map[u'is_set'][0])
+        assert_equal(tuple(self.par.map[u'std'][0]), (0.1, 0.1))
 
     def test_map_size2(self):
         self.par._axes_manager = DummyAxesManager()
@@ -221,9 +221,9 @@ class TestParameterLen2:
         self.par.value = (1, 1)
         self.par.std = (0.1, 0.1)
         self.par.store_current_value_in_array()
-        assert_equal(tuple(self.par.map['values'][1]), (1, 1))
-        assert_true(self.par.map['is_set'][1])
-        assert_equal(tuple(self.par.map['std'][1]), (0.1, 0.1))
+        assert_equal(tuple(self.par.map[u'values'][1]), (1, 1))
+        assert_true(self.par.map[u'is_set'][1])
+        assert_equal(tuple(self.par.map[u'std'][1]), (0.1, 0.1))
 
     def test_is_tuple(self):
         self.par.value = np.array((1, 2))
@@ -232,7 +232,7 @@ class TestParameterLen2:
         assert_true(isinstance(self.par.value, tuple))
 
 
-class TestParameterTwin:
+class TestParameterTwin(object):
 
     def setUp(self):
         self.p1 = Parameter()

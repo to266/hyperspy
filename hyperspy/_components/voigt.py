@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 import math
 
@@ -25,7 +26,7 @@ sqrt2pi = math.sqrt(2 * math.pi)
 
 
 def voigt(x, FWHM=1, gamma=1, center=0, scale=1):
-    """Voigt lineshape.
+    u"""Voigt lineshape.
 
     The voigt peak is the convolution of a Lorentz peak with a Gaussian peak.
 
@@ -64,7 +65,7 @@ def voigt(x, FWHM=1, gamma=1, center=0, scale=1):
 
 class Voigt(Component):
 
-    """Voigt profile component with support for shirley background,
+    u"""Voigt profile component with support for shirley background,
     non_isochromaticity,transmission_function corrections and spin orbit
     splitting specially suited for Photoemission spectroscopy data analysis.
 
@@ -90,14 +91,14 @@ class Voigt(Component):
 
     def __init__(self):
         Component.__init__(self, (
-            'area',
-            'centre',
-            'FWHM',
-            'gamma',
-            'resolution',
-            'shirley_background',
-            'non_isochromaticity',
-            'transmission_function'))
+            u'area',
+            u'centre',
+            u'FWHM',
+            u'gamma',
+            u'resolution',
+            u'shirley_background',
+            u'non_isochromaticity',
+            u'transmission_function'))
         self._position = self.centre
         self.FWHM.value = 1
         self.gamma.value = 0
@@ -145,7 +146,7 @@ class Voigt(Component):
             return f
 
     def estimate_parameters(self, signal, E1, E2, only_current=False):
-        """Estimate the voigt function by calculating the momenta the gaussian.
+        u"""Estimate the voigt function by calculating the momenta the gaussian.
 
         Parameters
         ----------
@@ -218,10 +219,10 @@ class Voigt(Component):
         else:
             if self.area.map is None:
                 self.create_arrays(signal.axes_manager.navigation_shape)
-            self.area.map['values'][:] = height * sigma * sqrt2pi
-            self.area.map['is_set'][:] = True
-            self.FWHM.map['values'][:] = sigma * 2.3548200450309493
-            self.FWHM.map['is_set'][:] = True
-            self.centre.map['values'][:] = center
-            self.centre.map['is_set'][:] = True
+            self.area.map[u'values'][:] = height * sigma * sqrt2pi
+            self.area.map[u'is_set'][:] = True
+            self.FWHM.map[u'values'][:] = sigma * 2.3548200450309493
+            self.FWHM.map[u'is_set'][:] = True
+            self.centre.map[u'values'][:] = center
+            self.centre.map[u'is_set'][:] = True
             return True

@@ -11,23 +11,23 @@ def test_xray_lines_near_energy():
     lines = get_xray_lines_near_energy(E)
     nose.tools.assert_list_equal(
         lines,
-        ['Pm_M2N4', 'Ho_Ma', 'Eu_Mg', 'Se_La', 'Br_Ln', 'W_Mz', 'As_Lb3',
-         'Kr_Ll', 'Ho_Mb', 'Ta_Mz', 'Dy_Mb', 'As_Lb1', 'Gd_Mg', 'Er_Ma',
-         'Sm_M2N4', 'Mg_Kb', 'Se_Lb1', 'Ge_Lb3', 'Br_Ll', 'Sm_Mg', 'Dy_Ma',
-         'Nd_M2N4', 'As_La', 'Re_Mz', 'Hf_Mz', 'Kr_Ln', 'Er_Mb', 'Tb_Mb'])
+        [u'Pm_M2N4', u'Ho_Ma', u'Eu_Mg', u'Se_La', u'Br_Ln', u'W_Mz', u'As_Lb3',
+         u'Kr_Ll', u'Ho_Mb', u'Ta_Mz', u'Dy_Mb', u'As_Lb1', u'Gd_Mg', u'Er_Ma',
+         u'Sm_M2N4', u'Mg_Kb', u'Se_Lb1', u'Ge_Lb3', u'Br_Ll', u'Sm_Mg', u'Dy_Ma',
+         u'Nd_M2N4', u'As_La', u'Re_Mz', u'Hf_Mz', u'Kr_Ln', u'Er_Mb', u'Tb_Mb'])
     lines = get_xray_lines_near_energy(E, 0.02)
-    nose.tools.assert_list_equal(lines, ['Pm_M2N4'])
+    nose.tools.assert_list_equal(lines, [u'Pm_M2N4'])
     E = 5.4
     lines = get_xray_lines_near_energy(E)
     nose.tools.assert_list_equal(
         lines,
-        ['Cr_Ka', 'La_Lb2', 'V_Kb', 'Pm_La', 'Pm_Ln', 'Ce_Lb3', 'Gd_Ll',
-         'Pr_Lb1', 'Xe_Lg3', 'Pr_Lb4'])
-    lines = get_xray_lines_near_energy(E, only_lines=('a', 'b'))
+        [u'Cr_Ka', u'La_Lb2', u'V_Kb', u'Pm_La', u'Pm_Ln', u'Ce_Lb3', u'Gd_Ll',
+         u'Pr_Lb1', u'Xe_Lg3', u'Pr_Lb4'])
+    lines = get_xray_lines_near_energy(E, only_lines=(u'a', u'b'))
     nose.tools.assert_list_equal(
         lines,
-        ['Cr_Ka', 'V_Kb', 'Pm_La', 'Pr_Lb1'])
-    lines = get_xray_lines_near_energy(E, only_lines=('a'))
+        [u'Cr_Ka', u'V_Kb', u'Pm_La', u'Pr_Lb1'])
+    lines = get_xray_lines_near_energy(E, only_lines=(u'a'))
     nose.tools.assert_list_equal(
         lines,
-        ['Cr_Ka', 'Pm_La'])
+        [u'Cr_Ka', u'Pm_La'])

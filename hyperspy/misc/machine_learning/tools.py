@@ -1,8 +1,9 @@
+from __future__ import division
 import numpy as np
 
 
 def amari(C, A):
-    """Amari test for ICA
+    u"""Amari test for ICA
     Adapted from the MILCA package http://www.klab.caltech.edu/~kraskov/MILCA/
 
     Parameters
@@ -25,6 +26,6 @@ def amari(C, A):
 def _ntu(C):
     m, n = C.shape
     CN = C.copy() * 0
-    for t in range(n):
+    for t in xrange(n):
         CN[:, t] = C[:, t] / np.max(np.abs(C[:, t]))
     return CN

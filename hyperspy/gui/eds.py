@@ -25,56 +25,56 @@ class General(t.HasTraits):
     title = t.Str(t.Undefined)
     original_filename = t.File(t.Undefined)
     signal_kind = t.Str(t.Undefined)
-    record_by = t.Enum('spectrum', 'image', default=t.Undefined)
+    record_by = t.Enum(u'spectrum', u'image', default=t.Undefined)
 
 
 class SEMParametersUI(t.HasTraits):
 
     beam_energy = t.Float(t.Undefined,
-                          label='Beam energy (keV)')
+                          label=u'Beam energy (keV)')
     live_time = t.Float(t.Undefined,
-                        label='Live time (s)')
+                        label=u'Live time (s)')
     tilt_stage = t.Float(t.Undefined,
-                         label='Stage tilt (degree)')
+                         label=u'Stage tilt (degree)')
     azimuth_angle = t.Float(t.Undefined,
-                            label='Azimuth angle (degree)')
+                            label=u'Azimuth angle (degree)')
     elevation_angle = t.Float(t.Undefined,
-                              label='Elevation angle (degree)')
+                              label=u'Elevation angle (degree)')
     energy_resolution_MnKa = t.Float(t.Undefined,
-                                     label='Energy resolution MnKa (eV)')
+                                     label=u'Energy resolution MnKa (eV)')
 
     traits_view = tu.View(
-        tu.Group('beam_energy',
-                 'tilt_stage',
-                 label='SEM', show_border=True),
-        tu.Group('live_time', 'azimuth_angle',
-                 'elevation_angle', 'energy_resolution_MnKa',
-                 label='EDS', show_border=True),
-        kind='modal', buttons=[OKButton, CancelButton],
-        title='SEM parameters definition wizard')
+        tu.Group(u'beam_energy',
+                 u'tilt_stage',
+                 label=u'SEM', show_border=True),
+        tu.Group(u'live_time', u'azimuth_angle',
+                 u'elevation_angle', u'energy_resolution_MnKa',
+                 label=u'EDS', show_border=True),
+        kind=u'modal', buttons=[OKButton, CancelButton],
+        title=u'SEM parameters definition wizard')
 
 
 class TEMParametersUI(t.HasTraits):
 
     beam_energy = t.Float(t.Undefined,
-                          label='Beam energy (keV)')
+                          label=u'Beam energy (keV)')
     live_time = t.Float(t.Undefined,
-                        label='Live time (s)')
+                        label=u'Live time (s)')
     tilt_stage = t.Float(t.Undefined,
-                         label='Stage tilt (degree)')
+                         label=u'Stage tilt (degree)')
     azimuth_angle = t.Float(t.Undefined,
-                            label='Azimuth angle (degree)')
+                            label=u'Azimuth angle (degree)')
     elevation_angle = t.Float(t.Undefined,
-                              label='Elevation angle (degree)')
+                              label=u'Elevation angle (degree)')
     energy_resolution_MnKa = t.Float(t.Undefined,
-                                     label='Energy resolution MnKa (eV)')
+                                     label=u'Energy resolution MnKa (eV)')
 
     traits_view = tu.View(
-        tu.Group('beam_energy',
-                 'tilt_stage',
-                 label='TEM', show_border=True),
-        tu.Group('live_time', 'azimuth_angle',
-                 'elevation_angle', 'energy_resolution_MnKa',
-                 label='EDS', show_border=True),
-        kind='modal', buttons=[OKButton, CancelButton],
-        title='TEM parameters definition wizard')
+        tu.Group(u'beam_energy',
+                 u'tilt_stage',
+                 label=u'TEM', show_border=True),
+        tu.Group(u'live_time', u'azimuth_angle',
+                 u'elevation_angle', u'energy_resolution_MnKa',
+                 label=u'EDS', show_border=True),
+        kind=u'modal', buttons=[OKButton, CancelButton],
+        title=u'TEM parameters definition wizard')

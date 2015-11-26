@@ -17,6 +17,7 @@
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import division
 import numpy as np
 
 from hyperspy.component import Component
@@ -27,7 +28,7 @@ sqrt2pi = np.sqrt(2 * np.pi)
 
 class SEE(Component):
 
-    """Secondary electron emission component for Photoemission Spectroscopy
+    u"""Secondary electron emission component for Photoemission Spectroscopy
 
     Attributes
     ----------
@@ -40,7 +41,7 @@ class SEE(Component):
     """
 
     def __init__(self, A=1., Phi=1., B=0., sigma=0):
-        Component.__init__(self, ('A', 'Phi', 'B', 'sigma'))
+        Component.__init__(self, (u'A', u'Phi', u'B', u'sigma'))
         self.A.value, self.Phi.value, self.B.value, self.sigma.value = \
             A, Phi, B, sigma
 
@@ -64,10 +65,10 @@ class SEE(Component):
         self.gaussian.A.value = 1.
 
     def __repr__(self):
-        return 'SEE'
+        return u'SEE'
 
     def function(self, x):
-        """
+        u"""
         """
         if self.sigma.value:
             self.gaussian.sigma.value = self.sigma.value
@@ -80,7 +81,7 @@ class SEE(Component):
                         x - self.Phi.value) / (
                         x - self.Phi.value + self.B.value) ** 4,
                     0),
-                'same')
+                u'same')
         else:
             return np.where(x > self.Phi.value, self.A.value *
                             (x -
@@ -90,7 +91,7 @@ class SEE(Component):
                              self.B.value) ** 4, 0)
 
     def grad_A(self, x):
-        """
+        u"""
         """
         if self.sigma.value:
             self.gaussian.sigma.value = self.sigma.value
@@ -101,13 +102,13 @@ class SEE(Component):
                     x > self.Phi.value,
                     (x - self.Phi.value) /
                     (x - self.Phi.value + self.B.value) ** 4, 0),
-                'same')
+                u'same')
         else:
             return np.where(x > self.Phi.value, (x - self.Phi.value) /
                             (x - self.Phi.value + self.B.value) ** 4, 0)
 
     def grad_sigma(self, x):
-        """
+        u"""
         """
         self.gaussian.sigma.value = self.sigma.value
         self.gaussian.origin.value = (x[-1] + x[0]) / 2
@@ -117,10 +118,10 @@ class SEE(Component):
                 x > self.Phi.value,
                 self.A.value * (x - self.Phi.value) /
                 (x - self.Phi.value + self.B.value) ** 4, 0),
-            'same')
+            u'same')
 
     def grad_Phi(self, x):
-        """
+        u"""
         """
         if self.sigma.value:
             self.gaussian.sigma.value = self.sigma.value
@@ -133,7 +134,7 @@ class SEE(Component):
                     (self.B.value + x - self.Phi.value) ** 5 -
                     self.A.value / (self.B.value + x - self.Phi.value) ** 4,
                     0),
-                'same')
+                u'same')
         else:
             return np.where(
                 x > self.Phi.value,
@@ -151,7 +152,7 @@ class SEE(Component):
                     x > self.Phi.value,
                     -(4 * (x - self.Phi.value) * self.A.value) /
                     (self.B.value + x - self.Phi.value) ** 5, 0),
-                'same')
+                u'same')
         else:
             return np.where(
                 x > self.Phi.value,

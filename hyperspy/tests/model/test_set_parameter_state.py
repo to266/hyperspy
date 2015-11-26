@@ -23,7 +23,7 @@ from hyperspy._signals.spectrum import Spectrum
 from hyperspy.components import Gaussian
 
 
-class TestSetParameterInModel:
+class TestSetParameterInModel(object):
 
     def setUp(self):
         g1 = Gaussian()
@@ -88,7 +88,7 @@ class TestSetParameterInModel:
         g1 = self.g1
         g2 = self.g2
         g3 = self.g3
-        m.set_parameters_not_free(parameter_name_list=['A'])
+        m.set_parameters_not_free(parameter_name_list=[u'A'])
         assert_true(not g1.A.free)
         assert_true(g1.sigma.free)
         assert_true(g1.centre.free)
@@ -104,7 +104,7 @@ class TestSetParameterInModel:
         g1 = self.g1
         g2 = self.g2
         g3 = self.g3
-        m.set_parameters_not_free([g2], parameter_name_list=['A'])
+        m.set_parameters_not_free([g2], parameter_name_list=[u'A'])
         assert_true(g1.A.free)
         assert_true(g1.sigma.free)
         assert_true(g1.centre.free)
@@ -121,7 +121,7 @@ class TestSetParameterInModel:
         g2 = self.g2
         g3 = self.g3
         m.set_parameters_not_free()
-        m.set_parameters_free([g1], parameter_name_list=['centre'])
+        m.set_parameters_free([g1], parameter_name_list=[u'centre'])
         assert_true(not g1.A.free)
         assert_true(not g1.sigma.free)
         assert_true(g1.centre.free)

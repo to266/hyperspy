@@ -32,16 +32,16 @@ class MessageHandler(tu.Handler):
         return True
 
 information_view = tu.View(tu.Group(
-    tu.Item('text',
+    tu.Item(u'text',
             show_label=False,
-            style='readonly',
+            style=u'readonly',
             springy=True,
             width=300,
             padding=15),),
-    kind='modal',
+    kind=u'modal',
     buttons=[OKButton, CancelButton],
     handler=MessageHandler,
-    title='Message')
+    title=u'Message')
 
 
 class Message(t.HasTraits):
@@ -54,11 +54,11 @@ class Message(t.HasTraits):
 
 
 class Options(t.HasTraits):
-    options = t.Enum(('a'))
+    options = t.Enum((u'a'))
 
     def __init__(self, options=None):
         if not options:
-            options = ['a', 'b', 'c']
+            options = [u'a', u'b', u'c']
         self.options = options
 
 

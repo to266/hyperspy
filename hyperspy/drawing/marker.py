@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 
 class MarkerBase(object):
 
-    """Marker that can be added to the signal figure
+    u"""Marker that can be added to the signal figure
 
     Attributes
     ----------
@@ -65,7 +65,7 @@ class MarkerBase(object):
                 pass
 
     def set_marker_properties(self, **kwargs):
-        """
+        u"""
         Set the line_properties attribute using keyword
         arguments.
         """
@@ -73,7 +73,7 @@ class MarkerBase(object):
 
     def set_data(self, x1=None, y1=None,
                  x2=None, y2=None, text=None, size=None):
-        """
+        u"""
         Set data to the structured array. Each field of data should have
         the same dimensions than the nagivation axes. The other fields are
         overwritten.
@@ -81,13 +81,13 @@ class MarkerBase(object):
         self.data = np.array((np.array(x1), np.array(y1),
                               np.array(x2), np.array(y2),
                               np.array(text), np.array(size)),
-                             dtype=[('x1', object), ('y1', object),
-                                    ('x2', object), ('y2', object),
-                                    ('text', object), ('size', object)])
+                             dtype=[(u'x1', object), (u'y1', object),
+                                    (u'x2', object), (u'y2', object),
+                                    (u'text', object), (u'size', object)])
         self._is_marker_static()
 
     def add_data(self, **kwargs):
-        """
+        u"""
         Add data to the structured array. Each field of data should have
         the same dimensions than the nagivation axes. The other fields are
         not changed.
@@ -100,7 +100,7 @@ class MarkerBase(object):
         self._is_marker_static()
 
     def _is_marker_static(self):
-        isiterable = lambda obj: not isinstance(obj, (str, bytes)) and hasattr(obj, '__iter__')
+        isiterable = lambda obj: not isinstance(obj, (unicode, str)) and hasattr(obj, u'__iter__')
         test = [isiterable(self.data[key].item()[()]) is False
                        for key in self.data.dtype.names]
         if np.alltrue(test):
@@ -112,7 +112,7 @@ class MarkerBase(object):
         data = self.data
         if data[ind].item()[()] is None:
             return None
-        elif hasattr(data[ind].item()[()], "__iter__") and \
+        elif hasattr(data[ind].item()[()], u"__iter__") and \
                 self.auto_update:
             indices = self.axes_manager.indices[::-1]
             return data[ind].item()[indices]

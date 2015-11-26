@@ -22,7 +22,7 @@ import nose.tools
 import hyperspy.api as hs
 
 
-class Test_Estimate_Elastic_Scattering_Threshold:
+class Test_Estimate_Elastic_Scattering_Threshold(object):
 
     def setUp(self):
         # Create an empty spectrum
@@ -81,7 +81,7 @@ class Test_Estimate_Elastic_Scattering_Threshold:
         nose.tools.assert_true(np.all(np.isnan(data)))
 
 
-class TestEstimateZLPCentre:
+class TestEstimateZLPCentre(object):
 
     def setUp(self):
         s = hs.signals.EELSSpectrumSimulation(np.diag(np.arange(1, 11)))
@@ -100,7 +100,7 @@ class TestEstimateZLPCentre:
                     0.1)))
 
 
-class TestAlignZLP:
+class TestAlignZLP(object):
 
     def setUp(self):
         s = hs.signals.EELSSpectrumSimulation(np.zeros((10, 100)))
@@ -163,7 +163,7 @@ class TestAlignZLP:
         nose.tools.assert_true(np.allclose(zlp_max, 8))
 
 
-class TestPowerLawExtrapolation:
+class TestPowerLawExtrapolation(object):
 
     def setUp(self):
         s = hs.signals.EELSSpectrum(0.1 * np.arange(50, 250, 0.5) ** -3.)

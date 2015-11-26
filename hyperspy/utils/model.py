@@ -1,4 +1,4 @@
-"""Model functions.
+u"""Model functions.
 
 
 The :mod:`~hyperspy.api.model` module contains the following submodules:

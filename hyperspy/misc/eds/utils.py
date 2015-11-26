@@ -1,40 +1,38 @@
 
 
+from __future__ import division
 import numpy as np
 import math
 
 from hyperspy.misc.elements import elements as elements_db
-from functools import reduce
-
-
 def _get_element_and_line(Xray_line):
-    lim = Xray_line.find('_')
+    lim = Xray_line.find(u'_')
     return Xray_line[:lim], Xray_line[lim + 1:]
 
 
 def _get_energy_xray_line(xray_line):
     element, line = _get_element_and_line(xray_line)
-    return elements_db[element]['Atomic_properties']['Xray_lines'][
-        line]['energy (keV)']
+    return elements_db[element][u'Atomic_properties'][u'Xray_lines'][
+        line][u'energy (keV)']
 
 
 def _parse_only_lines(only_lines):
-    if hasattr(only_lines, '__iter__'):
-        if any(isinstance(line, str) is False for line in only_lines):
+    if hasattr(only_lines, u'__iter__'):
+        if any(isinstance(line, unicode) is False for line in only_lines):
             return only_lines
-    elif isinstance(only_lines, str) is False:
+    elif isinstance(only_lines, unicode) is False:
         return only_lines
     only_lines = list(only_lines)
     for only_line in only_lines:
-        if only_line == 'a':
-            only_lines.extend(['Ka', 'La', 'Ma'])
-        elif only_line == 'b':
-            only_lines.extend(['Kb', 'Lb1', 'Mb'])
+        if only_line == u'a':
+            only_lines.extend([u'Ka', u'La', u'Ma'])
+        elif only_line == u'b':
+            only_lines.extend([u'Kb', u'Lb1', u'Mb'])
     return only_lines
 
 
 def get_xray_lines_near_energy(energy, width=0.2, only_lines=None):
-    """Find xray lines near a specific energy, more specifically all xray lines
+    u"""Find xray lines near a specific energy, more specifically all xray lines
     that satisfy only_lines and are within the given energy window width around
     the passed energy.
 
@@ -58,23 +56,23 @@ def get_xray_lines_near_energy(energy, width=0.2, only_lines=None):
     for element, el_props in elements_db.items():
         # Not all elements in the DB have the keys, so catch KeyErrors
         try:
-            lines = el_props['Atomic_properties']['Xray_lines']
+            lines = el_props[u'Atomic_properties'][u'Xray_lines']
         except KeyError:
             continue
         for line, l_props in lines.items():
             if only_lines and line not in only_lines:
                 continue
-            line_energy = l_props['energy (keV)']
+            line_energy = l_props[u'energy (keV)']
             if E_min <= line_energy <= E_max:
                 # Store line in Element_Line format, and energy difference
-                valid_lines.append((element + "_" + line,
+                valid_lines.append((element + u"_" + line,
                                     np.abs(line_energy - energy)))
     # Sort by energy difference, but return only the line names
     return [line for line, _ in sorted(valid_lines, key=lambda x: x[1])]
 
 
 def get_FWHM_at_Energy(energy_resolution_MnKa, E):
-    """Calculates the FWHM of a peak at energy E.
+    u"""Calculates the FWHM of a peak at energy E.
 
     Parameters
     ----------
@@ -94,15 +92,15 @@ def get_FWHM_at_Energy(energy_resolution_MnKa, E):
 
     """
     FWHM_ref = energy_resolution_MnKa
-    E_ref = _get_energy_xray_line('Mn_Ka')
+    E_ref = _get_energy_xray_line(u'Mn_Ka')
 
     FWHM_e = 2.5 * (E - E_ref) * 1000 + FWHM_ref * FWHM_ref
 
     return math.sqrt(FWHM_e) / 1000  # In mrad
 
 
-def xray_range(xray_line, beam_energy, density='auto'):
-    """Return the Anderson-Hasler X-ray range.
+def xray_range(xray_line, beam_energy, density=u'auto'):
+    u"""Return the Anderson-Hasler X-ray range.
 
     Return the maximum range of X-ray generation in a pure bulk material.
 
@@ -142,19 +140,19 @@ def xray_range(xray_line, beam_energy, density='auto'):
     """
 
     element, line = _get_element_and_line(xray_line)
-    if density == 'auto':
+    if density == u'auto':
         density = elements_db[
             element][
-            'Physical_properties'][
-            'density (g/cm^3)']
+            u'Physical_properties'][
+            u'density (g/cm^3)']
     Xray_energy = _get_energy_xray_line(xray_line)
 
     return 0.064 / density * (np.power(beam_energy, 1.68) -
                               np.power(Xray_energy, 1.68))
 
 
-def electron_range(element, beam_energy, density='auto', tilt=0):
-    """Return the Kanaya-Okayama electron range.
+def electron_range(element, beam_energy, density=u'auto', tilt=0):
+    u"""Return the Kanaya-Okayama electron range.
 
     Return the maximum electron range in a pure bulk material.
 
@@ -189,11 +187,11 @@ def electron_range(element, beam_energy, density='auto', tilt=0):
 
     """
 
-    if density == 'auto':
+    if density == u'auto':
         density = elements_db[
-            element]['Physical_properties']['density (g/cm^3)']
-    Z = elements_db[element]['General_properties']['Z']
-    A = elements_db[element]['General_properties']['atomic_weight']
+            element][u'Physical_properties'][u'density (g/cm^3)']
+    Z = elements_db[element][u'General_properties'][u'Z']
+    A = elements_db[element][u'General_properties'][u'atomic_weight']
 
     return (0.0276 * A / np.power(Z, 0.89) / density *
             np.power(beam_energy, 1.67) * math.cos(math.radians(tilt)))
@@ -202,7 +200,7 @@ def electron_range(element, beam_energy, density='auto', tilt=0):
 def take_off_angle(tilt_stage,
                    azimuth_angle,
                    elevation_angle):
-    """Calculate the take-off-angle (TOA).
+    u"""Calculate the take-off-angle (TOA).
 
     TOA is the angle with which the X-rays leave the surface towards
     the detector.
@@ -246,7 +244,7 @@ def take_off_angle(tilt_stage,
 def quantification_cliff_lorimer(intensities,
                                  kfactors,
                                  mask=None):
-    """
+    u"""
     Quantification using Cliff-Lorimer
 
     Parameters
@@ -272,8 +270,8 @@ def quantification_cliff_lorimer(intensities,
     if len(dim) > 1:
         dim2 = reduce(lambda x, y: x * y, dim[1:])
         intens = intensities.reshape(dim[0], dim2)
-        intens = intens.astype('float')
-        for i in range(dim2):
+        intens = intens.astype(u'float')
+        for i in xrange(dim2):
             index = np.where(intens[:, i] > min_intensity)[0]
             if len(index) > 1:
                 ref_index, ref_index2 = index[:2]
@@ -285,7 +283,7 @@ def quantification_cliff_lorimer(intensities,
                     intens[index[0], i] = 1.
         intens = intens.reshape(dim)
         if mask is not None:
-            for i in range(dim[0]):
+            for i in xrange(dim[0]):
                 intens[i][mask] = 0
         return intens
     else:
@@ -307,7 +305,7 @@ def _quantification_cliff_lorimer(intensities,
                                   kfactors,
                                   ref_index=0,
                                   ref_index2=1):
-    """
+    u"""
     Quantification using Cliff-Lorimer
 
     Parameters
@@ -328,13 +326,13 @@ def _quantification_cliff_lorimer(intensities,
     shape as intensities.
     """
     if len(intensities) != len(kfactors):
-        raise ValueError('The number of kfactors must match the size of the '
-                         'first axis of intensities.')
-    ab = np.zeros_like(intensities, dtype='float')
-    composition = np.ones_like(intensities, dtype='float')
+        raise ValueError(u'The number of kfactors must match the size of the '
+                         u'first axis of intensities.')
+    ab = np.zeros_like(intensities, dtype=u'float')
+    composition = np.ones_like(intensities, dtype=u'float')
     # ab = Ia/Ib / kab
 
-    other_index = list(range(len(kfactors)))
+    other_index = range(len(kfactors))
     other_index.pop(ref_index)
     for i in other_index:
         ab[i] = intensities[ref_index] * kfactors[ref_index]  \

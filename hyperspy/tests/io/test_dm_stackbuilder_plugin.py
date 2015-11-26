@@ -25,12 +25,12 @@ from hyperspy.io import load
 my_path = os.path.dirname(__file__)
 
 
-class TestStackBuilder:
+class TestStackBuilder(object):
 
     def test_load_stackbuilder_imagestack(self):
         image_stack = load(
             my_path +
-            "/dm_stackbuilder_plugin/test_stackbuilder_imagestack.dm3")
+            u"/dm_stackbuilder_plugin/test_stackbuilder_imagestack.dm3")
         data_dimensions = image_stack.data.ndim
         am = image_stack.axes_manager
         axes_dimensions = am.signal_dimension + am.navigation_dimension

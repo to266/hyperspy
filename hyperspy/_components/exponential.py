@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 
 from hyperspy.component import Component
@@ -23,7 +24,7 @@ from hyperspy.component import Component
 
 class Exponential(Component):
 
-    """Exponentian function components
+    u"""Exponentian function components
 
     f(x) = A*e^{-x/k}
 
@@ -39,13 +40,13 @@ class Exponential(Component):
     """
 
     def __init__(self):
-        Component.__init__(self, ['A', 'tau'])
+        Component.__init__(self, [u'A', u'tau'])
         self.isbackground = False
         self.A.grad = self.grad_A
         self.tau.grad = self.grad_tau
 
     def function(self, x):
-        """
+        u"""
         """
         A = self.A.value
         tau = self.tau.value

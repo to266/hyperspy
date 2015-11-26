@@ -4,10 +4,11 @@ import numpy as np
 
 from hyperspy.signals import Spectrum, Image
 from hyperspy.misc.machine_learning.import_sklearn import sklearn_installed
+from itertools import izip
 
 
 def are_bss_components_equivalent(c1_list, c2_list, atol=1e-4):
-    """Check if two list of components are equivalent.
+    u"""Check if two list of components are equivalent.
 
     To be equivalent they must differ by a max of `atol` except
     for an arbitraty -1 factor.
@@ -33,7 +34,7 @@ def are_bss_components_equivalent(c1_list, c2_list, atol=1e-4):
     return matches == len(c1_list)
 
 
-class TestBSS1D:
+class TestBSS1D(object):
 
     def setUp(self):
         ics = np.random.laplace(size=(3, 1000))
@@ -46,11 +47,11 @@ class TestBSS1D:
         if not sklearn_installed:
             raise SkipTest
         self.s.blind_source_separation(
-            3, diff_order=0, fun="exp", on_loadings=False)
+            3, diff_order=0, fun=u"exp", on_loadings=False)
         s2 = self.s.as_spectrum(0)
         s2.decomposition()
         s2.blind_source_separation(
-            3, diff_order=0, fun="exp", on_loadings=True)
+            3, diff_order=0, fun=u"exp", on_loadings=True)
         nose.tools.assert_true(are_bss_components_equivalent(
             self.s.get_bss_factors(), s2.get_bss_loadings()))
 
@@ -61,7 +62,7 @@ class TestBSS1D:
         # It is designed to test if the mask is correctly dilated inside the
         # `blind_source_separation_method`. If the mask is not correctely
         # dilated the nan in the loadings should raise an error.
-        mask = self.s._get_signal_signal(dtype="bool")
+        mask = self.s._get_signal_signal(dtype=u"bool")
         mask.isig[5] = True
         self.s.learning_results.factors[5, :] = np.nan
         self.s.blind_source_separation(3, diff_order=0, mask=mask)
@@ -73,7 +74,7 @@ class TestBSS1D:
         # It is designed to test if the mask is correctly dilated inside the
         # `blind_source_separation_method`. If the mask is not correctely
         # dilated the nan in the loadings should raise an error.
-        mask = self.s._get_signal_signal(dtype="bool")
+        mask = self.s._get_signal_signal(dtype=u"bool")
         mask.isig[5] = True
         self.s.learning_results.factors[5, :] = np.nan
         self.s.blind_source_separation(3, diff_order=1, mask=mask)
@@ -85,7 +86,7 @@ class TestBSS1D:
         # It is designed to test if the mask is correctly dilated inside the
         # `blind_source_separation_method`. If the mask is not correctely
         # dilated the nan in the loadings should raise an error.
-        mask = self.s._get_navigation_signal(dtype="bool")
+        mask = self.s._get_navigation_signal(dtype=u"bool")
         mask.isig[5] = True
         self.s.learning_results.loadings[5, :] = np.nan
         self.s.blind_source_separation(3, diff_order=0, mask=mask,
@@ -98,21 +99,21 @@ class TestBSS1D:
         # It is designed to test if the mask is correctly dilated inside the
         # `blind_source_separation_method`. If the mask is not correctely
         # dilated the nan in the loadings should raise an error.
-        mask = self.s._get_navigation_signal(dtype="bool")
+        mask = self.s._get_navigation_signal(dtype=u"bool")
         mask.isig[5] = True
         self.s.learning_results.loadings[5, :] = np.nan
         self.s.blind_source_separation(3, diff_order=1, mask=mask,
                                        on_loadings=True)
 
 
-class TestBSS2D:
+class TestBSS2D(object):
 
     def setUp(self):
         ics = np.random.laplace(size=(3, 1024))
         np.random.seed(1)
         mixing_matrix = np.random.random((100, 3))
         s = Image(np.dot(mixing_matrix, ics).reshape((100, 32, 32)))
-        for (axis, name) in zip(s.axes_manager._axes, ("z", "y", "x")):
+        for (axis, name) in izip(s.axes_manager._axes, (u"z", u"y", u"x")):
             axis.name = name
         s.decomposition()
         self.s = s
@@ -120,20 +121,20 @@ class TestBSS2D:
     def test_diff_axes_string_with_mask(self):
         if not sklearn_installed:
             raise SkipTest
-        mask = self.s._get_signal_signal(dtype="bool")
+        mask = self.s._get_signal_signal(dtype=u"bool")
         mask.unfold()
         mask.isig[5] = True
         mask.fold()
         self.s.learning_results.factors[5, :] = np.nan
         factors = self.s.get_decomposition_factors().inav[:3]
         self.s.blind_source_separation(
-            3, diff_order=0, fun="exp", on_loadings=False,
-            factors=factors.diff(axis="x", order=1),
-            mask=mask.diff(axis="x", order=1))
+            3, diff_order=0, fun=u"exp", on_loadings=False,
+            factors=factors.diff(axis=u"x", order=1),
+            mask=mask.diff(axis=u"x", order=1))
         matrix = self.s.learning_results.unmixing_matrix.copy()
         self.s.blind_source_separation(
-            3, diff_order=1, fun="exp", on_loadings=False,
-            diff_axes=["x"], mask=mask
+            3, diff_order=1, fun=u"exp", on_loadings=False,
+            diff_axes=[u"x"], mask=mask
         )
         nose.tools.assert_true(
             np.allclose(matrix, self.s.learning_results.unmixing_matrix,
@@ -143,13 +144,13 @@ class TestBSS2D:
         if not sklearn_installed:
             raise SkipTest
         factors = self.s.get_decomposition_factors().inav[:3].diff(
-            axis="x", order=1)
+            axis=u"x", order=1)
         self.s.blind_source_separation(
-            3, diff_order=0, fun="exp", on_loadings=False, factors=factors)
+            3, diff_order=0, fun=u"exp", on_loadings=False, factors=factors)
         matrix = self.s.learning_results.unmixing_matrix.copy()
         self.s.blind_source_separation(
-            3, diff_order=1, fun="exp", on_loadings=False,
-            diff_axes=["x"],
+            3, diff_order=1, fun=u"exp", on_loadings=False,
+            diff_axes=[u"x"],
         )
         nose.tools.assert_true(
             np.allclose(matrix, self.s.learning_results.unmixing_matrix,
@@ -159,12 +160,12 @@ class TestBSS2D:
         if not sklearn_installed:
             raise SkipTest
         factors = self.s.get_decomposition_factors().inav[:3].diff(
-            axis="y", order=1)
+            axis=u"y", order=1)
         self.s.blind_source_separation(
-            3, diff_order=0, fun="exp", on_loadings=False, factors=factors)
+            3, diff_order=0, fun=u"exp", on_loadings=False, factors=factors)
         matrix = self.s.learning_results.unmixing_matrix.copy()
         self.s.blind_source_separation(
-            3, diff_order=1, fun="exp", on_loadings=False, diff_axes=[2],)
+            3, diff_order=1, fun=u"exp", on_loadings=False, diff_axes=[2],)
         nose.tools.assert_true(
             np.allclose(matrix, self.s.learning_results.unmixing_matrix,
                         atol=1e-3))
@@ -173,11 +174,11 @@ class TestBSS2D:
         if not sklearn_installed:
             raise SkipTest
         self.s.blind_source_separation(
-            3, diff_order=0, fun="exp", on_loadings=False)
+            3, diff_order=0, fun=u"exp", on_loadings=False)
         s2 = self.s.as_spectrum(0)
         s2.decomposition()
         s2.blind_source_separation(
-            3, diff_order=0, fun="exp", on_loadings=True)
+            3, diff_order=0, fun=u"exp", on_loadings=True)
         nose.tools.assert_true(are_bss_components_equivalent(
             self.s.get_bss_factors(), s2.get_bss_loadings()))
 
@@ -188,7 +189,7 @@ class TestBSS2D:
         # It is designed to test if the mask is correctly dilated inside the
         # `blind_source_separation_method`. If the mask is not correctely
         # dilated the nan in the loadings should raise an error.
-        mask = self.s._get_signal_signal(dtype="bool")
+        mask = self.s._get_signal_signal(dtype=u"bool")
         mask.unfold()
         mask.isig[5] = True
         mask.fold()
@@ -202,7 +203,7 @@ class TestBSS2D:
         # It is designed to test if the mask is correctly dilated inside the
         # `blind_source_separation_method`. If the mask is not correctely
         # dilated the nan in the loadings should raise an error.
-        mask = self.s._get_signal_signal(dtype="bool")
+        mask = self.s._get_signal_signal(dtype=u"bool")
         mask.unfold()
         mask.isig[5] = True
         mask.fold()
@@ -216,13 +217,13 @@ class TestBSS2D:
         # It is designed to test if the mask is correctly dilated inside the
         # `blind_source_separation_method`. If the mask is not correctely
         # dilated the nan in the loadings should raise an error.
-        mask = self.s._get_signal_signal(dtype="bool")
+        mask = self.s._get_signal_signal(dtype=u"bool")
         mask.unfold()
         mask.isig[5] = True
         mask.fold()
         self.s.learning_results.factors[5, :] = np.nan
         self.s.blind_source_separation(3, diff_order=1, mask=mask,
-                                       diff_axes=["x", ])
+                                       diff_axes=[u"x", ])
 
     def test_mask_diff_order_0_on_loadings(self):
         if not sklearn_installed:
@@ -231,7 +232,7 @@ class TestBSS2D:
         # It is designed to test if the mask is correctly dilated inside the
         # `blind_source_separation_method`. If the mask is not correctely
         # dilated the nan in the loadings should raise an error.
-        mask = self.s._get_navigation_signal(dtype="bool")
+        mask = self.s._get_navigation_signal(dtype=u"bool")
         mask.unfold()
         mask.isig[5] = True
         mask.fold()
@@ -248,7 +249,7 @@ class TestBSS2D:
         # dilated the nan in the loadings should raise an error.
         s = self.s.to_spectrum()
         s.decomposition()
-        mask = s._get_navigation_signal(dtype="bool")
+        mask = s._get_navigation_signal(dtype=u"bool")
         mask.unfold()
         mask.isig[5] = True
         mask.fold()
@@ -265,10 +266,10 @@ class TestBSS2D:
         # dilated the nan in the loadings should raise an error.
         s = self.s.to_spectrum()
         s.decomposition()
-        mask = s._get_navigation_signal(dtype="bool")
+        mask = s._get_navigation_signal(dtype=u"bool")
         mask.unfold()
         mask.isig[5] = True
         mask.fold()
         s.learning_results.loadings[5, :] = np.nan
         s.blind_source_separation(3, diff_order=1, mask=mask,
-                                  on_loadings=True, diff_axes=["x"])
+                                  on_loadings=True, diff_axes=[u"x"])

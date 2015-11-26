@@ -16,14 +16,16 @@
 # along with HyperSpy. If not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import division
 import numpy as np
 import nose.tools as nt
 from scipy.misc import lena
 
 import hyperspy.hspy as hs
+from itertools import izip
 
 
-class TestAlignTools:
+class TestAlignTools(object):
 
     def setUp(self):
         im = lena()
@@ -32,7 +34,7 @@ class TestAlignTools:
         self.scales = np.array((0.1, 0.3))
         self.offsets = np.array((-2, -3))
         izlp = []
-        for ax, offset, scale in zip(
+        for ax, offset, scale in izip(
                 s.axes_manager.signal_axes, self.offsets, self.scales):
             ax.scale = scale
             ax.offset = offset
@@ -42,7 +44,7 @@ class TestAlignTools:
                                  (2, 2), (5, 6), (-9, -9), (-9, -9), (-6, -9)])
         self.new_offsets = self.offsets - self.ishifts.min(0) * self.scales
         zlp_pos = self.ishifts + self.izlp
-        for i in range(10):
+        for i in xrange(10):
             slices = self.lena_offset - zlp_pos[i, ...]
             s.data[i, ...] = im[slices[0]:slices[0] + 100,
                                 slices[1]:slices[1] + 100]
@@ -59,8 +61,8 @@ class TestAlignTools:
     def test_estimate_shift(self):
         s = self.spectrum
         shifts = s.estimate_shift2D()
-        print(shifts)
-        print(self.ishifts)
+        print shifts
+        print self.ishifts
         nt.assert_true(np.allclose(shifts, self.ishifts))
 
     def test_align(self):

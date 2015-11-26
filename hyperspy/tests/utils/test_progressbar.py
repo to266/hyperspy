@@ -21,19 +21,19 @@ import nose.tools as nt
 from hyperspy.external import progressbar
 
 
-class TestProgressBar:
+class TestProgressBar(object):
 
     def setUp(self):
         pass
 
     def test_progressbar_not_shown(self):
         pbar = progressbar.progressbar(maxval=2, disabled=True)
-        for i in range(2):
+        for i in xrange(2):
             pbar.update(i)
         pbar.finish()
 
     def test_progressbar_shown(self):
         pbar = progressbar.progressbar(maxval=2, disabled=False)
-        for i in range(2):
+        for i in xrange(2):
             pbar.update(i)
         pbar.finish()

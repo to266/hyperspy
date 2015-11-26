@@ -7,7 +7,7 @@ import numpy as np
 from hyperspy.axes import DataAxis
 
 
-class TestDataAxis:
+class TestDataAxis(object):
 
     def setUp(self):
         self.axis = DataAxis(size=10, scale=0.1, offset=10)

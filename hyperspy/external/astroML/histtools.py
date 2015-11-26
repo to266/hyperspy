@@ -1,6 +1,7 @@
-"""
+u"""
 Tools for working with distributions
 """
+from __future__ import division
 import numpy as np
 from hyperspy.external.astroML.bayesian_blocks import bayesian_blocks
 from scipy.special import gammaln
@@ -8,7 +9,7 @@ from scipy import optimize
 
 
 def scotts_bin_width(data, return_bins=False):
-    r"""Return the optimal histogram bin width using Scott's rule:
+    ur"""Return the optimal histogram bin width using Scott's rule:
 
     Parameters
     ----------
@@ -42,7 +43,7 @@ def scotts_bin_width(data, return_bins=False):
     """
     data = np.asarray(data)
     if data.ndim != 1:
-        raise ValueError("data should be one-dimensional")
+        raise ValueError(u"data should be one-dimensional")
 
     n = data.size
     sigma = np.std(data)
@@ -59,7 +60,7 @@ def scotts_bin_width(data, return_bins=False):
 
 
 def freedman_bin_width(data, return_bins=False):
-    r"""Return the optimal histogram bin width using the Freedman-Diaconis rule
+    ur"""Return the optimal histogram bin width using the Freedman-Diaconis rule
 
     Parameters
     ----------
@@ -93,11 +94,11 @@ def freedman_bin_width(data, return_bins=False):
     """
     data = np.asarray(data)
     if data.ndim != 1:
-        raise ValueError("data should be one-dimensional")
+        raise ValueError(u"data should be one-dimensional")
 
     n = data.size
     if n < 4:
-        raise ValueError("data should have more than three entries")
+        raise ValueError(u"data should have more than three entries")
 
     dsorted = np.sort(data)
     v25 = dsorted[n / 4 - 1]
@@ -116,7 +117,7 @@ def freedman_bin_width(data, return_bins=False):
 
 class KnuthF(object):
 
-    r"""Class which implements the function minimized by knuth_bin_width
+    ur"""Class which implements the function minimized by knuth_bin_width
 
     Parameters
     ----------
@@ -145,19 +146,19 @@ class KnuthF(object):
     def __init__(self, data):
         self.data = np.array(data, copy=True)
         if self.data.ndim != 1:
-            raise ValueError("data should be 1-dimensional")
+            raise ValueError(u"data should be 1-dimensional")
         self.data.sort()
         self.n = self.data.size
 
     def bins(self, M):
-        """Return the bin edges given a width dx"""
+        u"""Return the bin edges given a width dx"""
         return np.linspace(self.data[0], self.data[-1], int(M) + 1)
 
     def __call__(self, M):
         return self.eval(M)
 
     def eval(self, M):
-        """Evaluate the Knuth function
+        u"""Evaluate the Knuth function
 
         Parameters
         ----------
@@ -182,7 +183,7 @@ class KnuthF(object):
 
 
 def knuth_bin_width(data, return_bins=False):
-    r"""Return the optimal histogram bin width using Knuth's rule [1]_
+    ur"""Return the optimal histogram bin width using Knuth's rule [1]_
 
     Parameters
     ----------
@@ -236,7 +237,7 @@ def knuth_bin_width(data, return_bins=False):
 
 
 def histogram(a, bins=10, range=None, **kwargs):
-    """Enhanced histogram
+    u"""Enhanced histogram
 
     This is a histogram function that enables the use of more sophisticated
     algorithms for determining bins.  Aside from the `bins` argument allowing
@@ -278,19 +279,19 @@ def histogram(a, bins=10, range=None, **kwargs):
 
     # if range is specified, we need to truncate the data for
     # the bin-finding routines
-    if (range is not None and (bins in ['blocks', 'knuth',
-                                        'scotts', 'freedman'])):
+    if (range is not None and (bins in [u'blocks', u'knuth',
+                                        u'scotts', u'freedman'])):
         a = a[(a >= range[0]) & (a <= range[1])]
 
-    if bins == 'blocks':
+    if bins == u'blocks':
         bins = bayesian_blocks(a)
-    elif bins == 'knuth':
+    elif bins == u'knuth':
         da, bins = knuth_bin_width(a, True)
-    elif bins == 'scotts':
+    elif bins == u'scotts':
         da, bins = scotts_bin_width(a, True)
-    elif bins == 'freedman':
+    elif bins == u'freedman':
         da, bins = freedman_bin_width(a, True)
-    elif isinstance(bins, str):
-        raise ValueError("unrecognized bin code: '%s'" % bins)
+    elif isinstance(bins, unicode):
+        raise ValueError(u"unrecognized bin code: '%s'" % bins)
 
     return np.histogram(a, bins, range, **kwargs)

@@ -4,7 +4,7 @@ import traitsui.api as tui
 
 
 def navigation_sliders(data_axes, title=None):
-    """Raises a windows with sliders to control the index of DataAxis
+    u"""Raises a windows with sliders to control the index of DataAxis
 
     Parameters
     ----------
@@ -18,16 +18,16 @@ def navigation_sliders(data_axes, title=None):
     nav = NavigationSliders()
     view_tuple = ()
     for axis in data_axes:
-        name = str(axis).replace(" ", "_")
+        name = unicode(axis).replace(u" ", u"_")
         nav.add_class_trait(name, axis)
         nav.trait_set([name, axis])
         view_tuple += (
             tui.Item(name,
-                     style="custom",
+                     style=u"custom",
                      editor=tui.InstanceEditor(
                          view=tui.View(
                              tui.Item(
-                                 "index",
+                                 u"index",
                                  show_label=False,
                                  # The following is commented out
                                  # due to a traits ui bug
@@ -38,7 +38,7 @@ def navigation_sliders(data_axes, title=None):
                      ),
         )
 
-    view = tui.View(tui.VSplit(view_tuple), title="Navigation sliders"
+    view = tui.View(tui.VSplit(view_tuple), title=u"Navigation sliders"
                     if title is None
                     else title)
 
@@ -48,44 +48,44 @@ def navigation_sliders(data_axes, title=None):
 data_axis_view = tui.View(
     tui.Group(
         tui.Group(
-            tui.Item(name='name'),
-            tui.Item(name='size', style='readonly'),
-            tui.Item(name='index_in_array', style='readonly'),
-            tui.Item(name='index'),
-            tui.Item(name='value', style='readonly'),
-            tui.Item(name='units'),
-            tui.Item(name='navigate', label='navigate'),
+            tui.Item(name=u'name'),
+            tui.Item(name=u'size', style=u'readonly'),
+            tui.Item(name=u'index_in_array', style=u'readonly'),
+            tui.Item(name=u'index'),
+            tui.Item(name=u'value', style=u'readonly'),
+            tui.Item(name=u'units'),
+            tui.Item(name=u'navigate', label=u'navigate'),
             show_border=True,),
         tui.Group(
-            tui.Item(name='scale'),
-            tui.Item(name='offset'),
-            label='Calibration',
+            tui.Item(name=u'scale'),
+            tui.Item(name=u'offset'),
+            label=u'Calibration',
             show_border=True,),
-        label="Data Axis properties",
+        label=u"Data Axis properties",
         show_border=True,),
-    title='Axis configuration',)
+    title=u'Axis configuration',)
 
 
-def get_axis_group(n, label=''):
+def get_axis_group(n, label=u''):
     group = tui.Group(
         tui.Group(
-            tui.Item('axis%i.name' % n),
-            tui.Item('axis%i.size' % n, style='readonly'),
-            tui.Item('axis%i.index_in_array' % n, style='readonly'),
-            tui.Item('axis%i.low_index' % n, style='readonly'),
-            tui.Item('axis%i.high_index' % n, style='readonly'),
+            tui.Item(u'axis%i.name' % n),
+            tui.Item(u'axis%i.size' % n, style=u'readonly'),
+            tui.Item(u'axis%i.index_in_array' % n, style=u'readonly'),
+            tui.Item(u'axis%i.low_index' % n, style=u'readonly'),
+            tui.Item(u'axis%i.high_index' % n, style=u'readonly'),
             # The style of the index is chosen to be readonly because of
             # a bug in Traits 4.0.0 when using context with a Range traits
             # where the limits are defined by another traits_view
-            tui.Item('axis%i.index' % n, style='readonly'),
-            tui.Item('axis%i.value' % n, style='readonly'),
-            tui.Item('axis%i.units' % n),
-            tui.Item('axis%i.navigate' % n, label='slice'),
+            tui.Item(u'axis%i.index' % n, style=u'readonly'),
+            tui.Item(u'axis%i.value' % n, style=u'readonly'),
+            tui.Item(u'axis%i.units' % n),
+            tui.Item(u'axis%i.navigate' % n, label=u'slice'),
             show_border=True,),
         tui.Group(
-            tui.Item('axis%i.scale' % n),
-            tui.Item('axis%i.offset' % n),
-            label='Calibration',
+            tui.Item(u'axis%i.scale' % n),
+            tui.Item(u'axis%i.offset' % n),
+            label=u'Calibration',
             show_border=True,),
         label=label,
         show_border=True,)

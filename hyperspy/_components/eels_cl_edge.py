@@ -17,6 +17,7 @@
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import division
 import math
 
 import numpy as np
@@ -32,7 +33,7 @@ from hyperspy.misc.eels.effective_angle import effective_angle
 
 class EELSCLEdge(Component):
 
-    """EELS core loss ionisation edge from hydrogenic or tabulated
+    u"""EELS core loss ionisation edge from hydrogenic or tabulated
     Hartree-Slater GOS with splines for fine structure fitting.
 
     Hydrogenic GOS are limited to K and L shells.
@@ -88,16 +89,16 @@ class EELSCLEdge(Component):
     def __init__(self, element_subshell, GOS=None):
         # Declare the parameters
         Component.__init__(self,
-                           ['intensity',
-                            'fine_structure_coeff',
-                            'effective_angle',
-                            'onset_energy'])
+                           [u'intensity',
+                            u'fine_structure_coeff',
+                            u'effective_angle',
+                            u'onset_energy'])
         if isinstance(element_subshell, dict):
-            self.element = element_subshell['element']
-            self.subshell = element_subshell['subshell']
+            self.element = element_subshell[u'element']
+            self.subshell = element_subshell[u'subshell']
         else:
-            self.element, self.subshell = element_subshell.split('_')
-        self.name = "_".join([self.element, self.subshell])
+            self.element, self.subshell = element_subshell.split(u'_')
+        self.name = u"_".join([self.element, self.subshell])
         self.energy_scale = None
         self.effective_angle.free = False
         self.fine_structure_active = preferences.EELS.fine_structure_active
@@ -108,21 +109,21 @@ class EELSCLEdge(Component):
         if GOS is None:
             try:
                 self.GOS = HartreeSlaterGOS(element_subshell)
-                GOS = 'Hartree-Slater'
+                GOS = u'Hartree-Slater'
             except IOError:
-                GOS = 'hydrogenic'
+                GOS = u'hydrogenic'
                 messages.information(
-                    'Hartree-Slater GOS not available. '
-                    'Using hydrogenic GOS')
+                    u'Hartree-Slater GOS not available. '
+                    u'Using hydrogenic GOS')
         if self.GOS is None:
-            if GOS == 'Hartree-Slater':
+            if GOS == u'Hartree-Slater':
                 self.GOS = HartreeSlaterGOS(element_subshell)
-            elif GOS == 'hydrogenic':
+            elif GOS == u'hydrogenic':
                 self.GOS = HydrogenicGOS(element_subshell)
             else:
                 raise ValueError(
-                    'gos must be one of: None, \'hydrogenic\''
-                    ' or \'Hartree-Slater\'')
+                    u'gos must be one of: None, \'hydrogenic\''
+                    u' or \'Hartree-Slater\'')
         self.onset_energy.value = self.GOS.onset_energy
         self.onset_energy.free = False
         self._position = self.onset_energy
@@ -132,16 +133,16 @@ class EELSCLEdge(Component):
         self.intensity.bmin = 0.
         self.intensity.bmax = None
 
-        self._whitelist['GOS'] = ('init', GOS)
-        if GOS == 'Hartree-Slater':
-            self._whitelist['element_subshell'] = (
-                'init',
+        self._whitelist[u'GOS'] = (u'init', GOS)
+        if GOS == u'Hartree-Slater':
+            self._whitelist[u'element_subshell'] = (
+                u'init',
                 self.GOS.as_dictionary(True))
-        elif GOS == 'hydrogenic':
-            self._whitelist['element_subshell'] = ('init', element_subshell)
-        self._whitelist['fine_structure_active'] = None
-        self._whitelist['fine_structure_width'] = None
-        self._whitelist['fine_structure_smoothing'] = None
+        elif GOS == u'hydrogenic':
+            self._whitelist[u'element_subshell'] = (u'init', element_subshell)
+        self._whitelist[u'fine_structure_active'] = None
+        self._whitelist[u'fine_structure_width'] = None
+        self._whitelist[u'fine_structure_smoothing'] = None
 
     # Automatically fix the fine structure when the fine structure is
     # disable.
@@ -211,7 +212,7 @@ class EELSCLEdge(Component):
 
     @property
     def fine_structure_smoothing(self):
-        """Controls the level of the smoothing of the fine structure.
+        u"""Controls the level of the smoothing of the fine structure.
 
         It must a real number between 0 and 1. The higher close to 0
         the higher the smoothing.
@@ -226,7 +227,7 @@ class EELSCLEdge(Component):
             self._set_fine_structure_coeff()
         else:
             raise ValueError(
-                "The value must be a number between 0 and 1")
+                u"The value must be a number between 0 and 1")
 
     # It is needed because the property cannot be used to sort the edges
     def _onset_energy(self):
@@ -246,7 +247,7 @@ class EELSCLEdge(Component):
             self.fine_structure_coeff._create_array()
 
     def set_microscope_parameters(self, E0, alpha, beta, energy_scale):
-        """
+        u"""
         Parameters
         ----------
         E0 : float
@@ -298,7 +299,7 @@ class EELSCLEdge(Component):
             [stop] * 4]
 
     def function(self, E):
-        """Returns the number of counts in barns
+        u"""Returns the number of counts in barns
 
         """
         Emax = self.GOS.energy_axis[-1] + self.GOS.energy_shift
@@ -323,8 +324,8 @@ class EELSCLEdge(Component):
         return self.function(E) / self.intensity.value
 
     def fine_structure_coeff_to_txt(self, filename):
-        np.savetxt(filename + '.dat', self.fine_structure_coeff.value,
-                   fmt="%12.6G")
+        np.savetxt(filename + u'.dat', self.fine_structure_coeff.value,
+                   fmt=u"%12.6G")
 
     def txt_to_fine_structure_coeff(self, filename):
         fs = np.loadtxt(filename)
@@ -333,11 +334,11 @@ class EELSCLEdge(Component):
             self.fine_structure_coeff.value = fs
         else:
             messages.warning_exit(
-                "The provided fine structure file "
-                "doesn't match the size of the current fine structure")
+                u"The provided fine structure file "
+                u"doesn't match the size of the current fine structure")
 
     def get_fine_structure_as_spectrum(self):
-        """Returns a spectrum containing the fine structure.
+        u"""Returns a spectrum containing the fine structure.
 
         Notes
         -----
@@ -367,6 +368,6 @@ class EELSCLEdge(Component):
         self.fetch_stored_values()
 
         s.metadata.General.title = self.name.replace(
-            '_', ' ') + ' fine structure'
+            u'_', u' ') + u' fine structure'
 
         return s

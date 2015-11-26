@@ -1,3 +1,4 @@
+from __future__ import division
 try:
     from collections import OrderedDict
     ordict = True
@@ -9,7 +10,7 @@ import numpy as np
 
 
 def get_array_memory_size_in_GiB(shape, dtype):
-    """Given the size and dtype returns the amount of memory that such
+    u"""Given the size and dtype returns the amount of memory that such
     an array needs to allocate
 
     Parameters
@@ -18,13 +19,13 @@ def get_array_memory_size_in_GiB(shape, dtype):
     dtype : data-type
         The desired data-type for the array.
     """
-    if isinstance(dtype, str):
+    if isinstance(dtype, unicode):
         dtype = np.dtype(dtype)
     return np.array(shape).cumprod()[-1] * dtype.itemsize / 2. ** 30
 
 
 def are_aligned(shape1, shape2):
-    """Check if two numpy arrays are aligned.
+    u"""Check if two numpy arrays are aligned.
 
     Parameters
     ----------
@@ -50,7 +51,7 @@ def are_aligned(shape1, shape2):
 
 
 def homogenize_ndim(*args):
-    """Given any number of arrays returns the same arrays
+    u"""Given any number of arrays returns the same arrays
     reshaped by adding facing dimensions of size 1.
 
     """
@@ -62,7 +63,7 @@ def homogenize_ndim(*args):
 
 
 def rebin(a, new_shape):
-    """Rebin array.
+    u"""Rebin array.
 
     rebin ndarray data into a smaller ndarray of the same rank whose dimensions
     are factors of the original dimensions. eg. An array with 6 columns and 4
@@ -91,14 +92,14 @@ def rebin(a, new_shape):
     shape = a.shape
     lenShape = len(shape)
     factor = np.asarray(shape) / np.asarray(new_shape)
-    evList = ['a.reshape('] + \
-             ['new_shape[%d],factor[%d],' % (i, i) for i in range(lenShape)] + \
-             [')'] + ['.sum(%d)' % (i + 1) for i in range(lenShape)]
-    return eval(''.join(evList))
+    evList = [u'a.reshape('] + \
+             [u'new_shape[%d],factor[%d],' % (i, i) for i in xrange(lenShape)] + \
+             [u')'] + [u'.sum(%d)' % (i + 1) for i in xrange(lenShape)]
+    return eval(u''.join(evList))
 
 
 def sarray2dict(sarray, dictionary=None):
-    """Converts a struct array to an ordered dictionary
+    u"""Converts a struct array to an ordered dictionary
 
     Parameters
     ----------
@@ -116,10 +117,9 @@ def sarray2dict(sarray, dictionary=None):
         if ordict:
             dictionary = OrderedDict()
         else:
-            print("\nWARNING:")
-            print("sarray2dict")
-            print(
-                "OrderedDict is not available, using a standard dictionary.\n")
+            print u"\nWARNING:"
+            print u"sarray2dict"
+            print u"OrderedDict is not available, using a standard dictionary.\n"
             dictionary = {}
     for name in sarray.dtype.names:
         dictionary[name] = sarray[name][0] if len(sarray[name]) == 1 \

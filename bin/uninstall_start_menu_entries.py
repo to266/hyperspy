@@ -28,7 +28,7 @@ import shutil
 def get_special_folder_path(path_name):
     from win32com.shell import shellcon
 
-    for maybe in """
+    for maybe in u"""
         CSIDL_COMMON_STARTMENU CSIDL_STARTMENU CSIDL_COMMON_APPDATA
         CSIDL_LOCAL_APPDATA CSIDL_APPDATA CSIDL_COMMON_DESKTOPDIRECTORY
         CSIDL_DESKTOPDIRECTORY CSIDL_COMMON_STARTUP CSIDL_STARTUP
@@ -37,7 +37,7 @@ def get_special_folder_path(path_name):
         if maybe == path_name:
             csidl = getattr(shellcon, maybe)
             return shell.SHGetSpecialFolderPath(0, csidl, False)
-    raise ValueError("%s is an unknown path ID" % (path_name,))
+    raise ValueError(u"%s is an unknown path ID" % (path_name,))
 
 
 def admin_rights():
@@ -45,27 +45,27 @@ def admin_rights():
 
 
 def uninstall_start_menu_entries():
-    commons_sm = get_special_folder_path("CSIDL_COMMON_STARTMENU")
+    commons_sm = get_special_folder_path(u"CSIDL_COMMON_STARTMENU")
     start_menu = commons_sm
 
     # Remove the start menu entry
     if sys.getwindowsversion()[0] < 6.:  # Older than Windows Vista:
-        hspy_sm_path = os.path.join(start_menu, "Programs", "HyperSpy")
+        hspy_sm_path = os.path.join(start_menu, u"Programs", u"HyperSpy")
     else:
-        hspy_sm_path = os.path.join(start_menu, "Programs", "HyperSpy")
+        hspy_sm_path = os.path.join(start_menu, u"Programs", u"HyperSpy")
     if os.path.isdir(hspy_sm_path):
         try:
             shutil.rmtree(hspy_sm_path)
-            print("HyperSpy Start Menu entries uninstalled correctly")
+            print u"HyperSpy Start Menu entries uninstalled correctly"
         except:
             # Sometimes we get a permission error
-            print("Something has gone wrong. Start menu entries were not removed.")
+            print u"Something has gone wrong. Start menu entries were not removed."
             pass
 
 
-if __name__ == "__main__":
+if __name__ == u"__main__":
     if admin_rights() is True:
         uninstall_start_menu_entries()
     else:
-        print("To remove start menu entries, run this script "
-              "with administrator rights")
+        print u"To remove start menu entries, run this script "
+              u"with administrator rights"

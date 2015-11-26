@@ -21,7 +21,7 @@ from hyperspy.drawing.marker import MarkerBase
 
 class Text(MarkerBase):
 
-    """Text marker that can be added to the signal figure
+    u"""Text marker that can be added to the signal figure
 
     Parameters
     ---------
@@ -53,7 +53,7 @@ class Text(MarkerBase):
 
     def __init__(self, x, y, text, **kwargs):
         MarkerBase.__init__(self)
-        lp = {'color': 'black'}
+        lp = {u'color': u'black'}
         self.marker_properties = lp
         self.set_data(x1=x, y1=y, text=text)
         self.set_marker_properties(**kwargs)
@@ -61,19 +61,19 @@ class Text(MarkerBase):
     def update(self):
         if self.auto_update is False:
             return
-        self.marker.set_position([self.get_data_position('x1'),
-                                  self.get_data_position('y1')])
-        self.marker.set_text(self.get_data_position('text'))
+        self.marker.set_position([self.get_data_position(u'x1'),
+                                  self.get_data_position(u'y1')])
+        self.marker.set_text(self.get_data_position(u'text'))
 
     def plot(self):
         if self.ax is None:
             raise AttributeError(
-                "To use this method the marker needs to be first add to a " +
-                "figure using `s._plot.signal_plot.add_marker(m)` or " +
-                "`s._plot.navigator_plot.add_marker(m)`")
+                u"To use this method the marker needs to be first add to a " +
+                u"figure using `s._plot.signal_plot.add_marker(m)` or " +
+                u"`s._plot.navigator_plot.add_marker(m)`")
         self.marker = self.ax.text(
-            self.get_data_position('x1'), self.get_data_position('y1'),
-            self.get_data_position('text'), **self.marker_properties)
+            self.get_data_position(u'x1'), self.get_data_position(u'y1'),
+            self.get_data_position(u'text'), **self.marker_properties)
         self.marker.set_animated(True)
         try:
             self.ax.hspy_fig._draw_animated()

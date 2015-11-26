@@ -54,7 +54,7 @@ def test_eds_sem_binned_default():
     nose.tools.assert_true(s.metadata.Signal.binned)
 
 
-class TestModelBinned:
+class TestModelBinned(object):
 
     def setUp(self):
         s = hs.signals.Spectrum([1])

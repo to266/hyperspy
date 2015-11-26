@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 
 from hyperspy.component import Component
@@ -23,7 +24,7 @@ from hyperspy.component import Component
 
 class VolumePlasmonDrude(Component):
 
-    """Drude volume plasmon energy loss function component
+    u"""Drude volume plasmon energy loss function component
 
     .. math::
 
@@ -51,8 +52,8 @@ class VolumePlasmonDrude(Component):
     """
 
     def __init__(self):
-        Component.__init__(self, ['intensity', 'plasmon_energy',
-                                  'fwhm'])
+        Component.__init__(self, [u'intensity', u'plasmon_energy',
+                                  u'fwhm'])
         self._position = self.plasmon_energy
         self.intensity.value = 1
         self.plasmon_energy.value = 7.1

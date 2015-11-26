@@ -24,10 +24,10 @@ from hyperspy.misc.eels.tools import eels_constant
 import hyperspy.api as hs
 
 
-class Test2D:
+class Test2D(object):
 
     def setUp(self):
-        """To test the kramers_kronig_analysis we will generate 3
+        u"""To test the kramers_kronig_analysis we will generate 3
         EELSSpectrum instances. First a model energy loss function(ELF),
         in our case following the Drude bulk plasmon peak. Second, we
         simulate the inelastic scattering to generate a model scattering
@@ -54,14 +54,14 @@ class Test2D:
         vpm = VolumePlasmonDrude()
         m = s.create_model(auto_background=False)
         m.append(vpm)
-        vpm.intensity.map['values'][:] = 1
-        vpm.plasmon_energy.map['values'] = np.array([[8., 18.4, 15.8],
+        vpm.intensity.map[u'values'][:] = 1
+        vpm.plasmon_energy.map[u'values'] = np.array([[8., 18.4, 15.8],
                                                      [16.6, 4.3, 3.7]])
-        vpm.fwhm.map['values'] = np.array([[2.3, 4.8, 0.53],
+        vpm.fwhm.map[u'values'] = np.array([[2.3, 4.8, 0.53],
                                            [3.7, 0.3, 0.3]])
-        vpm.intensity.map['is_set'][:] = True
-        vpm.plasmon_energy.map['is_set'][:] = True
-        vpm.fwhm.map['is_set'][:] = True
+        vpm.intensity.map[u'is_set'][:] = True
+        vpm.plasmon_energy.map[u'is_set'][:] = True
+        vpm.fwhm.map[u'is_set'][:] = True
         s.data = (m.as_signal(show_progressbar=None) * k).data
 
         # Create ZLP
@@ -80,7 +80,7 @@ class Test2D:
         self.zlp = z
 
     def test_df_given_n(self):
-        """The kramers kronig analysis method applied to the signal we
+        u"""The kramers kronig analysis method applied to the signal we
         have just designed above will return the CDF for the Drude bulk
         plasmon. Hopefully, we recover the signal by inverting the CDF.
 
@@ -95,7 +95,7 @@ class Test2D:
                                            rtol=0.01))
 
     def test_df_given_thickness(self):
-        """The kramers kronig analysis method applied to the signal we
+        u"""The kramers kronig analysis method applied to the signal we
         have just designed above will return the CDF for the Drude bulk
         plasmon. Hopefully, we recover the signal by inverting the CDF.
 
@@ -124,7 +124,7 @@ class Test2D:
                                   [3.64866394, 0.15693674, 0.11146413]])))
 
     def test_thickness_estimation(self):
-        """Kramers kronig analysis gives a rough estimation of sample
+        u"""Kramers kronig analysis gives a rough estimation of sample
         thickness. As we have predefined sample thickness for our
         scattering distribution, we can use it for testing putposes.
 
@@ -136,7 +136,7 @@ class Test2D:
         nose.tools.assert_true(
             np.allclose(
                 self.thickness.data,
-                output['thickness'].data,
+                output[u'thickness'].data,
                 rtol=0.01))
 
     @nose.tools.raises(ValueError)

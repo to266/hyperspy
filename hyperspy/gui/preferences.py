@@ -8,34 +8,34 @@ class PreferencesHandler(tui.Handler):
         info.object.save()
         return True
 preferences_view = tui.View(
-    tui.Group(tui.Item('General', style='custom', show_label=False, ),
-              label='General'),
-    tui.Group(tui.Item('Model', style='custom', show_label=False, ),
-              label='Model'),
-    tui.Group(tui.Item('EELS', style='custom', show_label=False, ),
-              label='EELS'),
-    tui.Group(tui.Item('EDS', style='custom', show_label=False, ),
-              label='EDS'),
-    tui.Group(tui.Item('MachineLearning', style='custom',
+    tui.Group(tui.Item(u'General', style=u'custom', show_label=False, ),
+              label=u'General'),
+    tui.Group(tui.Item(u'Model', style=u'custom', show_label=False, ),
+              label=u'Model'),
+    tui.Group(tui.Item(u'EELS', style=u'custom', show_label=False, ),
+              label=u'EELS'),
+    tui.Group(tui.Item(u'EDS', style=u'custom', show_label=False, ),
+              label=u'EDS'),
+    tui.Group(tui.Item(u'MachineLearning', style=u'custom',
                        show_label=False,),
-              label='Machine Learning'),
-    tui.Group(tui.Item('Plot', style='custom', show_label=False, ),
-              label='Plot'),
-    title='Preferences',
+              label=u'Machine Learning'),
+    tui.Group(tui.Item(u'Plot', style=u'custom', show_label=False, ),
+              label=u'Plot'),
+    title=u'Preferences',
     handler=PreferencesHandler,)
 
 eels_view = tui.View(
     tui.Group(
-        'synchronize_cl_with_ll',
-        label='General'),
+        u'synchronize_cl_with_ll',
+        label=u'General'),
     tui.Group(
-        'eels_gos_files_path',
-        'preedge_safe_window_width',
+        u'eels_gos_files_path',
+        u'preedge_safe_window_width',
         tui.Group(
-            'fine_structure_width',
-            'fine_structure_active',
-            'fine_structure_smoothing',
-            'min_distance_between_edges_for_fine_structure',
-            label='Fine structure'),
-        label='Model')
+            u'fine_structure_width',
+            u'fine_structure_active',
+            u'fine_structure_smoothing',
+            u'min_distance_between_edges_for_fine_structure',
+            label=u'Fine structure'),
+        label=u'Model')
 )

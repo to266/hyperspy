@@ -17,6 +17,7 @@
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import division
 import numpy as np
 
 from hyperspy.component import Component
@@ -24,7 +25,7 @@ from hyperspy.component import Component
 
 class Logistic(Component):
 
-    """Logistic function component
+    u"""Logistic function component
 
     f(x) = a/(1+b*exp(-c*(x-origin)))
 
@@ -39,7 +40,7 @@ class Logistic(Component):
 
     def __init__(self):
         # Define the parameters
-        Component.__init__(self, ('a', 'b', 'c', 'origin'))
+        Component.__init__(self, (u'a', u'b', u'c', u'origin'))
         # Define the name of the component
         self.a.grad = self.grad_a
         self.b.grad = self.grad_b
@@ -48,7 +49,7 @@ class Logistic(Component):
         self._position = self.origin
 
     def function(self, x):
-        """
+        u"""
         """
         a = self.a.value
         b = self.b.value
@@ -57,7 +58,7 @@ class Logistic(Component):
         return a / (1 + b * np.exp(-c * (x - origin)))
 
     def grad_a(self, x):
-        """
+        u"""
         Returns d(function)/d(parameter_1)
         """
         b = self.b.value
@@ -67,7 +68,7 @@ class Logistic(Component):
         return 1 / (1 + b * np.exp(-c * (x - origin)))
 
     def grad_b(self, x):
-        """
+        u"""
         Returns d(function)/d(parameter_1)
         """
         a = self.a.value
@@ -79,7 +80,7 @@ class Logistic(Component):
             (b * np.exp(-c * (x - origin)) + 1) ** 2
 
     def grad_c(self, x):
-        """
+        u"""
         Returns d(function)/d(parameter_1)
         """
         a = self.a.value
@@ -91,7 +92,7 @@ class Logistic(Component):
             (b * np.exp(-c * (x - origin)) + 1) ** 2
 
     def grad_origin(self, x):
-        """
+        u"""
         Returns d(function)/d(parameter_1)
         """
         a = self.a.value

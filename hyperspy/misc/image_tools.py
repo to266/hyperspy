@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 import scipy as sp
 from scipy.fftpack import fftn, ifftn
@@ -33,7 +34,7 @@ def shift_image(im, shift, fill_value=np.nan):
 
 
 def triu_indices_minus_diag(n):
-    """Returns the indices for the upper-triangle of an (n, n) array
+    u"""Returns the indices for the upper-triangle of an (n, n) array
     excluding its diagonal
 
     Parameters
@@ -48,7 +49,7 @@ def triu_indices_minus_diag(n):
 
 
 def hanning2d(M, N):
-    """
+    u"""
     A 2D hanning window created by outer product.
     """
     return np.outer(np.hanning(M), np.hanning(N))
@@ -62,7 +63,7 @@ def sobel_filter(im):
 
 
 def fft_correlation(in1, in2, normalize=False):
-    """Correlation of two N-dimensional arrays using FFT.
+    u"""Correlation of two N-dimensional arrays using FFT.
 
     Adapted from scipy's fftconvolve.
 
@@ -90,8 +91,8 @@ def fft_correlation(in1, in2, normalize=False):
 
 def estimate_image_shift(ref, image, roi=None, sobel=True,
                          medfilter=True, hanning=True, plot=False,
-                         dtype='float', normalize_corr=False,):
-    """Estimate the shift in a image using phase correlation
+                         dtype=u'float', normalize_corr=False,):
+    u"""Estimate the shift in a image using phase correlation
 
     This method can only estimate the shift by comparing
     bidimensional features that should not change the position
@@ -175,9 +176,9 @@ def estimate_image_shift(ref, image, roi=None, sobel=True,
         axarr[0].imshow(ref)
         axarr[1].imshow(image)
         axarr[2].imshow(phase_correlation)
-        axarr[0].set_title('Reference')
-        axarr[1].set_title('Image')
-        axarr[2].set_title('Phase correlation')
+        axarr[0].set_title(u'Reference')
+        axarr[1].set_title(u'Image')
+        axarr[2].set_title(u'Phase correlation')
         plt.show()
     # Liberate the memory. It is specially necessary if it is a
     # memory map
@@ -188,7 +189,7 @@ def estimate_image_shift(ref, image, roi=None, sobel=True,
 
 
 def contrast_stretching(data, saturated_pixels):
-    """Calculate bounds that leaves out a given percentage of the data.
+    u"""Calculate bounds that leaves out a given percentage of the data.
 
     Parameters
     ----------
@@ -211,7 +212,7 @@ def contrast_stretching(data, saturated_pixels):
     # Sanity check
     if not 0 <= saturated_pixels <= 100:
         raise ValueError(
-            "saturated_pixels must be a scalar in the range[0, 100]")
+            u"saturated_pixels must be a scalar in the range[0, 100]")
     nans = np.isnan(data)
     if nans.any():
         data = data[~nans]
@@ -220,24 +221,24 @@ def contrast_stretching(data, saturated_pixels):
     return vmin, vmax
 
 MPL_DIVERGING_COLORMAPS = [
-    "BrBG",
-    "bwr",
-    "coolwarm",
-    "PiYG",
-    "PRGn",
-    "PuOr",
-    "RdBu",
-    "RdGy",
-    "RdYIBu",
-    "RdYIGn",
-    "seismic",
-    "Spectral", ]
+    u"BrBG",
+    u"bwr",
+    u"coolwarm",
+    u"PiYG",
+    u"PRGn",
+    u"PuOr",
+    u"RdBu",
+    u"RdGy",
+    u"RdYIBu",
+    u"RdYIGn",
+    u"seismic",
+    u"Spectral", ]
 # Add reversed colormaps
-MPL_DIVERGING_COLORMAPS += [cmap + "_r" for cmap in MPL_DIVERGING_COLORMAPS]
+MPL_DIVERGING_COLORMAPS += [cmap + u"_r" for cmap in MPL_DIVERGING_COLORMAPS]
 
 
 def centre_colormap_values(vmin, vmax):
-    """Calculate vmin and vmax to set the colormap midpoint to zero.
+    u"""Calculate vmin and vmax to set the colormap midpoint to zero.
 
     Parameters
     ----------

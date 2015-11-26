@@ -17,6 +17,7 @@
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import with_statement
 from distutils.core import setup
 
 import distutils.dir_util
@@ -27,83 +28,84 @@ import sys
 import fileinput
 
 import hyperspy.Release as Release
+from io import open
 # clean the build directory so we aren't mixing Windows and Linux
 # installations carelessly.
-if os.path.exists('build'):
-    distutils.dir_util.remove_tree('build')
+if os.path.exists(u'build'):
+    distutils.dir_util.remove_tree(u'build')
 
-install_req = ['scipy',
-               'ipython (>= 2.0)',
-               'matplotlib (>= 1.2)',
-               'numpy',
-               'traits',
-               'traitsui',
-               'sympy']
+install_req = [u'scipy',
+               u'ipython (>= 2.0)',
+               u'matplotlib (>= 1.2)',
+               u'numpy',
+               u'traits',
+               u'traitsui',
+               u'sympy']
 
 
 def are_we_building4windows():
     for arg in sys.argv:
-        if 'wininst' in arg:
+        if u'wininst' in arg:
             return True
 
-scripts = ['bin/hyperspy', ]
+scripts = [u'bin/hyperspy', ]
 
-if are_we_building4windows() or os.name in ['nt', 'dos']:
+if are_we_building4windows() or os.name in [u'nt', u'dos']:
     # In the Windows command prompt we can't execute Python scripts
     # without a .py extension. A solution is to create batch files
     # that runs the different scripts.
     # (code adapted from scitools)
-    scripts.extend(('bin/win_post_installation.py',
-                    'bin/install_hyperspy_here.py',
-                    'bin/uninstall_hyperspy_here.py'))
+    scripts.extend((u'bin/win_post_installation.py',
+                    u'bin/install_hyperspy_here.py',
+                    u'bin/uninstall_hyperspy_here.py'))
     batch_files = []
     for script in scripts:
-        batch_file = os.path.splitext(script)[0] + '.bat'
-        f = open(batch_file, "w")
-        f.write('set path=%~dp0;%~dp0\..\;%PATH%\n')
-        f.write('python "%%~dp0\%s" %%*\n' % os.path.split(script)[1])
+        batch_file = os.path.splitext(script)[0] + u'.bat'
+        f = open(batch_file, u"w")
+        f.write(u'set path=%~dp0;%~dp0\..\;%PATH%\n')
+        f.write(u'python "%%~dp0\%s" %%*\n' % os.path.split(script)[1])
         f.close()
         batch_files.append(batch_file)
-        if script in ('bin/hyperspy'):
-            for env in ('qtconsole', 'notebook'):
-                batch_file = os.path.splitext(script)[0] + '_%s' % env + '.bat'
-                f = open(batch_file, "w")
-                f.write('set path=%~dp0;%~dp0\..\;%PATH%\n')
-                f.write('cd %1\n')
-                if env == "qtconsole":
-                    f.write('start pythonw "%%~dp0\%s " %s \n' % (
+        if script in (u'bin/hyperspy'):
+            for env in (u'qtconsole', u'notebook'):
+                batch_file = os.path.splitext(script)[0] + u'_%s' % env + u'.bat'
+                f = open(batch_file, u"w")
+                f.write(u'set path=%~dp0;%~dp0\..\;%PATH%\n')
+                f.write(u'cd %1\n')
+                if env == u"qtconsole":
+                    f.write(u'start pythonw "%%~dp0\%s " %s \n' % (
                         os.path.split(script)[1], env))
                 else:
-                    f.write('python "%%~dp0\%s" %s \n' %
+                    f.write(u'python "%%~dp0\%s" %s \n' %
                             (os.path.split(script)[1], env))
 
                 batch_files.append(batch_file)
     scripts.extend(batch_files)
 
 
-class update_version_when_dev:
+class update_version_when_dev(object):
 
     def __enter__(self):
         self.release_version = Release.version
 
         # Get the hash from the git repository if available
         self.restore_version = False
-        git_master_path = ".git/refs/heads/master"
-        if "+dev" in self.release_version and \
+        git_master_path = u".git/refs/heads/master"
+        if u"+dev" in self.release_version and \
                 os.path.isfile(git_master_path):
             try:
-                p = subprocess.Popen(["git", "describe",
-                                      "--tags", "--dirty", "--always"],
+                p = subprocess.Popen([u"git", u"describe",
+                                      u"--tags", u"--dirty", u"--always"],
                                      stdout=subprocess.PIPE)
                 stdout = p.communicate()[0]
                 if p.returncode != 0:
                     raise EnvironmentError
                 else:
                     version = stdout[1:].strip().decode()
-                    if str(self.release_version[:-4] + '-') in version:
+                    if unicode(self.release_version[:-4] + u'-') in version:
                         version = version.replace(
-                            self.release_version[:-4] + '-',
-                            self.release_version[:-4] + '+git')
+                            self.release_version[:-4] + u'-',
+                            self.release_version[:-4] + u'+git')
                     self.version = version
             except EnvironmentError:
                 # Git is not available, but the .git directory exists
@@ -111,13 +113,13 @@ class update_version_when_dev:
                 with open(git_master_path) as f:
                     masterhash = f.readline()
                 self.version = self.release_version.replace(
-                    "+dev", "+git-%s" % masterhash[:7])
-            for line in fileinput.FileInput("hyperspy/Release.py",
+                    u"+dev", u"+git-%s" % masterhash[:7])
+            for line in fileinput.FileInput(u"hyperspy/Release.py",
                                             inplace=1):
-                if line.startswith('version = '):
-                    print("version = \"%s\"" % self.version)
+                if line.startswith(u'version = '):
+                    print u"version = \"%s\"" % self.version
                 else:
-                    print(line, end=' ')
+                    print line,
             self.restore_version = True
         else:
             self.version = self.release_version
@@ -125,93 +127,93 @@ class update_version_when_dev:
 
     def __exit__(self, type, value, traceback):
         if self.restore_version is True:
-            for line in fileinput.FileInput("hyperspy/Release.py",
+            for line in fileinput.FileInput(u"hyperspy/Release.py",
                                             inplace=1):
-                if line.startswith('version = '):
-                    print("version = \"%s\"" % self.release_version)
+                if line.startswith(u'version = '):
+                    print u"version = \"%s\"" % self.release_version
                 else:
-                    print(line, end=' ')
+                    print line,
 
 
 with update_version_when_dev() as version:
     setup(
-        name="hyperspy",
-        package_dir={'hyperspy': 'hyperspy'},
+        name=u"hyperspy",
+        package_dir={u'hyperspy': u'hyperspy'},
         version=version,
-        packages=['hyperspy',
-                  'hyperspy._components',
-                  'hyperspy.datasets',
-                  'hyperspy.io_plugins',
-                  'hyperspy.docstrings',
-                  'hyperspy.drawing',
-                  'hyperspy.drawing._markers',
-                  'hyperspy.learn',
-                  'hyperspy._signals',
-                  'hyperspy.gui',
-                  'hyperspy.utils',
-                  'hyperspy.tests',
-                  'hyperspy.tests.axes',
-                  'hyperspy.tests.component',
-                  'hyperspy.tests.drawing',
-                  'hyperspy.tests.io',
-                  'hyperspy.tests.model',
-                  'hyperspy.tests.mva',
-                  'hyperspy.tests.signal',
-                  'hyperspy.tests.utils',
-                  'hyperspy.tests.misc',
-                  'hyperspy.models',
-                  'hyperspy.misc',
-                  'hyperspy.misc.eels',
-                  'hyperspy.misc.eds',
-                  'hyperspy.misc.io',
-                  'hyperspy.misc.machine_learning',
-                  'hyperspy.external',
-                  'hyperspy.external.mpfit',
-                  'hyperspy.external.mpfit.tests',
-                  'hyperspy.external.astroML',
+        packages=[u'hyperspy',
+                  u'hyperspy._components',
+                  u'hyperspy.datasets',
+                  u'hyperspy.io_plugins',
+                  u'hyperspy.docstrings',
+                  u'hyperspy.drawing',
+                  u'hyperspy.drawing._markers',
+                  u'hyperspy.learn',
+                  u'hyperspy._signals',
+                  u'hyperspy.gui',
+                  u'hyperspy.utils',
+                  u'hyperspy.tests',
+                  u'hyperspy.tests.axes',
+                  u'hyperspy.tests.component',
+                  u'hyperspy.tests.drawing',
+                  u'hyperspy.tests.io',
+                  u'hyperspy.tests.model',
+                  u'hyperspy.tests.mva',
+                  u'hyperspy.tests.signal',
+                  u'hyperspy.tests.utils',
+                  u'hyperspy.tests.misc',
+                  u'hyperspy.models',
+                  u'hyperspy.misc',
+                  u'hyperspy.misc.eels',
+                  u'hyperspy.misc.eds',
+                  u'hyperspy.misc.io',
+                  u'hyperspy.misc.machine_learning',
+                  u'hyperspy.external',
+                  u'hyperspy.external.mpfit',
+                  u'hyperspy.external.mpfit.tests',
+                  u'hyperspy.external.astroML',
                   ],
         requires=install_req,
         scripts=scripts,
         package_data={
-            'hyperspy':
-            ['bin/*.py',
-             'ipython_profile/*',
-             'data/*.ico',
-             'misc/eds/example_signals/*.hdf5',
-             'tests/io/dm_stackbuilder_plugin/test_stackbuilder_imagestack.dm3',
-             'tests/io/dm3_1D_data/*.dm3',
-             'tests/io/dm3_2D_data/*.dm3',
-             'tests/io/dm3_3D_data/*.dm3',
-             'tests/io/dm4_1D_data/*.dm4',
-             'tests/io/dm4_2D_data/*.dm4',
-             'tests/io/dm4_3D_data/*.dm4',
-             'tests/io/msa_files/*.msa',
-             'tests/io/hdf5_files/*.hdf5',
-             'tests/io/tiff_files/*.tif',
-             'tests/io/npy_files/*.npy',
-             'tests/drawing/*.ipynb',
+            u'hyperspy':
+            [u'bin/*.py',
+             u'ipython_profile/*',
+             u'data/*.ico',
+             u'misc/eds/example_signals/*.hdf5',
+             u'tests/io/dm_stackbuilder_plugin/test_stackbuilder_imagestack.dm3',
+             u'tests/io/dm3_1D_data/*.dm3',
+             u'tests/io/dm3_2D_data/*.dm3',
+             u'tests/io/dm3_3D_data/*.dm3',
+             u'tests/io/dm4_1D_data/*.dm4',
+             u'tests/io/dm4_2D_data/*.dm4',
+             u'tests/io/dm4_3D_data/*.dm4',
+             u'tests/io/msa_files/*.msa',
+             u'tests/io/hdf5_files/*.hdf5',
+             u'tests/io/tiff_files/*.tif',
+             u'tests/io/npy_files/*.npy',
+             u'tests/drawing/*.ipynb',
              ],
         },
-        author=Release.authors['all'][0],
-        author_email=Release.authors['all'][1],
-        maintainer='Francisco de la Peña',
-        maintainer_email='fjd29@cam.ac.uk',
+        author=Release.authors[u'all'][0],
+        author_email=Release.authors[u'all'][1],
+        maintainer=u'Francisco de la Peña',
+        maintainer_email=u'fjd29@cam.ac.uk',
         description=Release.description,
-        long_description=open('README.rst').read(),
+        long_description=open(u'README.rst').read(),
         license=Release.license,
         platforms=Release.platforms,
         url=Release.url,
         #~ test_suite = 'nose.collector',
         keywords=Release.keywords,
         classifiers=[
-            "Programming Language :: Python :: 2.7",
-            "Development Status :: 4 - Beta",
-            "Environment :: Console",
-            "Intended Audience :: Science/Research",
-            "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-            "Natural Language :: English",
-            "Operating System :: OS Independent",
-            "Topic :: Scientific/Engineering",
-            "Topic :: Scientific/Engineering :: Physics",
+            u"Programming Language :: Python :: 2.7",
+            u"Development Status :: 4 - Beta",
+            u"Environment :: Console",
+            u"Intended Audience :: Science/Research",
+            u"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+            u"Natural Language :: English",
+            u"Operating System :: OS Independent",
+            u"Topic :: Scientific/Engineering",
+            u"Topic :: Scientific/Engineering :: Physics",
         ],
     )

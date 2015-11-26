@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import math
 
 import numpy as np
@@ -25,7 +26,7 @@ from hyperspy.component import Component
 
 class PowerLaw(Component):
 
-    """Power law component
+    u"""Power law component
 
     f(x) = A*(x-x0)^-r
 
@@ -47,7 +48,7 @@ class PowerLaw(Component):
     """
 
     def __init__(self, A=10e5, r=3., origin=0.):
-        Component.__init__(self, ('A', 'r', 'origin'))
+        Component.__init__(self, (u'A', u'r', u'origin'))
         self.A.value = A
         self.r.value = r
         self.origin.value = origin
@@ -81,7 +82,7 @@ class PowerLaw(Component):
                         self.A.value, 0)
 
     def estimate_parameters(self, signal, x1, x2, only_current=False):
-        """Estimate the parameters by the two area method
+        u"""Estimate the parameters by the two area method
 
         Parameters
         ----------
@@ -116,8 +117,8 @@ class PowerLaw(Component):
             s = signal.get_current_signal()
         else:
             s = signal
-        I1 = s.isig[i1:i3].integrate1D(2j).data.astype("float")
-        I2 = s.isig[i3:i2].integrate1D(2j).data.astype("float")
+        I1 = s.isig[i1:i3].integrate1D(2j).data.astype(u"float")
+        I2 = s.isig[i3:i2].integrate1D(2j).data.astype(u"float")
         try:
             r = 2 * np.log(I1 / I2) / math.log(x2 / x1)
             k = 1 - r
@@ -133,9 +134,9 @@ class PowerLaw(Component):
         else:
             if self.A.map is None:
                 self._create_arrays()
-            self.A.map['values'][:] = A
-            self.A.map['is_set'][:] = True
-            self.r.map['values'][:] = r
-            self.r.map['is_set'][:] = True
+            self.A.map[u'values'][:] = A
+            self.A.map[u'is_set'][:] = True
+            self.r.map[u'values'][:] = r
+            self.r.map[u'is_set'][:] = True
             self.fetch_stored_values()
             return True

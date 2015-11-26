@@ -18,6 +18,7 @@
 
 
 
+from __future__ import division
 import math
 import warnings
 
@@ -38,7 +39,7 @@ from hyperspy.drawing.figure import BlittedFigure
 
 class ImagePlot(BlittedFigure):
 
-    """Class to plot an image with the necessary machinery to update
+    u"""Class to plot an image with the necessary machinery to update
     the image when the coordinates of an AxesManager change.
 
     Attributes
@@ -78,12 +79,12 @@ class ImagePlot(BlittedFigure):
         self._colorbar = None
         self.figure = None
         self.ax = None
-        self.title = ''
+        self.title = u''
         self.vmin = None
         self.vmax = None
         self.auto_contrast = True
-        self._ylabel = ''
-        self._xlabel = ''
+        self._ylabel = u''
+        self._xlabel = u''
         self.plot_indices = True
         self._text = None
         self._text_position = (0, 1.05,)
@@ -95,13 +96,13 @@ class ImagePlot(BlittedFigure):
         self.min_aspect = 0.1
         self.saturated_pixels = 0.2
         self.ax_markers = list()
-        self.scalebar_color = "white"
+        self.scalebar_color = u"white"
         self._user_scalebar = None
         self._auto_scalebar = False
         self._user_axes_ticks = None
         self._auto_axes_ticks = True
         self.no_nans = False
-        self.centre_colormap = "auto"
+        self.centre_colormap = u"auto"
 
     @property
     def axes_ticks(self):
@@ -132,13 +133,13 @@ class ImagePlot(BlittedFigure):
         xaxis = self.xaxis
         yaxis = self.yaxis
         # Image labels
-        self._xlabel = '%s' % str(xaxis)
+        self._xlabel = u'%s' % unicode(xaxis)
         if xaxis.units is not Undefined:
-            self._xlabel += ' (%s)' % xaxis.units
+            self._xlabel += u' (%s)' % xaxis.units
 
-        self._ylabel = '%s' % str(yaxis)
+        self._ylabel = u'%s' % unicode(yaxis)
         if yaxis.units is not Undefined:
-            self._ylabel += ' (%s)' % yaxis.units
+            self._ylabel += u' (%s)' % yaxis.units
 
         if (xaxis.units == yaxis.units) and (
                 xaxis.scale == yaxis.scale):
@@ -174,7 +175,7 @@ class ImagePlot(BlittedFigure):
                 self.vmax is not None and
                 not self.auto_contrast):
             return
-        if 'complex' in data.dtype.name:
+        if u'complex' in data.dtype.name:
             data = np.log(np.abs(data))
         vmin, vmax = contrast_stretching(data, self.saturated_pixels)
         if self.vmin is None or self.auto_contrast:
@@ -193,11 +194,11 @@ class ImagePlot(BlittedFigure):
         figsize = np.array((width * wfactor, height)) * max_size / max(
             (width * wfactor, height))
         self.figure = utils.create_figure(
-            window_title=("Figure " + self.title
+            window_title=(u"Figure " + self.title
                           if self.title
                           else None),
             figsize=figsize.clip(min_size, max_size))
-        self.figure.canvas.mpl_connect('draw_event', self._on_draw)
+        self.figure.canvas.mpl_connect(u'draw_event', self._on_draw)
         utils.on_figure_window_close(self.figure, self.close)
 
     def create_axis(self):
@@ -221,8 +222,8 @@ class ImagePlot(BlittedFigure):
             data = rgb_tools.rgbx2regular_array(data, plot_friendly=True)
         if self.vmin is not None or self.vmax is not None:
             warnings.warn(
-                'vmin or vmax value given, hence '
-                'auto_contrast is set to False')
+                u'vmin or vmax value given, hence '
+                u'auto_contrast is set to False')
             self.auto_contrast = False
         self.optimize_contrast(data)
         if (not self.axes_manager or
@@ -233,10 +234,10 @@ class ImagePlot(BlittedFigure):
                 self._text.remove()
             self._text = self.ax.text(
                 *self._text_position,
-                s=str(self.axes_manager.indices),
+                s=unicode(self.axes_manager.indices),
                 transform=self.ax.transAxes,
                 fontsize=12,
-                color='red',
+                color=u'red',
                 animated=True)
         for marker in self.ax_markers:
             marker.plot()
@@ -255,7 +256,7 @@ class ImagePlot(BlittedFigure):
             self._colorbar.ax.yaxis.set_animated(True)
 
         self.figure.canvas.draw()
-        if hasattr(self.figure, 'tight_layout'):
+        if hasattr(self.figure, u'tight_layout'):
             try:
                 self.figure.tight_layout()
             except:
@@ -273,9 +274,9 @@ class ImagePlot(BlittedFigure):
 
     def update(self, auto_contrast=None, **kwargs):
         # Turn on centre_colormap if a diverging colormap is used.
-        if self.centre_colormap == "auto":
-            if "cmap" in kwargs:
-                cmap = kwargs["cmap"]
+        if self.centre_colormap == u"auto":
+            if u"cmap" in kwargs:
+                cmap = kwargs[u"cmap"]
             else:
                 cmap = plt.cm.get_cmap().name
             if cmap in MPL_DIVERGING_COLORMAPS:
@@ -302,9 +303,9 @@ class ImagePlot(BlittedFigure):
                     row = -1
                 if col >= 0 and row >= 0:
                     z = data[row, col]
-                    return 'x=%1.4g, y=%1.4g, intensity=%1.4g' % (x, y, z)
+                    return u'x=%1.4g, y=%1.4g, intensity=%1.4g' % (x, y, z)
                 else:
-                    return 'x=%1.4g, y=%1.4g' % (x, y)
+                    return u'x=%1.4g, y=%1.4g' % (x, y)
             self.ax.format_coord = format_coord
         if (auto_contrast is True or
                 auto_contrast is None and self.auto_contrast is True):
@@ -314,7 +315,7 @@ class ImagePlot(BlittedFigure):
                 redraw_colorbar = True
                 ims[0].autoscale()
 
-        if 'complex' in data.dtype.name:
+        if u'complex' in data.dtype.name:
             data = np.log(np.abs(data))
         if self.plot_indices is True:
             self._text.set_text(self.axes_manager.indices)
@@ -340,12 +341,12 @@ class ImagePlot(BlittedFigure):
             if np.isnan(data).any():
                 self.figure.canvas.draw()
         else:
-            new_args = {'interpolation': 'nearest',
-                        'vmin': vmin,
-                        'vmax': vmax,
-                        'extent': self._extent,
-                        'aspect': self._aspect,
-                        'animated': True}
+            new_args = {u'interpolation': u'nearest',
+                        u'vmin': vmin,
+                        u'vmax': vmax,
+                        u'extent': self._extent,
+                        u'aspect': self._aspect,
+                        u'animated': True}
             new_args.update(kwargs)
             self.ax.imshow(data,
                            **new_args)
@@ -362,14 +363,14 @@ class ImagePlot(BlittedFigure):
         return ceditor
 
     def connect(self):
-        self.figure.canvas.mpl_connect('key_press_event',
+        self.figure.canvas.mpl_connect(u'key_press_event',
                                        self.on_key_press)
         self.figure.canvas.draw()
         if self.axes_manager:
             self.axes_manager.connect(self._update)
 
     def on_key_press(self, event):
-        if event.key == 'h':
+        if event.key == u'h':
             self.adjust_contrast()
 
     def set_contrast(self, vmin, vmax):

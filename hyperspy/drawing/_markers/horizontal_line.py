@@ -21,7 +21,7 @@ from hyperspy.drawing.marker import MarkerBase
 
 class HorizontalLine(MarkerBase):
 
-    """Horizontal line marker that can be added to the signal figure
+    u"""Horizontal line marker that can be added to the signal figure
 
     Parameters
     ---------
@@ -44,7 +44,7 @@ class HorizontalLine(MarkerBase):
 
     def __init__(self, y, **kwargs):
         MarkerBase.__init__(self)
-        lp = {'linewidth': 1, 'color': 'black'}
+        lp = {u'linewidth': 1, u'color': u'black'}
         self.marker_properties = lp
         self.set_data(y1=y)
         self.set_marker_properties(**kwargs)
@@ -52,15 +52,15 @@ class HorizontalLine(MarkerBase):
     def update(self):
         if self.auto_update is False:
             return
-        self.marker.set_ydata(self.get_data_position('y1'))
+        self.marker.set_ydata(self.get_data_position(u'y1'))
 
     def plot(self):
         if self.ax is None:
             raise AttributeError(
-                "To use this method the marker needs to be first add to a " +
-                "figure using `s._plot.signal_plot.add_marker(m)` or " +
-                "`s._plot.navigator_plot.add_marker(m)`")
-        self.marker = self.ax.axhline(self.get_data_position('y1'),
+                u"To use this method the marker needs to be first add to a " +
+                u"figure using `s._plot.signal_plot.add_marker(m)` or " +
+                u"`s._plot.navigator_plot.add_marker(m)`")
+        self.marker = self.ax.axhline(self.get_data_position(u'y1'),
                                       **self.marker_properties)
         self.marker.set_animated(True)
         try:

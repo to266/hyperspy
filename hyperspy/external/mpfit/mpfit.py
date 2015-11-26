@@ -1,4 +1,4 @@
-"""
+u"""
 Perform Levenberg-Marquardt least-squares minimization, based on MINPACK-1.
 
 								   AUTHORS
@@ -409,6 +409,7 @@ Perform Levenberg-Marquardt least-squares minimization, based on MINPACK-1.
    Fixed the analytic derivatives features (The HyperSpy Developers, 2011)
 """
 
+from __future__ import division
 import numpy
 import types
 import scipy.linalg
@@ -596,19 +597,19 @@ import scipy.linalg
 #	 **********
 
 
-class mpfit:
+class mpfit(object):
 
     blas_enorm32, = scipy.linalg.get_blas_funcs(
-        ['nrm2'], numpy.array(
+        [u'nrm2'], numpy.array(
             [0], dtype=numpy.float32))
     blas_enorm64, = scipy.linalg.get_blas_funcs(
-        ['nrm2'], numpy.array(
+        [u'nrm2'], numpy.array(
             [0], dtype=numpy.float64))
 
     def __init__(self, fcn, xall=None, functkw=None, parinfo=None, ftol=1.e-10, xtol=1.e-10, gtol=1.e-10, damp=0.,
-                 maxiter=200, factor=100., nprint=1, iterfunct='default', iterkw={}, nocovar=0, rescale=0,
+                 maxiter=200, factor=100., nprint=1, iterfunct=u'default', iterkw={}, nocovar=0, rescale=0,
                  autoderivative=1, quiet=0, diag=None, epsfcn=None, debug=0):
-        """
+        u"""
 Inputs:
 fcn:
    The function to be minimized.  The function should return the weighted
@@ -851,56 +852,56 @@ Outputs:
         self.perror = None
         self.status = 0  # Invalid input flag set while we check inputs
         self.debug = debug
-        self.errmsg = ''
+        self.errmsg = u''
         self.nfev = 0
         self.damp = damp
         self.dof = 0
 
         if fcn is None:
-            self.errmsg = "Usage: parms = mpfit('myfunt', ... )"
+            self.errmsg = u"Usage: parms = mpfit('myfunt', ... )"
             return
 
-        if iterfunct == 'default':
+        if iterfunct == u'default':
             iterfunct = self.defiter
 
         # Parameter damping doesn't work when user is providing their own
         # gradients.
         if (self.damp != 0) and (autoderivative == 0):
-            self.errmsg = 'ERROR: keywords DAMP and AUTODERIVATIVE are mutually exclusive'
+            self.errmsg = u'ERROR: keywords DAMP and AUTODERIVATIVE are mutually exclusive'
             return
 
         # Parameters can either be stored in parinfo, or x. x takes precedence
         # if it exists
         if (xall is None) and (parinfo is None):
-            self.errmsg = 'ERROR: must pass parameters in P or PARINFO'
+            self.errmsg = u'ERROR: must pass parameters in P or PARINFO'
             return
 
         # Be sure that PARINFO is of the right type
         if parinfo is not None:
             if not isinstance(parinfo, list):
-                self.errmsg = 'ERROR: PARINFO must be a list of dictionaries.'
+                self.errmsg = u'ERROR: PARINFO must be a list of dictionaries.'
                 return
             else:
                 if not isinstance(parinfo[0], dict):
-                    self.errmsg = 'ERROR: PARINFO must be a list of dictionaries.'
+                    self.errmsg = u'ERROR: PARINFO must be a list of dictionaries.'
                     return
             if (xall is not None) and (len(xall) != len(parinfo)):
-                self.errmsg = 'ERROR: number of elements in PARINFO and P must agree'
+                self.errmsg = u'ERROR: number of elements in PARINFO and P must agree'
                 return
 
         # If the parameters were not specified at the command line, then
         # extract them from PARINFO
         if xall is None:
-            xall = self.parinfo(parinfo, 'value')
+            xall = self.parinfo(parinfo, u'value')
             if xall is None:
-                self.errmsg = 'ERROR: either P or PARINFO(*)["value"] must be supplied.'
+                self.errmsg = u'ERROR: either P or PARINFO(*)["value"] must be supplied.'
                 return
 
         # Make sure parameters are numpy arrays
         xall = numpy.asarray(xall)
         # In the case if the xall is not float or if is float but has less
         # than 64 bits we do convert it into double
-        if xall.dtype.kind != 'f' or xall.dtype.itemsize <= 4:
+        if xall.dtype.kind != u'f' or xall.dtype.itemsize <= 4:
             xall = xall.astype(numpy.float)
 
         npar = len(xall)
@@ -908,35 +909,35 @@ Outputs:
         fnorm1 = -1.
 
         # TIED parameters?
-        ptied = self.parinfo(parinfo, 'tied', default='', n=npar)
+        ptied = self.parinfo(parinfo, u'tied', default=u'', n=npar)
         self.qanytied = 0
-        for i in range(npar):
+        for i in xrange(npar):
             ptied[i] = ptied[i].strip()
-            if ptied[i] != '':
+            if ptied[i] != u'':
                 self.qanytied = 1
         self.ptied = ptied
 
         # FIXED parameters ?
-        pfixed = self.parinfo(parinfo, 'fixed', default=0, n=npar)
+        pfixed = self.parinfo(parinfo, u'fixed', default=0, n=npar)
         pfixed = (pfixed == 1)
-        for i in range(npar):
+        for i in xrange(npar):
             # Tied parameters are also effectively fixed
-            pfixed[i] = pfixed[i] or (ptied[i] != '')
+            pfixed[i] = pfixed[i] or (ptied[i] != u'')
 
         # Finite differencing step, absolute and relative, and sidedness of
         # deriv.
-        step = self.parinfo(parinfo, 'step', default=0., n=npar)
-        dstep = self.parinfo(parinfo, 'relstep', default=0., n=npar)
-        dside = self.parinfo(parinfo, 'mpside', default=0, n=npar)
+        step = self.parinfo(parinfo, u'step', default=0., n=npar)
+        dstep = self.parinfo(parinfo, u'relstep', default=0., n=npar)
+        dside = self.parinfo(parinfo, u'mpside', default=0, n=npar)
 
         # Maximum and minimum steps allowed to be taken in one iteration
-        maxstep = self.parinfo(parinfo, 'mpmaxstep', default=0., n=npar)
-        minstep = self.parinfo(parinfo, 'mpminstep', default=0., n=npar)
+        maxstep = self.parinfo(parinfo, u'mpmaxstep', default=0., n=npar)
+        minstep = self.parinfo(parinfo, u'mpminstep', default=0., n=npar)
         qmin = minstep != 0
         qmin[:] = False  # Remove minstep for now!!
         qmax = maxstep != 0
         if numpy.any(qmin & qmax & (maxstep < minstep)):
-            self.errmsg = 'ERROR: MPMINSTEP is greater than MPMAXSTEP'
+            self.errmsg = u'ERROR: MPMINSTEP is greater than MPMAXSTEP'
             return
         wh = (numpy.nonzero((qmin != 0.) | (qmax != 0.)))[0]
         qminmax = len(wh > 0)
@@ -945,7 +946,7 @@ Outputs:
         ifree = (numpy.nonzero(pfixed != 1))[0]
         nfree = len(ifree)
         if nfree == 0:
-            self.errmsg = 'ERROR: no free parameters'
+            self.errmsg = u'ERROR: no free parameters'
             return
 
         # Compose only VARYING parameters
@@ -954,18 +955,18 @@ Outputs:
         x = self.params[ifree]  # x is the set of free parameters
 
         # LIMITED parameters ?
-        limited = self.parinfo(parinfo, 'limited', default=[0, 0], n=npar)
-        limits = self.parinfo(parinfo, 'limits', default=[0., 0.], n=npar)
+        limited = self.parinfo(parinfo, u'limited', default=[0, 0], n=npar)
+        limits = self.parinfo(parinfo, u'limits', default=[0., 0.], n=npar)
         if (limited is not None) and (limits is not None):
             # Error checking on limits in parinfo
             if numpy.any((limited[:, 0] & (xall < limits[:, 0])) |
                          (limited[:, 1] & (xall > limits[:, 1]))):
-                self.errmsg = 'ERROR: parameters are not within PARINFO limits'
+                self.errmsg = u'ERROR: parameters are not within PARINFO limits'
                 return
             if numpy.any((limited[:, 0] & limited[:, 1]) &
                          (limits[:, 0] >= limits[:, 1]) &
                          (pfixed == 0)):
-                self.errmsg = 'ERROR: PARINFO parameter limits are not consistent'
+                self.errmsg = u'ERROR: PARINFO parameter limits are not consistent'
                 return
 
             # Transfer structure values to local variables
@@ -990,21 +991,21 @@ Outputs:
         # Check input parameters for errors
         if (n < 0) or (ftol <= 0) or (xtol <= 0) or (gtol <= 0) \
                 or (maxiter < 0) or (factor <= 0):
-            self.errmsg = 'ERROR: input keywords are inconsistent'
+            self.errmsg = u'ERROR: input keywords are inconsistent'
             return
 
         if rescale != 0:
-            self.errmsg = 'ERROR: DIAG parameter scales are inconsistent'
+            self.errmsg = u'ERROR: DIAG parameter scales are inconsistent'
             if len(diag) < n:
                 return
             if numpy.any(diag <= 0):
                 return
-            self.errmsg = ''
+            self.errmsg = u''
 
         [self.status, fvec] = self.call(fcn, self.params, functkw)
 
         if self.status < 0:
-            self.errmsg = 'ERROR: first call to "' + str(fcn) + '" failed'
+            self.errmsg = u'ERROR: first call to "' + unicode(fcn) + u'" failed'
             return
         # If the returned fvec has more than four bits I assume that we have
         # double precision
@@ -1020,7 +1021,7 @@ Outputs:
 
         m = len(fvec)
         if m < n:
-            self.errmsg = 'ERROR: number of parameters must not exceed data'
+            self.errmsg = u'ERROR: number of parameters must not exceed data'
             return
         self.dof = m - nfree
         self.fnorm = self.enorm(fvec)
@@ -1062,8 +1063,8 @@ Outputs:
 
                     # Check for user termination
                     if self.status < 0:
-                        self.errmsg = 'WARNING: premature termination by ' + \
-                            str(iterfunct)
+                        self.errmsg = u'WARNING: premature termination by ' + \
+                            unicode(iterfunct)
                         return
 
                     # If parameters were changed (grrr..) then re-tie
@@ -1074,18 +1075,18 @@ Outputs:
 
             # Calculate the jacobian matrix
             self.status = 2
-            catch_msg = 'calling MPFIT_FDJAC2'
+            catch_msg = u'calling MPFIT_FDJAC2'
             fjac = self.fdjac2(fcn, x, fvec, step, qulim, ulim, dside,
                                epsfcn=epsfcn,
                                autoderivative=autoderivative, dstep=dstep,
                                functkw=functkw, ifree=ifree, xall=self.params)
             if fjac is None:
-                self.errmsg = 'WARNING: premature termination by FDJAC2'
+                self.errmsg = u'WARNING: premature termination by FDJAC2'
                 return
 
             # Determine if any of the parameters are pegged at the limits
             if qanylim:
-                catch_msg = 'zeroing derivatives of pegged parameters'
+                catch_msg = u'zeroing derivatives of pegged parameters'
                 whlpeg = (numpy.nonzero(qllim & (x == llim)))[0]
                 nlpeg = len(whlpeg)
                 whupeg = (numpy.nonzero(qulim & (x == ulim)))[0]
@@ -1093,13 +1094,13 @@ Outputs:
                 # See if any "pegged" values should keep their derivatives
                 if nlpeg > 0:
                     # Total derivative of sum wrt lower pegged parameters
-                    for i in range(nlpeg):
+                    for i in xrange(nlpeg):
                         sum0 = sum(fvec * fjac[:, whlpeg[i]])
                         if sum0 > 0:
                             fjac[:, whlpeg[i]] = 0
                 if nupeg > 0:
                     # Total derivative of sum wrt upper pegged parameters
-                    for i in range(nupeg):
+                    for i in xrange(nupeg):
                         sum0 = sum(fvec * fjac[:, whupeg[i]])
                         if sum0 < 0:
                             fjac[:, whupeg[i]] = 0
@@ -1109,7 +1110,7 @@ Outputs:
 
             # On the first iteration if "diag" is unspecified, scale
             # according to the norms of the columns of the initial jacobian
-            catch_msg = 'rescaling diagonal elements'
+            catch_msg = u'rescaling diagonal elements'
             if self.niter == 1:
                 if (rescale == 0) or (len(diag) < n):
                     diag = wa2.copy()
@@ -1124,9 +1125,9 @@ Outputs:
                     delta = factor
 
             # Form (q transpose)*fvec and store the first n components in qtf
-            catch_msg = 'forming (q transpose)*fvec'
+            catch_msg = u'forming (q transpose)*fvec'
             wa4 = fvec.copy()
-            for j in range(n):
+            for j in xrange(n):
                 lj = ipvt[j]
                 temp3 = fjac[j, lj]
                 if temp3 != 0:
@@ -1141,7 +1142,7 @@ Outputs:
             fjac = fjac[0:n, 0:n]
             fjac.shape = [n, n]
             temp = fjac.copy()
-            for i in range(n):
+            for i in xrange(n):
                 temp[:, i] = fjac[:, ipvt[i]]
             fjac = temp.copy()
 
@@ -1152,10 +1153,10 @@ Outputs:
             # if ct GT 0 then goto, FAIL_OVERFLOW
 
             # Compute the norm of the scaled gradient
-            catch_msg = 'computing the scaled gradient'
+            catch_msg = u'computing the scaled gradient'
             gnorm = 0.
             if self.fnorm != 0:
-                for j in range(n):
+                for j in xrange(n):
                     l = ipvt[j]
                     if wa2[l] != 0:
                         sum0 = sum(
@@ -1178,7 +1179,7 @@ Outputs:
             while True:
 
                 # Determine the levenberg-marquardt parameter
-                catch_msg = 'calculating LM parameter (MPFIT_)'
+                catch_msg = u'calculating LM parameter (MPFIT_)'
                 [fjac, par, wa1, wa2] = self.lmpar(fjac, ipvt, diag, qtf,
                                                    delta, wa1, wa2, par=par)
                 # Store the direction p and x+p. Calculate the norm of p
@@ -1198,7 +1199,7 @@ Outputs:
 
                     if qanylim:
                         # Do not allow any steps out of bounds
-                        catch_msg = 'checking for a step out of bounds'
+                        catch_msg = u'checking for a step out of bounds'
                         if nlpeg > 0:
                             wa1[whlpeg] = numpy.clip(
                                 wa1[whlpeg],
@@ -1271,23 +1272,23 @@ Outputs:
 
                 # Evaluate the function at x+p and calculate its norm
                 mperr = 0
-                catch_msg = 'calling ' + str(fcn)
+                catch_msg = u'calling ' + unicode(fcn)
                 [self.status, wa4] = self.call(fcn, self.params, functkw)
                 if self.status < 0:
-                    self.errmsg = 'WARNING: premature termination by "' + \
-                        fcn + '"'
+                    self.errmsg = u'WARNING: premature termination by "' + \
+                        fcn + u'"'
                     return
                 fnorm1 = self.enorm(wa4)
 
                 # Compute the scaled actual reduction
-                catch_msg = 'computing convergence criteria'
+                catch_msg = u'computing convergence criteria'
                 actred = -1.
                 if (0.1 * fnorm1) < self.fnorm:
                     actred = - (fnorm1 / self.fnorm) ** 2 + 1.
 
                 # Compute the scaled predicted reduction and the scaled directional
                 # derivative
-                for j in range(n):
+                for j in xrange(n):
                     wa3[j] = 0
                     wa3[0:j + 1] = wa3[0:j + 1] + \
                         fjac[0:j + 1, j] * wa1[ipvt[j]]
@@ -1361,7 +1362,7 @@ Outputs:
                 # Check for over/underflow
                 if ~numpy.all(numpy.isfinite(wa1) & numpy.isfinite(wa2) &
                               numpy.isfinite(x)) or ~numpy.isfinite(ratio):
-                    errmsg = ('''ERROR: parameter or function value(s) have become
+                    errmsg = (u'''ERROR: parameter or function value(s) have become
 						'infinite; check model function for over- 'and underflow''')
                     self.status = -16
                     break
@@ -1372,7 +1373,7 @@ Outputs:
                 break
         # End of outer loop.
 
-        catch_msg = 'in the termination phase'
+        catch_msg = u'in the termination phase'
         # Termination, either normal or user imposed.
         if len(self.params) == 0:
             return
@@ -1381,9 +1382,9 @@ Outputs:
         else:
             self.params[ifree] = x
         if (nprint > 0) and (self.status > 0):
-            catch_msg = 'calling ' + str(fcn)
+            catch_msg = u'calling ' + unicode(fcn)
             [status, fvec] = self.call(fcn, self.params, functkw)
-            catch_msg = 'in the termination phase'
+            catch_msg = u'in the termination phase'
             self.fnorm = self.enorm(fvec)
 
         if (self.fnorm is not None) and (fnorm1 is not None):
@@ -1399,7 +1400,7 @@ Outputs:
             if (n > 0) and (sz[0] >= n) and (sz[1] >= n) \
                     and (len(ipvt) >= n):
 
-                catch_msg = 'computing the covariance matrix'
+                catch_msg = u'computing the covariance matrix'
                 cv = self.calc_covar(fjac[0:n, 0:n], ipvt[0:n])
                 cv.shape = [n, n]
                 nn = len(xall)
@@ -1407,11 +1408,11 @@ Outputs:
                 # Fill in actual covariance matrix, accounting for fixed
                 # parameters.
                 self.covar = numpy.zeros([nn, nn], dtype=float)
-                for i in range(n):
+                for i in xrange(n):
                     self.covar[ifree, ifree[i]] = cv[:, i]
 
                 # Compute errors in parameters
-                catch_msg = 'computing parameter errors'
+                catch_msg = u'computing parameter errors'
                 self.perror = numpy.zeros(nn, dtype=float)
                 d = numpy.diagonal(self.covar)
                 wh = (numpy.nonzero(d >= 0))[0]
@@ -1420,15 +1421,15 @@ Outputs:
         return
 
     def __str__(self):
-        return {'niter': self.niter,
-                'params': self.params,
-                'covar': self.covar,
-                'perror': self.perror,
-                'status': self.status,
-                'debug': self.debug,
-                'errmsg': self.errmsg,
-                'nfev': self.nfev,
-                'damp': self.damp
+        return {u'niter': self.niter,
+                u'params': self.params,
+                u'covar': self.covar,
+                u'perror': self.perror,
+                u'status': self.status,
+                u'debug': self.debug,
+                u'errmsg': self.errmsg,
+                u'nfev': self.nfev,
+                u'damp': self.damp
                 #,'machar':self.machar
                 }.__str__()
 
@@ -1436,10 +1437,10 @@ Outputs:
     # the parameter values.
     def defiter(self, fcn, x, iter, fnorm=None, functkw=None,
                 quiet=0, iterstop=None, parinfo=None,
-                format=None, pformat='%.10g', dof=1):
+                format=None, pformat=u'%.10g', dof=1):
 
         if self.debug:
-            print('Entering defiter...')
+            print u'Entering defiter...'
         if quiet:
             return
         if fnorm is None:
@@ -1448,18 +1449,18 @@ Outputs:
 
         # Determine which parameters to print
         nprint = len(x)
-        print("Iter ", ('%6i' % iter), "   CHI-SQUARE = ", ('%.10g' % fnorm), " DOF = ", ('%i' % dof))
-        for i in range(nprint):
-            if (parinfo is not None) and ('parname' in parinfo[i]):
-                p = '   ' + parinfo[i]['parname'] + ' = '
+        print u"Iter ", (u'%6i' % iter), u"   CHI-SQUARE = ", (u'%.10g' % fnorm), u" DOF = ", (u'%i' % dof)
+        for i in xrange(nprint):
+            if (parinfo is not None) and (u'parname' in parinfo[i]):
+                p = u'   ' + parinfo[i][u'parname'] + u' = '
             else:
-                p = '   P' + str(i) + ' = '
-            if (parinfo is not None) and ('mpprint' in parinfo[i]):
-                iprint = parinfo[i]['mpprint']
+                p = u'   P' + unicode(i) + u' = '
+            if (parinfo is not None) and (u'mpprint' in parinfo[i]):
+                iprint = parinfo[i][u'mpprint']
             else:
                 iprint = 1
             if iprint:
-                print(p + (pformat % x[i]) + '  ')
+                print p + (pformat % x[i]) + u'  '
         return 0
 
     #  DO_ITERSTOP:
@@ -1480,9 +1481,9 @@ Outputs:
 
     # Procedure to parse the parameter values in PARINFO, which is a list of
     # dictionaries
-    def parinfo(self, parinfo=None, key='a', default=None, n=0):
+    def parinfo(self, parinfo=None, key=u'a', default=None, n=0):
         if self.debug:
-            print('Entering parinfo...')
+            print u'Entering parinfo...'
         if (n == 0) and (parinfo is not None):
             n = len(parinfo)
         if n == 0:
@@ -1490,7 +1491,7 @@ Outputs:
 
             return values
         values = []
-        for i in range(n):
+        for i in xrange(n):
             if (parinfo is not None) and (key in parinfo[i]):
                 values.append(parinfo[i][key])
             else:
@@ -1510,7 +1511,7 @@ Outputs:
     # derivatives or not.
     def call(self, fcn, x, functkw, fjac=None):
         if self.debug:
-            print('Entering call...')
+            print u'Entering call...'
         if self.qanytied:
             x = self.tie(x, self.ptied)
         self.nfev += 1
@@ -1546,7 +1547,7 @@ Outputs:
             dstep=None):
 
         if self.debug:
-            print('Entering fdjac2...')
+            print u'Entering fdjac2...'
         machep = self.machar.machep
         if epsfcn is None:
             epsfcn = machep
@@ -1570,9 +1571,9 @@ Outputs:
             [status, fjac] = self.call(fcn, xall, functkw, fjac=fjac)
 
             if fjac.shape != (m, nall):
-                print('ERROR: Derivative matrix was not computed properly.')
-                print(fjac.shape)
-                print(m, nall)
+                print u'ERROR: Derivative matrix was not computed properly.'
+                print fjac.shape
+                print m, nall
                 return None
 
             # This definition is consistent with CURVEFIT
@@ -1620,7 +1621,7 @@ Outputs:
             if len(wh) > 0:
                 h[wh] = - h[wh]
         # Loop through parameters, computing the derivative for each
-        for j in range(n):
+        for j in xrange(n):
             xp = xall.copy()
             xp[ifree[j]] = xp[ifree[j]] + h[j]
             [status, fp] = self.call(fcn, xp, functkw)
@@ -1778,7 +1779,7 @@ Outputs:
     def qrfac(self, a, pivot=0):
 
         if self.debug:
-            print('Entering qrfac...')
+            print u'Entering qrfac...'
         machep = self.machar.machep
         sz = a.shape
         m = sz[0]
@@ -1786,7 +1787,7 @@ Outputs:
 
         # Compute the initial column norms and initialize arrays
         acnorm = numpy.zeros(n, dtype=float)
-        for j in range(n):
+        for j in xrange(n):
             acnorm[j] = self.enorm(a[:, j])
         rdiag = acnorm.copy()
         wa = rdiag.copy()
@@ -1794,7 +1795,7 @@ Outputs:
 
         # Reduce a to r with householder transformations
         minmn = numpy.min([m, n])
-        for j in range(minmn):
+        for j in xrange(minmn):
             if pivot != 0:
                 # Bring the column of largest norm into the pivot position
                 rmax = numpy.max(rdiag[j:])
@@ -1837,7 +1838,7 @@ Outputs:
             # but it actually got slower.  Reverted to "for" loop to keep
             # it simple.
             if j + 1 < n:
-                for k in range(j + 1, n):
+                for k in xrange(j + 1, n):
                     lk = ipvt[k]
                     ajk = a[j:, lk]
                     # *** Note optimization a(j:*,lk)
@@ -1934,7 +1935,7 @@ Outputs:
     #
     def qrsolv(self, r, ipvt, diag, qtb, sdiag):
         if self.debug:
-            print('Entering qrsolv...')
+            print u'Entering qrsolv...'
         sz = r.shape
         m = sz[0]
         n = sz[1]
@@ -1942,13 +1943,13 @@ Outputs:
         # copy r and (q transpose)*b to preserve input and initialize s.
         # in particular, save the diagonal elements of r in x.
 
-        for j in range(n):
+        for j in xrange(n):
             r[j:n, j] = r[j, j:n]
         x = numpy.diagonal(r).copy()
         wa = qtb.copy()
 
         # Eliminate the diagonal matrix d using a givens rotation
-        for j in range(n):
+        for j in xrange(n):
             l = ipvt[j]
             if diag[l] == 0:
                 break
@@ -1960,7 +1961,7 @@ Outputs:
             # is initially zero.
 
             qtbpj = 0.
-            for k in range(j, n):
+            for k in xrange(j, n):
                 if sdiag[k] == 0:
                     break
                 if numpy.abs(r[k, k]) < numpy.abs(sdiag[k]):
@@ -1999,7 +2000,7 @@ Outputs:
         if nsing >= 1:
             wa[nsing - 1] = wa[nsing - 1] / sdiag[nsing - 1]  # Degenerate case
             # *** Reverse loop ***
-            for j in range(nsing - 2, -1, -1):
+            for j in xrange(nsing - 2, -1, -1):
                 sum0 = sum(r[j + 1:nsing, j] * wa[j + 1:nsing])
                 wa[j] = (wa[j] - sum0) / sdiag[j]
 
@@ -2103,7 +2104,7 @@ Outputs:
     def lmpar(self, r, ipvt, diag, qtb, delta, x, sdiag, par=None):
 
         if self.debug:
-            print('Entering lmpar...')
+            print u'Entering lmpar...'
         dwarf = self.machar.minnum
         machep = self.machar.machep
         sz = r.shape
@@ -2121,7 +2122,7 @@ Outputs:
             wa1[wh[0]:] = 0
         if nsing >= 1:
             # *** Reverse loop ***
-            for j in range(nsing - 1, -1, -1):
+            for j in xrange(nsing - 1, -1, -1):
                 wa1[j] = wa1[j] / r[j, j]
                 if j - 1 >= 0:
                     wa1[0:j] = wa1[0:j] - r[0:j, j] * wa1[j]
@@ -2146,7 +2147,7 @@ Outputs:
         if nsing >= n:
             wa1 = diag[ipvt] * wa2[ipvt] / dxnorm
             wa1[0] = wa1[0] / r[0, 0]  # Degenerate case
-            for j in range(1, n):   # Note "1" here, not zero
+            for j in xrange(1, n):   # Note "1" here, not zero
                 sum0 = sum(r[0:j, j] * wa1[0:j])
                 wa1[j] = (wa1[j] - sum0) / r[j, j]
 
@@ -2154,7 +2155,7 @@ Outputs:
             parl = ((fp / delta) / temp) / temp
 
         # Calculate an upper bound, paru, for the zero of the function
-        for j in range(n):
+        for j in xrange(n):
             sum0 = sum(r[0:j + 1, j] * qtb[0:j + 1])
             wa1[j] = sum0 / diag[ipvt[j]]
         gnorm = self.enorm(wa1)
@@ -2193,7 +2194,7 @@ Outputs:
             # Compute the newton correction
             wa1 = diag[ipvt] * wa2[ipvt] / dxnorm
 
-            for j in range(n - 1):
+            for j in xrange(n - 1):
                 wa1[j] = wa1[j] / sdiag[j]
                 wa1[j + 1:n] = wa1[j + 1:n] - r[j + 1:n, j] * wa1[j]
             wa1[n - 1] = wa1[n - 1] / sdiag[n - 1]  # Degenerate case
@@ -2218,13 +2219,13 @@ Outputs:
     # Procedure to tie one parameter to another.
     def tie(self, p, ptied=None):
         if self.debug:
-            print('Entering tie...')
+            print u'Entering tie...'
         if ptied is None:
             return
-        for i in range(len(ptied)):
-            if ptied[i] == '':
+        for i in xrange(len(ptied)):
+            if ptied[i] == u'':
                 continue
-            cmd = 'p[' + str(i) + '] = ' + ptied[i]
+            cmd = u'p[' + unicode(i) + u'] = ' + ptied[i]
             exec(cmd)
         return p
 
@@ -2297,14 +2298,14 @@ Outputs:
     def calc_covar(self, rr, ipvt=None, tol=1.e-14):
 
         if self.debug:
-            print('Entering calc_covar...')
+            print u'Entering calc_covar...'
         if numpy.ndim(rr) != 2:
-            print('ERROR: r must be a two-dimensional matrix')
+            print u'ERROR: r must be a two-dimensional matrix'
             return -1
         s = rr.shape
         n = s[0]
         if s[0] != s[1]:
-            print('ERROR: r must be a square matrix')
+            print u'ERROR: r must be a square matrix'
             return -1
 
         if ipvt is None:
@@ -2315,11 +2316,11 @@ Outputs:
         # For the inverse of r in the full upper triangle of r
         l = -1
         tolr = tol * numpy.abs(r[0, 0])
-        for k in range(n):
+        for k in xrange(n):
             if numpy.abs(r[k, k]) <= tolr:
                 break
             r[k, k] = 1. / r[k, k]
-            for j in range(k):
+            for j in xrange(k):
                 temp = r[k, k] * r[j, k]
                 r[j, k] = 0.
                 r[0:j + 1, k] = r[0:j + 1, k] - temp * r[0:j + 1, j]
@@ -2328,8 +2329,8 @@ Outputs:
         # Form the full upper triangle of the inverse of (r transpose)*r
         # in the full upper triangle of r
         if l >= 0:
-            for k in range(l + 1):
-                for j in range(k):
+            for k in xrange(l + 1):
+                for j in xrange(k):
                     temp = r[j, k]
                     r[0:j + 1, j] = r[0:j + 1, j] + temp * r[0:j + 1, k]
                 temp = r[k, k]
@@ -2338,10 +2339,10 @@ Outputs:
         # For the full lower triangle of the covariance matrix
         # in the strict lower triangle or and in wa
         wa = numpy.repeat([r[0, 0]], n)
-        for j in range(n):
+        for j in xrange(n):
             jj = ipvt[j]
             sing = j > l
-            for i in range(j + 1):
+            for i in xrange(j + 1):
                 if sing:
                     r[i, j] = 0.
                 ii = ipvt[i]
@@ -2352,14 +2353,14 @@ Outputs:
             wa[jj] = r[j, j]
 
         # Symmetrize the covariance matrix in r
-        for j in range(n):
+        for j in xrange(n):
             r[0:j + 1, j] = r[j, 0:j + 1]
             r[j, j] = wa[j]
 
         return r
 
 
-class machar:
+class machar(object):
 
     def __init__(self, double=1):
         if double == 0:

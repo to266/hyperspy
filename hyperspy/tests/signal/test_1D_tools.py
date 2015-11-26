@@ -16,6 +16,7 @@
 # along with HyperSpy. If not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import division
 import numpy as np
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
@@ -30,7 +31,7 @@ from hyperspy.misc.tv_denoise import _tv_denoise_1d
 import hyperspy.api as hs
 
 
-class TestAlignTools:
+class TestAlignTools(object):
 
     def setUp(self):
         s = hs.signals.Spectrum(np.zeros((10, 100)))
@@ -118,7 +119,7 @@ class TestAlignTools:
         nt.assert_true(np.allclose(s.data[:, i_zlp], 12))
 
 
-class TestShift1D:
+class TestShift1D(object):
 
     def setUp(self):
         self.s = hs.signals.Spectrum(np.arange(10))
@@ -143,7 +144,7 @@ class TestShift1D:
                     0., 1.8, 0.2)))
 
 
-class TestFindPeaks1D:
+class TestFindPeaks1D(object):
 
     def setUp(self):
         x = np.arange(0, 50, 0.01)
@@ -156,36 +157,36 @@ class TestFindPeaks1D:
     def test_single_spectrum(self):
         peaks = self.spectrum.inav[0].find_peaks1D_ohaver()
         nt.assert_true(np.allclose(
-            peaks[0]['position'], self.peak_positions0, rtol=1e-5, atol=1e-4))
+            peaks[0][u'position'], self.peak_positions0, rtol=1e-5, atol=1e-4))
 
     def test_two_spectra(self):
         peaks = self.spectrum.find_peaks1D_ohaver()
         nt.assert_true(np.allclose(
-            peaks[1]['position'], self.peak_positions1, rtol=1e-5, atol=1e-4))
+            peaks[1][u'position'], self.peak_positions1, rtol=1e-5, atol=1e-4))
 
     def test_height(self):
         peaks = self.spectrum.find_peaks1D_ohaver()
         nt.assert_true(np.allclose(
-            peaks[1]['height'], 1.0, rtol=1e-5, atol=1e-4))
+            peaks[1][u'height'], 1.0, rtol=1e-5, atol=1e-4))
 
     def test_width(self):
         peaks = self.spectrum.find_peaks1D_ohaver()
         nt.assert_true(np.allclose(
-            peaks[1]['width'], 3.5758, rtol=1e-4, atol=1e-4),
-            msg="One or several widths are not close enough to expected " +
-            "value (3.5758): " + str(peaks[1]['width']))
+            peaks[1][u'width'], 3.5758, rtol=1e-4, atol=1e-4),
+            msg=u"One or several widths are not close enough to expected " +
+            u"value (3.5758): " + unicode(peaks[1][u'width']))
 
     def test_n_peaks(self):
         peaks = self.spectrum.find_peaks1D_ohaver()
         nt.assert_equal(len(peaks[1]), 8)
 
     def test_maxpeaksn(self):
-        for n in range(1, 10):
+        for n in xrange(1, 10):
             peaks = self.spectrum.find_peaks1D_ohaver(maxpeakn=n)
             nt.assert_equal(len(peaks[1]), min((8, n)))
 
 
-class TestInterpolateInBetween:
+class TestInterpolateInBetween(object):
 
     def setUp(self):
         s = hs.signals.Spectrum(np.arange(40).reshape((2, 20)))
@@ -210,25 +211,25 @@ class TestInterpolateInBetween:
 
     def test_delta_int(self):
         s = self.s.inav[0]
-        s.change_dtype('float')
+        s.change_dtype(u'float')
         s.data[12] *= 10
-        s.interpolate_in_between(8, 12, delta=2, kind='cubic')
-        print(s.data[8:12])
+        s.interpolate_in_between(8, 12, delta=2, kind=u'cubic')
+        print s.data[8:12]
         np.testing.assert_allclose(
             s.data[8:12], np.array([44., 95.4, 139.6, 155.]))
 
     def test_delta_float(self):
         s = self.s.inav[0]
-        s.change_dtype('float')
+        s.change_dtype(u'float')
         s.data[12] *= 10.
-        s.interpolate_in_between(8, 12, delta=0.31, kind='cubic')
-        print(s.data[8:12])
+        s.interpolate_in_between(8, 12, delta=0.31, kind=u'cubic')
+        print s.data[8:12]
         np.testing.assert_allclose(
             s.data[8:12], np.array([45.09388598, 104.16170809,
                                     155.48258721, 170.33564422]))
 
 
-class TestEstimatePeakWidth:
+class TestEstimatePeakWidth(object):
 
     def setUp(self):
         scale = 0.1
@@ -270,7 +271,7 @@ class TestEstimatePeakWidth:
         nt.assert_equal(right, np.nan)
 
 
-class TestSmoothing:
+class TestSmoothing(object):
 
     def setUp(self):
         n, m = 2, 100
@@ -284,7 +285,7 @@ class TestSmoothing:
         frac = 0.5
         it = 1
         data = self.s.data.copy()
-        for i in range(data.shape[0]):
+        for i in xrange(data.shape[0]):
             data[i, :] = lowess(
                 endog=data[i, :],
                 exog=self.s.axes_manager[-1].axis,
@@ -300,7 +301,7 @@ class TestSmoothing:
     def test_tv(self):
         weight = 1
         data = self.s.data.copy()
-        for i in range(data.shape[0]):
+        for i in xrange(data.shape[0]):
             data[i, :] = _tv_denoise_1d(
                 im=data[i, :],
                 weight=weight,)

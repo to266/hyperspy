@@ -21,14 +21,15 @@ from nose.tools import assert_true, assert_false
 from hyperspy._signals.spectrum_simulation import SpectrumSimulation
 from hyperspy._signals.eels import EELSSpectrum
 from hyperspy.components import Gaussian
+from itertools import izip
 
 
-class TestModelIndexing:
+class TestModelIndexing(object):
 
     def setUp(self):
         np.random.seed(1)
         axes = np.array([[100 * np.random.random() + np.arange(0., 600, 1)
-                        for i in range(3)] for j in range(4)])
+                        for i in xrange(3)] for j in xrange(4)])
         g = Gaussian()
         g.A.value = 30000.
         g.centre.value = 300.
@@ -59,7 +60,7 @@ class TestModelIndexing:
         assert_true((s.data == m2.spectrum.data).all())
         assert_true((m.dof.data == self.model.dof.data).all())
         for ic, c in enumerate(m):
-            for p_new, p_old in zip(c.parameters, self.model[ic].parameters):
+            for p_new, p_old in izip(c.parameters, self.model[ic].parameters):
                 assert_true((p_old.map == p_new.map).all())
         np.testing.assert_array_almost_equal(m.chisq.data + m1.chisq.data,
                                              self.model.chisq.data)
@@ -85,20 +86,20 @@ class TestModelIndexing:
                 self.model[ic]._active_array[
                     :,
                     0::2])
-            for p_new, p_old in zip(c.parameters, self.model[ic].parameters):
+            for p_new, p_old in izip(c.parameters, self.model[ic].parameters):
                 assert_true((p_old.map[:, 0::2] == p_new.map).all())
 
 
-class TestModelIndexingClass:
+class TestModelIndexingClass(object):
 
     def setUp(self):
-        s_eels = EELSSpectrum([list(range(10))] * 3)
+        s_eels = EELSSpectrum([range(10)] * 3)
         s_eels.metadata.set_item(
-            'Acquisition_instrument.TEM.Detector.EELS.collection_angle',
+            u'Acquisition_instrument.TEM.Detector.EELS.collection_angle',
             3.0)
-        s_eels.metadata.set_item('Acquisition_instrument.TEM.beam_energy', 1.0)
+        s_eels.metadata.set_item(u'Acquisition_instrument.TEM.beam_energy', 1.0)
         s_eels.metadata.set_item(
-            'Acquisition_instrument.TEM.convergence_angle',
+            u'Acquisition_instrument.TEM.convergence_angle',
             2.0)
         self.eels_m = s_eels.create_model(auto_background=False)
 
@@ -108,7 +109,7 @@ class TestModelIndexingClass:
         assert_true(isinstance(m_eels, type(m_eels.inav[1:])))
 
 
-class TestEELSModelSlicing:
+class TestEELSModelSlicing(object):
 
     def setUp(self):
         data = np.random.random((10, 10, 600))
@@ -116,11 +117,11 @@ class TestEELSModelSlicing:
         s.axes_manager[-1].offset = -150.
         s.axes_manager[-1].scale = 0.5
         s.metadata.set_item(
-            'Acquisition_instrument.TEM.Detector.EELS.collection_angle',
+            u'Acquisition_instrument.TEM.Detector.EELS.collection_angle',
             3.0)
-        s.metadata.set_item('Acquisition_instrument.TEM.beam_energy', 1.0)
+        s.metadata.set_item(u'Acquisition_instrument.TEM.beam_energy', 1.0)
         s.metadata.set_item(
-            'Acquisition_instrument.TEM.convergence_angle',
+            u'Acquisition_instrument.TEM.convergence_angle',
             2.0)
         m = s.create_model(
             ll=s + 1,

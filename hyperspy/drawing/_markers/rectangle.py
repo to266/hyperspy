@@ -23,7 +23,7 @@ from hyperspy.drawing.marker import MarkerBase
 
 class Rectangle(MarkerBase):
 
-    """Rectangle marker that can be added to the signal figure
+    u"""Rectangle marker that can be added to the signal figure
 
     Parameters
     ---------
@@ -57,7 +57,7 @@ class Rectangle(MarkerBase):
 
     def __init__(self, x1, y1, x2, y2, **kwargs):
         MarkerBase.__init__(self)
-        lp = {'color': 'black', 'fill': None, 'linewidth': 1}
+        lp = {u'color': u'black', u'fill': None, u'linewidth': 1}
         self.marker_properties = lp
         self.set_data(x1=x1, y1=y1, x2=x2, y2=y2)
         self.set_marker_properties(**kwargs)
@@ -65,23 +65,23 @@ class Rectangle(MarkerBase):
     def update(self):
         if self.auto_update is False:
             return
-        self.marker.set_xdata([self.get_data_position('x1'),
-                               self.get_data_position('x2')])
-        self.marker.set_ydata([self.get_data_position('y1'),
-                               self.get_data_position('y2')])
+        self.marker.set_xdata([self.get_data_position(u'x1'),
+                               self.get_data_position(u'x2')])
+        self.marker.set_ydata([self.get_data_position(u'y1'),
+                               self.get_data_position(u'y2')])
 
     def plot(self):
         if self.ax is None:
             raise AttributeError(
-                "To use this method the marker needs to be first add to a " +
-                "figure using `s._plot.signal_plot.add_marker(m)` or " +
-                "`s._plot.navigator_plot.add_marker(m)`")
-        width = abs(self.get_data_position('x1') -
-                    self.get_data_position('x2'))
-        height = abs(self.get_data_position('y1') -
-                     self.get_data_position('y2'))
+                u"To use this method the marker needs to be first add to a " +
+                u"figure using `s._plot.signal_plot.add_marker(m)` or " +
+                u"`s._plot.navigator_plot.add_marker(m)`")
+        width = abs(self.get_data_position(u'x1') -
+                    self.get_data_position(u'x2'))
+        height = abs(self.get_data_position(u'y1') -
+                     self.get_data_position(u'y2'))
         self.marker = self.ax.add_patch(plt.Rectangle(
-            (self.get_data_position('x1'), self.get_data_position('y1')),
+            (self.get_data_position(u'x1'), self.get_data_position(u'y1')),
             width, height, **self.marker_properties))
         self.marker.set_animated(True)
         try:

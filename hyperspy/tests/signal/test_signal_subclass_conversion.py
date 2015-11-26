@@ -6,7 +6,7 @@ from hyperspy import signals
 from hyperspy.exceptions import DataDimensionError
 
 
-class Test1d:
+class Test1d(object):
 
     def setUp(self):
         self.s = Signal(np.arange(2))
@@ -20,12 +20,12 @@ class Test1d:
 
     def test_set_EELS(self):
         s = self.s.as_spectrum(0)
-        s.set_signal_type("EELS")
-        assert_equal(s.metadata.Signal.signal_type, "EELS")
+        s.set_signal_type(u"EELS")
+        assert_equal(s.metadata.Signal.signal_type, u"EELS")
         assert_true(isinstance(s, signals.EELSSpectrum))
 
 
-class Test2d:
+class Test2d(object):
 
     def setUp(self):
         self.s = Signal(np.random.random((2, 3)))
@@ -48,21 +48,21 @@ class Test2d:
 
     def test_s2EELS2im2s(self):
         s = self.s.as_spectrum(0)
-        s.set_signal_type("EELS")
+        s.set_signal_type(u"EELS")
         im = s.as_image((1, 0))
-        assert_equal(im.metadata.Signal.signal_type, "EELS")
+        assert_equal(im.metadata.Signal.signal_type, u"EELS")
         s = im.as_spectrum(0)
-        assert_equal(s.metadata.Signal.signal_type, "EELS")
+        assert_equal(s.metadata.Signal.signal_type, u"EELS")
         assert_true(isinstance(s, signals.EELSSpectrum))
 
 
-class Test3d:
+class Test3d(object):
 
     def setUp(self):
         self.s = Signal(np.random.random((2, 3, 4)))
 
     def test_as_image_contigous(self):
-        assert_true(self.s.as_image((0, 1)).data.flags['C_CONTIGUOUS'])
+        assert_true(self.s.as_image((0, 1)).data.flags[u'C_CONTIGUOUS'])
 
     def test_as_image_1(self):
         assert_equal(
@@ -77,7 +77,7 @@ class Test3d:
             self.s.as_image((1, 2)).data.shape, (3, 4, 2))
 
     def test_as_spectrum_contigous(self):
-        assert_true(self.s.as_spectrum(0).data.flags['C_CONTIGUOUS'])
+        assert_true(self.s.as_spectrum(0).data.flags[u'C_CONTIGUOUS'])
 
     def test_as_spectrum_0(self):
         assert_equal(

@@ -2,7 +2,7 @@
 
 from hyperspy import docstrings
 
-__doc__ = """
+__doc__ = u"""
 HyperSpy: a multi-dimensional data analysis package for Python
 ==============================================================
 
@@ -21,10 +21,10 @@ More details in the :mod:`~hyperspy.api` docstring.
 
 import os
 
-os.environ['QT_API'] = "pyqt"
+os.environ[u'QT_API'] = u"pyqt"
 
 
 from . import Release
 
-__all__ = ["api"]
+__all__ = [u"api"]
 __version__ = Release.version

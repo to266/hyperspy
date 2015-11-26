@@ -1,4 +1,4 @@
-"""
+u"""
 
 Functions that operate of Signal instances and other goodies.
 

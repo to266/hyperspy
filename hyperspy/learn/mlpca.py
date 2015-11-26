@@ -24,13 +24,14 @@
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import division
 import numpy as np
 import scipy.linalg
 from hyperspy.misc.machine_learning.import_sklearn import *
 
 
 def mlpca(X, varX, p, convlim=1E-10, maxiter=50000, fast=False):
-    """
+    u"""
     This function performs MLPCA with missing
     data.
 
@@ -66,9 +67,9 @@ def mlpca(X, varX, p, convlim=1E-10, maxiter=50000, fast=False):
     XX = X
 #    varX = stdX**2
     n = XX.shape[1]
-    print("\nPerforming maximum likelihood principal components analysis")
+    print u"\nPerforming maximum likelihood principal components analysis"
     # Generate initial estimates
-    print("Generating initial estimates")
+    print u"Generating initial estimates"
 #    CV = np.zeros((X.shape[0], X.shape[0]))
 #    for i in xrange(X.shape[0]):
 #        for j in xrange(X.shape[0]):
@@ -80,7 +81,7 @@ def mlpca(X, varX, p, convlim=1E-10, maxiter=50000, fast=False):
     U0 = U
 
     # Loop for alternating least squares
-    print("Optimization iteration loop")
+    print u"Optimization iteration loop"
     count = 0
     Sold = 0
     ErrFlag = -1
@@ -88,7 +89,7 @@ def mlpca(X, varX, p, convlim=1E-10, maxiter=50000, fast=False):
         count += 1
         Sobj = 0
         MLX = np.zeros(XX.shape)
-        for i in range(n):
+        for i in xrange(n):
             #            Q = sp.sparse.lil_matrix((varX.shape[0] ,varX.shape[0]))
             #            Q.setdiag((1/(varX[:,i])).squeeze())
             #            Q.tocsc()
@@ -104,10 +105,10 @@ def mlpca(X, varX, p, convlim=1E-10, maxiter=50000, fast=False):
             dx = np.matrix((XX[:, i] - MLX[:, i]).squeeze())
             Sobj += float(dx * Q * dx.T)
         if (count % 2) == 1:
-            print("Iteration : %s" % (count / 2))
+            print u"Iteration : %s" % (count / 2)
             if (abs(Sold - Sobj) / Sobj) < convlim:
                 ErrFlag = 1
-            print("(abs(Sold - Sobj) / Sobj) = %s" % (abs(Sold - Sobj) / Sobj))
+            print u"(abs(Sold - Sobj) / Sobj) = %s" % (abs(Sold - Sobj) / Sobj)
             if count > maxiter:
                 ErrFlag = 1
 

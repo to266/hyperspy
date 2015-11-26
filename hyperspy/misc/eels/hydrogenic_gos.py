@@ -1,4 +1,5 @@
 
+from __future__ import division
 import math
 
 import numpy as np
@@ -20,7 +21,7 @@ XU = [
 
 class HydrogenicGOS(GOSBase):
 
-    """Computes the K and L GOS using R. Egerton's  routines.
+    u"""Computes the K and L GOS using R. Egerton's  routines.
 
     Parameters
     ----------
@@ -54,10 +55,10 @@ class HydrogenicGOS(GOSBase):
     I. Iyengar. See http://www.tem-eels.ca/ for the original code.
 
     """
-    _name = 'hydrogenic'
+    _name = u'hydrogenic'
 
     def __init__(self, element_subshell):
-        """
+        u"""
         Parameters
         ----------
 
@@ -68,20 +69,20 @@ class HydrogenicGOS(GOSBase):
         # Check if the Peter Rez's Hartree Slater GOS distributed by
         # Gatan are available. Otherwise exit
 
-        self.element, self.subshell = element_subshell.split('_')
+        self.element, self.subshell = element_subshell.split(u'_')
         self.read_elements()
         self.energy_shift = 0
 
-        if self.subshell[:1] == 'K':
+        if self.subshell[:1] == u'K':
             self.gosfunc = self.gosfuncK
             self.rel_energy_axis = self.get_parametrized_energy_axis(
                 50, 3, 50)
-        elif self.subshell[:1] == 'L':
+        elif self.subshell[:1] == u'L':
             self.gosfunc = self.gosfuncL
-            self.onset_energy_L3 = self.element_dict['Atomic_properties'][
-                'Binding_energies']['L3']['onset_energy (eV)']
-            self.onset_energy_L1 = self.element_dict['Atomic_properties'][
-                'Binding_energies']['L1']['onset_energy (eV)']
+            self.onset_energy_L3 = self.element_dict[u'Atomic_properties'][
+                u'Binding_energies'][u'L3'][u'onset_energy (eV)']
+            self.onset_energy_L1 = self.element_dict[u'Atomic_properties'][
+                u'Binding_energies'][u'L1'][u'onset_energy (eV)']
             self.onset_energy = self.onset_energy_L3
             relative_axis = self.get_parametrized_energy_axis(
                 50, 3, 50)
@@ -91,14 +92,14 @@ class HydrogenicGOS(GOSBase):
                 relative_axis + dL3L2))
         else:
             raise ValueError(
-                'The Hydrogenic GOS currently can only'
-                'compute K or L shells. Try using Hartree-Slater GOS')
+                u'The Hydrogenic GOS currently can only'
+                u'compute K or L shells. Try using Hartree-Slater GOS')
 
         self.energy_axis = self.rel_energy_axis + self.onset_energy
-        print("\nHydrogenic GOS")
-        print("\tElement: ", self.element)
-        print("\tSubshell: ", self.subshell[1:])
-        print("\tOnset energy: ", self.onset_energy)
+        print u"\nHydrogenic GOS"
+        print u"\tElement: ", self.element
+        print u"\tSubshell: ", self.subshell[1:]
+        print u"\tOnset energy: ", self.onset_energy
 
     def integrateq(self, onset_energy, angle, E0):
         energy_shift = onset_energy - self.onset_energy

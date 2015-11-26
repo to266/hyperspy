@@ -23,7 +23,7 @@ from hyperspy._signals.spectrum import Spectrum
 from hyperspy.components import Gaussian
 
 
-class TestChiSquared:
+class TestChiSquared(object):
 
     def setUp(self):
         s = Spectrum(np.array([1.0, 2, 4, 7, 12, 7, 4, 2, 1]))
@@ -45,7 +45,7 @@ class TestChiSquared:
         g = Gaussian()
         g1 = Gaussian()
         m.extend((g, g1))
-        g1.set_parameters_not_free('A')
+        g1.set_parameters_not_free(u'A')
         m.fit()
         assert_true(np.equal(m.dof(), 5))
 
@@ -71,7 +71,7 @@ class TestChiSquared:
         g = Gaussian()
         g1 = Gaussian()
         m.extend((g, g1))
-        g1.set_parameters_not_free('A')
+        g1.set_parameters_not_free(u'A')
         m._set_p0()
         m._set_current_degrees_of_freedom()
         assert_true(np.equal(m.dof(), 5))

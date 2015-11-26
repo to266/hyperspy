@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 from hyperspy.component import Component
 from .gaussian import Gaussian
@@ -23,21 +24,21 @@ from .gaussian import Gaussian
 
 class Vignetting(Component):
 
-    """
+    u"""
     Model the vignetting of the lens with a cos^4 law multiplied by lines on
     the edges
     """
 
     def __init__(self):
         Component.__init__(self,
-                           ['optical_center',
-                            'height',
-                            'period',
-                            'left_slope',
-                            'right_slope',
-                            'left',
-                            'right',
-                            'sigma'])
+                           [u'optical_center',
+                            u'height',
+                            u'period',
+                            u'left_slope',
+                            u'right_slope',
+                            u'left',
+                            u'right',
+                            u'sigma'])
         self.left.value = np.nan
         self.right.value = np.nan
         self.side_vignetting = False
@@ -62,7 +63,7 @@ class Vignetting(Component):
         if self.side_vignetting is True:
 
             x = x.tolist()
-            x = list(range(-ex, 0)) + x + list(range(int(x[-1]) + 1, int(x[-1]) + ex + 1))
+            x = xrange(-ex, 0) + x + xrange(int(x[-1]) + 1, int(x[-1]) + ex + 1)
             x = np.array(x)
             v1 = A * np.cos((x - x0) / (2 * np.pi * period)) ** 4
             v2 = np.where(x < l,
@@ -72,7 +73,7 @@ class Vignetting(Component):
                                    1. - (x - r) * ra))
             self.gaussian.sigma.value = sigma
             self.gaussian.origin.value = (x[-1] + x[0]) / 2
-            result = np.convolve(self.gaussian.function(x), v1 * v2, 'same')
+            result = np.convolve(self.gaussian.function(x), v1 * v2, u'same')
             return result[ex:-ex]
         else:
             return A * np.cos((x - x0) / (2 * np.pi * period)) ** 4

@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import math
 
 import numpy as np
@@ -28,7 +29,7 @@ sigma2fwhm = 2 * math.sqrt(2 * math.log(2))
 
 class Gaussian(Component):
 
-    """Normalized gaussian function component
+    u"""Normalized gaussian function component
 
     .. math::
 
@@ -51,7 +52,7 @@ class Gaussian(Component):
     """
 
     def __init__(self, A=1., sigma=1., centre=0.):
-        Component.__init__(self, ['A', 'sigma', 'centre'])
+        Component.__init__(self, [u'A', u'sigma', u'centre'])
         self.A.value = A
         self.sigma.value = sigma
         self.centre.value = centre
@@ -93,7 +94,7 @@ class Gaussian(Component):
                                                  (2 * self.sigma.value ** 2)) * self.A.value) / (sqrt2pi * self.sigma.value ** 3)
 
     def estimate_parameters(self, signal, x1, x2, only_current=False):
-        """Estimate the gaussian by calculating the momenta.
+        u"""Estimate the gaussian by calculating the momenta.
 
         Parameters
         ----------
@@ -167,15 +168,15 @@ class Gaussian(Component):
         else:
             if self.A.map is None:
                 self._create_arrays()
-            self.A.map['values'][:] = height * sigma * sqrt2pi
+            self.A.map[u'values'][:] = height * sigma * sqrt2pi
 
             if binned is True:
-                self.A.map['values'] /= axis.scale
-            self.A.map['is_set'][:] = True
-            self.sigma.map['values'][:] = sigma
-            self.sigma.map['is_set'][:] = True
-            self.centre.map['values'][:] = center
-            self.centre.map['is_set'][:] = True
+                self.A.map[u'values'] /= axis.scale
+            self.A.map[u'is_set'][:] = True
+            self.sigma.map[u'values'][:] = sigma
+            self.sigma.map[u'is_set'][:] = True
+            self.centre.map[u'values'][:] = center
+            self.centre.map[u'is_set'][:] = True
             self.fetch_stored_values()
             return True
 

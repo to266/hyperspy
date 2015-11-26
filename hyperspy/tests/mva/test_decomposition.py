@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 
 import nose.tools
@@ -5,7 +6,7 @@ from nose.tools import assert_true, raises
 from hyperspy import signals
 
 
-class TestNdAxes:
+class TestNdAxes(object):
 
     def setUp(self):
         # Create three signals with dimensions:
@@ -70,7 +71,7 @@ class TestNdAxes:
                                              s2.learning_results.loadings)
 
 
-class TestGetExplainedVarinaceRation:
+class TestGetExplainedVarinaceRation(object):
 
     def setUp(self):
         s = signals.Signal(np.empty(1))
@@ -86,7 +87,7 @@ class TestGetExplainedVarinaceRation:
         self.s.get_explained_variance_ration()
 
 
-class TestReverseDecompositionComponent:
+class TestReverseDecompositionComponent(object):
 
     def setUp(self):
         s = signals.Signal(np.empty(1))
@@ -151,7 +152,7 @@ class TestNormalizeComponents():
 
     def test_normalize_bss_factors(self):
         s = self.s
-        s.normalize_bss_components(target="factors",
+        s.normalize_bss_components(target=u"factors",
                                    function=np.sum)
         nose.tools.assert_true(
             (s.learning_results.bss_factors == self.factors / 2.).all())
@@ -160,7 +161,7 @@ class TestNormalizeComponents():
 
     def test_normalize_bss_loadings(self):
         s = self.s
-        s.normalize_bss_components(target="loadings",
+        s.normalize_bss_components(target=u"loadings",
                                    function=np.sum)
         nose.tools.assert_true(
             (s.learning_results.bss_factors == self.factors * 2.).all())
@@ -169,7 +170,7 @@ class TestNormalizeComponents():
 
     def test_normalize_decomposition_factors(self):
         s = self.s
-        s.normalize_decomposition_components(target="factors",
+        s.normalize_decomposition_components(target=u"factors",
                                              function=np.sum)
         nose.tools.assert_true(
             (s.learning_results.factors ==
@@ -180,7 +181,7 @@ class TestNormalizeComponents():
 
     def test_normalize_decomposition_loadings(self):
         s = self.s
-        s.normalize_decomposition_components(target="loadings",
+        s.normalize_decomposition_components(target=u"loadings",
                                              function=np.sum)
         nose.tools.assert_true(
             (s.learning_results.factors ==

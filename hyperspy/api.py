@@ -2,7 +2,7 @@
 
 from hyperspy import docstrings
 
-__doc__ = """
+__doc__ = u"""
 
 All public packages, functions and classes are available in this module.
 

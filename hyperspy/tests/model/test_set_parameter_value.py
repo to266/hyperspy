@@ -23,7 +23,7 @@ from hyperspy._signals.spectrum import Spectrum
 from hyperspy.components import Gaussian
 
 
-class TestSetParameterInModel:
+class TestSetParameterInModel(object):
 
     def setUp(self):
         g1 = Gaussian()
@@ -44,31 +44,31 @@ class TestSetParameterInModel:
         g1 = self.g1
         g2 = self.g2
         g3 = self.g3
-        m.set_parameters_value('A', 20)
-        assert_true(np.all(g1.A.map['values'] == 20))
-        assert_true(np.all(g2.A.map['values'] == 20))
-        assert_true(np.all(g3.A.map['values'] == 20))
+        m.set_parameters_value(u'A', 20)
+        assert_true(np.all(g1.A.map[u'values'] == 20))
+        assert_true(np.all(g2.A.map[u'values'] == 20))
+        assert_true(np.all(g3.A.map[u'values'] == 20))
 
     def test_set_parameter_value2(self):
         m = self.model
         g1 = self.g1
         g2 = self.g2
         g3 = self.g3
-        m.set_parameters_value('A', 20, component_list=[g1, g2])
-        assert_true(np.all(g1.A.map['values'] == 20))
-        assert_true(np.all(g2.A.map['values'] == 20))
-        assert_true(np.all(g3.A.map['values'] == 0))
+        m.set_parameters_value(u'A', 20, component_list=[g1, g2])
+        assert_true(np.all(g1.A.map[u'values'] == 20))
+        assert_true(np.all(g2.A.map[u'values'] == 20))
+        assert_true(np.all(g3.A.map[u'values'] == 0))
 
     def test_set_parameter_value3(self):
         m = self.model
         g1 = self.g1
         g2 = self.g2
         g3 = self.g3
-        m.set_parameters_value('A', 20, component_list=[g1], only_current=True)
-        g1.A.map['values'][0][0] -= 20
-        assert_true(np.all(g1.A.map['values'] == 0))
-        assert_true(np.all(g2.A.map['values'] == 0))
-        assert_true(np.all(g3.A.map['values'] == 0))
+        m.set_parameters_value(u'A', 20, component_list=[g1], only_current=True)
+        g1.A.map[u'values'][0][0] -= 20
+        assert_true(np.all(g1.A.map[u'values'] == 0))
+        assert_true(np.all(g2.A.map[u'values'] == 0))
+        assert_true(np.all(g3.A.map[u'values'] == 0))
 
     def test_set_active_value1(self):
         m = self.model

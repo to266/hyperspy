@@ -1,13 +1,15 @@
+from __future__ import division
 import numpy as np
 import numbers
 import warnings
 
 from hyperspy.misc.elements import elements as elements_db
 from hyperspy.misc.utils import stack
+from itertools import imap
 
 
 def _weight_to_atomic(weight_percent, elements):
-    """Convert weight percent (wt%) to atomic percent (at.%).
+    u"""Convert weight percent (wt%) to atomic percent (at.%).
 
     Parameters
     ----------
@@ -28,12 +30,12 @@ def _weight_to_atomic(weight_percent, elements):
     """
     if len(elements) != len(weight_percent):
         raise ValueError(
-            'The number of elements must match the size of the first axis'
-            'of weight_percent.')
+            u'The number of elements must match the size of the first axis'
+            u'of weight_percent.')
     atomic_weights = np.array(
-        [elements_db[element]['General_properties']['atomic_weight']
+        [elements_db[element][u'General_properties'][u'atomic_weight']
             for element in elements])
-    atomic_percent = np.array(list(map(np.divide, weight_percent, atomic_weights)))
+    atomic_percent = np.array(list(imap(np.divide, weight_percent, atomic_weights)))
     sum_weight = atomic_percent.sum(axis=0) / 100.
     for i, el in enumerate(elements):
         atomic_percent[i] /= sum_weight
@@ -41,8 +43,8 @@ def _weight_to_atomic(weight_percent, elements):
     return atomic_percent
 
 
-def weight_to_atomic(weight_percent, elements='auto'):
-    """Convert weight percent (wt%) to atomic percent (at.%).
+def weight_to_atomic(weight_percent, elements=u'auto'):
+    u"""Convert weight percent (wt%) to atomic percent (at.%).
 
     Parameters
     ----------
@@ -80,7 +82,7 @@ def weight_to_atomic(weight_percent, elements='auto'):
 
 
 def _atomic_to_weight(atomic_percent, elements):
-    """Convert atomic percent to weight percent.
+    u"""Convert atomic percent to weight percent.
 
     Parameters
     ----------
@@ -103,12 +105,12 @@ def _atomic_to_weight(atomic_percent, elements):
     """
     if len(elements) != len(atomic_percent):
         raise ValueError(
-            'The number of elements must match the size of the first axis'
-            'of atomic_percent.')
+            u'The number of elements must match the size of the first axis'
+            u'of atomic_percent.')
     atomic_weights = np.array(
-        [elements_db[element]['General_properties']['atomic_weight']
+        [elements_db[element][u'General_properties'][u'atomic_weight']
             for element in elements])
-    weight_percent = np.array(list(map(np.multiply, atomic_percent, atomic_weights)))
+    weight_percent = np.array(list(imap(np.multiply, atomic_percent, atomic_weights)))
     sum_atomic = weight_percent.sum(axis=0) / 100.
     for i, el in enumerate(elements):
         weight_percent[i] /= sum_atomic
@@ -116,8 +118,8 @@ def _atomic_to_weight(atomic_percent, elements):
     return weight_percent
 
 
-def atomic_to_weight(atomic_percent, elements='auto'):
-    """Convert atomic percent to weight percent.
+def atomic_to_weight(atomic_percent, elements=u'auto'):
+    u"""Convert atomic percent to weight percent.
 
     Parameters
     ----------
@@ -154,8 +156,8 @@ def atomic_to_weight(atomic_percent, elements='auto'):
 
 def _density_of_mixture_of_pure_elements(weight_percent,
                                          elements,
-                                         mean='harmonic'):
-    """Calculate the density a mixture of elements.
+                                         mean=u'harmonic'):
+    u"""Calculate the density a mixture of elements.
 
     The density of the elements is retrieved from an internal database. The
     calculation is only valid if there is no interaction between the
@@ -186,19 +188,19 @@ def _density_of_mixture_of_pure_elements(weight_percent,
     """
     if len(elements) != len(weight_percent):
         raise ValueError(
-            'The number of elements must match the size of the first axis'
-            'of weight_percent.')
+            u'The number of elements must match the size of the first axis'
+            u'of weight_percent.')
     densities = np.array(
-        [elements_db[element]['Physical_properties']['density (g/cm^3)']
+        [elements_db[element][u'Physical_properties'][u'density (g/cm^3)']
             for element in elements])
-    sum_densities = np.zeros_like(weight_percent, dtype='float')
-    if mean == 'harmonic':
+    sum_densities = np.zeros_like(weight_percent, dtype=u'float')
+    if mean == u'harmonic':
         for i, weight in enumerate(weight_percent):
             sum_densities[i] = weight / densities[i]
         sum_densities = sum_densities.sum(axis=0)
         density = np.sum(weight_percent, axis=0) / sum_densities
         return np.where(sum_densities == 0.0, 0.0, density)
-    elif mean == 'weighted':
+    elif mean == u'weighted':
         for i, weight in enumerate(weight_percent):
             sum_densities[i] = weight * densities[i]
         sum_densities = sum_densities.sum(axis=0)
@@ -208,9 +210,9 @@ def _density_of_mixture_of_pure_elements(weight_percent,
 
 
 def density_of_mixture_of_pure_elements(weight_percent,
-                                        elements='auto',
-                                        mean='harmonic'):
-    """Calculate the density of a mixture of elements.
+                                        elements=u'auto',
+                                        mean=u'harmonic'):
+    u"""Calculate the density of a mixture of elements.
 
     The density of the elements is retrieved from an internal database. The
     calculation is only valid if there is no interaction between the
@@ -255,19 +257,19 @@ def density_of_mixture_of_pure_elements(weight_percent,
 
 def _elements_auto(composition, elements):
     if isinstance(composition[0], numbers.Number):
-        if isinstance(elements, str):
-            if elements == 'auto':
-                raise ValueError("The elements needs to be provided.")
+        if isinstance(elements, unicode):
+            if elements == u'auto':
+                raise ValueError(u"The elements needs to be provided.")
     else:
-        if isinstance(elements, str):
-            if elements == 'auto':
+        if isinstance(elements, unicode):
+            if elements == u'auto':
                 elements = []
                 for compo in composition:
                     if len(compo.metadata.Sample.elements) > 1:
                         raise ValueError(
-                            "The signal %s contains more than one element "
-                            "but this function requires only one element "
-                            "per signal." % compo.metadata.General.title)
+                            u"The signal %s contains more than one element "
+                            u"but this function requires only one element "
+                            u"per signal." % compo.metadata.General.title)
                     else:
                         elements.append(compo.metadata.Sample.elements[0])
     return elements

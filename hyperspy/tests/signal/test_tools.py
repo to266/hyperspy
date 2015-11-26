@@ -3,25 +3,26 @@ import nose.tools as nt
 
 from hyperspy.signal import Signal
 from hyperspy import signals
+from itertools import izip
 
 
-class Test2D:
+class Test2D(object):
 
     def setUp(self):
         self.signal = Signal(np.arange(5 * 10).reshape(5, 10))
-        self.signal.axes_manager[0].name = "x"
-        self.signal.axes_manager[1].name = "E"
+        self.signal.axes_manager[0].name = u"x"
+        self.signal.axes_manager[1].name = u"E"
         self.signal.axes_manager[0].scale = 0.5
         self.data = self.signal.data.copy()
 
     def test_sum_x(self):
-        s = self.signal.sum("x")
+        s = self.signal.sum(u"x")
         np.testing.assert_array_equal(self.signal.data.sum(0), s.data)
         nt.assert_equal(s.data.ndim, 1)
         nt.assert_equal(s.axes_manager.navigation_dimension, 0)
 
     def test_sum_x_E(self):
-        s = self.signal.sum("x").sum("E")
+        s = self.signal.sum(u"x").sum(u"E")
         np.testing.assert_array_equal(self.signal.data.sum(), s.data)
         nt.assert_equal(s.data.ndim, 1)
         # Check that there is still one signal axis.
@@ -31,7 +32,7 @@ class Test2D:
         s1 = self.signal.deepcopy()
         s2 = self.signal.deepcopy()
         s1.crop(0, 2, 4)
-        s2.crop("x", 2, 4)
+        s2.crop(u"x", 2, 4)
         nt.assert_true((s1.data == s2.data).all())
 
     def test_crop_int(self):
@@ -59,7 +60,7 @@ class Test2D:
         nt.assert_true((result[1].data == self.data[:, 5:]).all())
 
     def test_split_axisE(self):
-        result = self.signal.split("E", 2)
+        result = self.signal.split(u"E", 2)
         nt.assert_true(len(result) == 2)
         nt.assert_true((result[0].data == self.data[:, :5]).all())
         nt.assert_true((result[1].data == self.data[:, 5:]).all())
@@ -108,13 +109,13 @@ class Test2D:
         nt.assert_true(s.unfold())
 
 
-class Test3D:
+class Test3D(object):
 
     def setUp(self):
         self.signal = Signal(np.arange(2 * 4 * 6).reshape(2, 4, 6))
-        self.signal.axes_manager[0].name = "x"
-        self.signal.axes_manager[1].name = "y"
-        self.signal.axes_manager[2].name = "E"
+        self.signal.axes_manager[0].name = u"x"
+        self.signal.axes_manager[1].name = u"y"
+        self.signal.axes_manager[2].name = u"E"
         self.signal.axes_manager[0].scale = 0.5
         self.data = self.signal.data.copy()
 
@@ -137,14 +138,14 @@ class Test3D:
         _ = new_s.metadata.Signal.Noise_properties
 
     def test_rebin_const_variance(self):
-        self.signal.metadata.set_item('Signal.Noise_properties.variance', 0.3)
+        self.signal.metadata.set_item(u'Signal.Noise_properties.variance', 0.3)
         new_s = self.signal.rebin((2, 1, 6))
         nt.assert_true(new_s.metadata.Signal.Noise_properties.variance == 0.3)
 
     def test_swap_axes(self):
         s = self.signal
         nt.assert_equal(s.swap_axes(0, 1).data.shape, (4, 2, 6))
-        nt.assert_true(s.swap_axes(0, 2).data.flags['C_CONTIGUOUS'])
+        nt.assert_true(s.swap_axes(0, 2).data.flags[u'C_CONTIGUOUS'])
 
     def test_get_navigation_signal_nav_dim0(self):
         s = self.signal
@@ -261,21 +262,21 @@ class Test3D:
     def test_get_navigation_signal_given_dtype(self):
         s = self.signal
         nt.assert_equal(
-            s._get_navigation_signal(dtype="bool").data.dtype.name, "bool")
+            s._get_navigation_signal(dtype=u"bool").data.dtype.name, u"bool")
 
     def test_get_signal_signal_given_dtype(self):
         s = self.signal
         nt.assert_equal(
-            s._get_signal_signal(dtype="bool").data.dtype.name, "bool")
+            s._get_signal_signal(dtype=u"bool").data.dtype.name, u"bool")
 
 
-class Test4D:
+class Test4D(object):
 
     def setUp(self):
         s = signals.Spectrum(np.ones((5, 4, 3, 6)))
-        for axis, name in zip(
+        for axis, name in izip(
                 s.axes_manager._get_axes_in_natural_order(),
-                ['x', 'y', 'z', 'E']):
+                [u'x', u'y', u'z', u'E']):
             axis.name = name
         self.s = s
 
@@ -296,7 +297,7 @@ class Test4D:
         nt.assert_equal(self.s.rollaxis(2, 0).data.shape, (4, 3, 5, 6))
 
     def test_rollaxis_str(self):
-        nt.assert_equal(self.s.rollaxis("z", "x").data.shape, (4, 3, 5, 6))
+        nt.assert_equal(self.s.rollaxis(u"z", u"x").data.shape, (4, 3, 5, 6))
 
     def test_unfold_spectrum(self):
         self.s.unfold()
@@ -339,14 +340,14 @@ class Test4D:
 
 def test_signal_iterator():
     s = Signal(np.arange(3).reshape((3, 1)))
-    nt.assert_equal(next(s).data[0], 0)
+    nt.assert_equal(s.next().data[0], 0)
     # If the following fails it can be because the iteration index was not
     # restarted
     for i, signal in enumerate(s):
         nt.assert_equal(i, signal.data[0])
 
 
-class TestDerivative:
+class TestDerivative(object):
 
     def setup(self):
         offset = 3

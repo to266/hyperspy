@@ -48,7 +48,7 @@ except NameError:
             winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
                            root_key_name, winreg.KEY_CREATE_SUB_KEY)
             return winreg.HKEY_LOCAL_MACHINE
-        except OSError as details:
+        except OSError, details:
             # Either not exist, or no permissions to create subkey means
             # must be HKCU
             return winreg.HKEY_CURRENT_USER
@@ -57,7 +57,7 @@ except NameError:
 def get_special_folder_path(path_name):
     from win32com.shell import shellcon
 
-    for maybe in """
+    for maybe in u"""
         CSIDL_COMMON_STARTMENU CSIDL_STARTMENU CSIDL_COMMON_APPDATA
         CSIDL_LOCAL_APPDATA CSIDL_APPDATA CSIDL_COMMON_DESKTOPDIRECTORY
         CSIDL_DESKTOPDIRECTORY CSIDL_COMMON_STARTUP CSIDL_STARTUP
@@ -66,7 +66,7 @@ def get_special_folder_path(path_name):
         if maybe == path_name:
             csidl = getattr(shellcon, maybe)
             return shell.SHGetSpecialFolderPath(0, csidl, False)
-    raise ValueError("%s is an unknown path ID" % (path_name,))
+    raise ValueError(u"%s is an unknown path ID" % (path_name,))
 
 
 try:
@@ -75,7 +75,7 @@ except NameError:
     # Create a function with the same signature as create_shortcut provided
     # by bdist_wininst
     def create_shortcut(path, description, filename,
-                        arguments="", workdir="", iconpath="", iconindex=0):
+                        arguments=u"", workdir=u"", iconpath=u"", iconindex=0):
         import pythoncom
         from win32com.shell import shell, shellcon
 
@@ -101,7 +101,7 @@ def create_weblink(
     link = os.path.join(hspy_sm_path, link_name)
     if os.path.isfile(link):
         os.remove(link)  # we want to make a new one
-    create_shortcut(address, description, link, '', '', icon_path)
+    create_shortcut(address, description, link, u'', u'', icon_path)
     file_created(link)
 
 
@@ -112,26 +112,26 @@ def admin_rights():
 def install_start_menu_entries():
     import hyperspy
 
-    commons_sm = get_special_folder_path("CSIDL_COMMON_STARTMENU")
-    local_sm = get_special_folder_path("CSIDL_STARTMENU")
+    commons_sm = get_special_folder_path(u"CSIDL_COMMON_STARTMENU")
+    local_sm = get_special_folder_path(u"CSIDL_STARTMENU")
     if admin_rights() is True:
         start_menu = commons_sm
     else:
         start_menu = local_sm
     hyperspy_install_path = os.path.dirname(hyperspy.__file__)
     logo_path = os.path.expandvars(os.path.join(hyperspy_install_path,
-                                                'data'))
+                                                u'data'))
     hyperspy_qtconsole_bat = os.path.join(sys.prefix,
-                                          'Scripts',
-                                          'hyperspy_qtconsole.bat')
+                                          u'Scripts',
+                                          u'hyperspy_qtconsole.bat')
     hyperspy_notebook_bat = os.path.join(sys.prefix,
-                                         'Scripts',
-                                         'hyperspy_notebook.bat')
+                                         u'Scripts',
+                                         u'hyperspy_notebook.bat')
     # Create the start_menu entry
     if sys.getwindowsversion()[0] < 6.:  # Older than Windows Vista:
-        hspy_sm_path = os.path.join(start_menu, "Programs", "HyperSpy")
+        hspy_sm_path = os.path.join(start_menu, u"Programs", u"HyperSpy")
     else:
-        hspy_sm_path = os.path.join(start_menu, "Programs", "HyperSpy")
+        hspy_sm_path = os.path.join(start_menu, u"Programs", u"HyperSpy")
     if os.path.isdir(hspy_sm_path):
         try:
             shutil.rmtree(hspy_sm_path)
@@ -141,50 +141,50 @@ def install_start_menu_entries():
     os.mkdir(hspy_sm_path)
     directory_created(hspy_sm_path)
     qtconsole_link_path = os.path.join(hspy_sm_path,
-                                       'HyperSpy QtConsole.lnk')
+                                       u'HyperSpy QtConsole.lnk')
     notebook_link_path = os.path.join(hspy_sm_path,
-                                      'HyperSpy Notebook.lnk')
+                                      u'HyperSpy Notebook.lnk')
     create_shortcut(hyperspy_qtconsole_bat,
-                    'HyperSpy QtConsole',
+                    u'HyperSpy QtConsole',
                     qtconsole_link_path,
-                    "",
-                    os.path.expanduser("~"),
+                    u"",
+                    os.path.expanduser(u"~"),
                     os.path.join(logo_path,
-                                 'hyperspy_qtconsole_logo.ico'))
-    print("Installed HyperSpy (QtConsole) shortcut")
+                                 u'hyperspy_qtconsole_logo.ico'))
+    print u"Installed HyperSpy (QtConsole) shortcut"
     create_shortcut(hyperspy_notebook_bat,
-                    'HyperSpy Notebook',
+                    u'HyperSpy Notebook',
                     notebook_link_path,
-                    "",
-                    os.path.expanduser("~"),
+                    u"",
+                    os.path.expanduser(u"~"),
                     os.path.join(logo_path,
-                                 'hyperspy_notebook_logo.ico'))
-    print("Installed HyperSpy (Notebook) shortcut")
+                                 u'hyperspy_notebook_logo.ico'))
+    print u"Installed HyperSpy (Notebook) shortcut"
     file_created(qtconsole_link_path)
     file_created(notebook_link_path)
 
     links = [
         {
-            'address': r"http://hyperspy.org/hyperspy-doc/current/index.html",
-            'link_name': "HyperSpy Documentation.lnk",
-            'hspy_sm_path': hspy_sm_path,
-            'description': 'HyperSpy online documentation',
-            'icon_path': os.path.join(logo_path, 'hyperspy_doc_logo.ico')},
+            u'address': ur"http://hyperspy.org/hyperspy-doc/current/index.html",
+            u'link_name': u"HyperSpy Documentation.lnk",
+            u'hspy_sm_path': hspy_sm_path,
+            u'description': u'HyperSpy online documentation',
+            u'icon_path': os.path.join(logo_path, u'hyperspy_doc_logo.ico')},
         {
-            'address': r"http://hyperspy.org",
-            'link_name': "HyperSpy Homepage.lnk",
-            'hspy_sm_path': hspy_sm_path,
-            'description': 'HyperSpy homepage',
-            'icon_path': os.path.join(logo_path, 'hyperspy_home_logo.ico')},
+            u'address': ur"http://hyperspy.org",
+            u'link_name': u"HyperSpy Homepage.lnk",
+            u'hspy_sm_path': hspy_sm_path,
+            u'description': u'HyperSpy homepage',
+            u'icon_path': os.path.join(logo_path, u'hyperspy_home_logo.ico')},
     ]
     for link in links:
         create_weblink(**link)
-    print("Installed HyperSpy web links")
+    print u"Installed HyperSpy web links"
 
-if __name__ == "__main__":
+if __name__ == u"__main__":
     if admin_rights() is True:
         install_start_menu_entries()
-        print("All Start Menu entries were installed correctly")
+        print u"All Start Menu entries were installed correctly"
     else:
-        print("To add start menu entries, run this script "
-              "with administrator rights")
+        print u"To add start menu entries, run this script "
+              u"with administrator rights"

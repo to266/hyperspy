@@ -18,6 +18,8 @@
 
 
 
+from __future__ import with_statement
+from __future__ import division
 import types
 import warnings
 
@@ -86,19 +88,19 @@ def _normalize_components(target, other, function=np.sum):
 
 class MVA():
 
-    """
+    u"""
     Multivariate analysis capabilities for the Spectrum class.
 
     """
 
     def __init__(self):
-        if not hasattr(self, 'learning_results'):
+        if not hasattr(self, u'learning_results'):
             self.learning_results = LearningResults()
 
     @do_not_replot
     def decomposition(self,
                       normalize_poissonian_noise=False,
-                      algorithm='svd',
+                      algorithm=u'svd',
                       output_dimension=None,
                       centre=None,
                       auto_transpose=True,
@@ -109,7 +111,7 @@ class MVA():
                       polyfit=None,
                       reproject=None,
                       **kwargs):
-        """Decomposition with a choice of algorithms
+        u"""Decomposition with a choice of algorithms
 
         The results are stored in self.learning_results
 
@@ -163,39 +165,39 @@ class MVA():
 
         """
         # Check if it is the wrong data type
-        if self.data.dtype.char not in ['e', 'f', 'd']:  # If not float
+        if self.data.dtype.char not in [u'e', u'f', u'd']:  # If not float
             messages.warning(
-                'To perform a decomposition the data must be of the float '
-                'type. You can change the type using the change_dtype method'
-                ' e.g. s.change_dtype(\'float64\')\n'
-                'Nothing done.')
+                u'To perform a decomposition the data must be of the float '
+                u'type. You can change the type using the change_dtype method'
+                u' e.g. s.change_dtype(\'float64\')\n'
+                u'Nothing done.')
             return
 
         if self.axes_manager.navigation_size < 2:
-            raise AttributeError("It is not possible to decompose a dataset "
-                                 "with navigation_size < 2")
+            raise AttributeError(u"It is not possible to decompose a dataset "
+                                 u"with navigation_size < 2")
         # backup the original data
         self._data_before_treatments = self.data.copy()
 
-        if algorithm == 'mlpca':
+        if algorithm == u'mlpca':
             if normalize_poissonian_noise is True:
                 messages.warning(
-                    "It makes no sense to do normalize_poissonian_noise with "
-                    "the MLPCA algorithm. Therefore, "
-                    "normalize_poissonian_noise is set to False")
+                    u"It makes no sense to do normalize_poissonian_noise with "
+                    u"the MLPCA algorithm. Therefore, "
+                    u"normalize_poissonian_noise is set to False")
                 normalize_poissonian_noise = False
             if output_dimension is None:
-                raise ValueError("With the mlpca algorithm the "
-                                 "output_dimension must be expecified")
+                raise ValueError(u"With the mlpca algorithm the "
+                                 u"output_dimension must be expecified")
 
         # Apply pre-treatments
         # Transform the data in a line spectrum
         self._unfolded4decomposition = self.unfold()
         try:
-            if hasattr(navigation_mask, 'ravel'):
+            if hasattr(navigation_mask, u'ravel'):
                 navigation_mask = navigation_mask.ravel()
 
-            if hasattr(signal_mask, 'ravel'):
+            if hasattr(signal_mask, u'ravel'):
                 signal_mask = signal_mask.ravel()
 
             # Normalize the poissonian noise
@@ -205,7 +207,7 @@ class MVA():
                 self.normalize_poissonian_noise(
                     navigation_mask=navigation_mask,
                     signal_mask=signal_mask,)
-            messages.information('Performing decomposition analysis')
+            messages.information(u'Performing decomposition analysis')
             # The rest of the code assumes that the first data axis
             # is the navigation axis. We transpose the data if that is not the
             # case.
@@ -235,12 +237,12 @@ class MVA():
             explained_variance_ratio = None
             mean = None
 
-            if algorithm == 'svd':
+            if algorithm == u'svd':
                 factors, loadings, explained_variance, mean = svd_pca(
                     dc[:, signal_mask][navigation_mask, :], centre=centre,
                     auto_transpose=auto_transpose)
 
-            elif algorithm == 'fast_svd':
+            elif algorithm == u'fast_svd':
                 factors, loadings, explained_variance, mean = svd_pca(
                     dc[:, signal_mask][navigation_mask, :],
                     fast=True,
@@ -248,10 +250,10 @@ class MVA():
                     centre=centre,
                     auto_transpose=auto_transpose)
 
-            elif algorithm == 'sklearn_pca':
+            elif algorithm == u'sklearn_pca':
                 if import_sklearn.sklearn_installed is False:
                     raise ImportError(
-                        'sklearn is not installed. Nothing done')
+                        u'sklearn is not installed. Nothing done')
                 sk = import_sklearn.sklearn.decomposition.PCA(**kwargs)
                 sk.n_components = output_dimension
                 loadings = sk.fit_transform((
@@ -259,56 +261,56 @@ class MVA():
                 factors = sk.components_.T
                 explained_variance = sk.explained_variance_
                 mean = sk.mean_
-                centre = 'trials'
+                centre = u'trials'
 
-            elif algorithm == 'nmf':
+            elif algorithm == u'nmf':
                 if import_sklearn.sklearn_installed is False:
                     raise ImportError(
-                        'sklearn is not installed. Nothing done')
+                        u'sklearn is not installed. Nothing done')
                 sk = import_sklearn.sklearn.decomposition.NMF(**kwargs)
                 sk.n_components = output_dimension
                 loadings = sk.fit_transform((
                     dc[:, signal_mask][navigation_mask, :]))
                 factors = sk.components_.T
 
-            elif algorithm == 'sparse_pca':
+            elif algorithm == u'sparse_pca':
                 if import_sklearn.sklearn_installed is False:
                     raise ImportError(
-                        'sklearn is not installed. Nothing done')
+                        u'sklearn is not installed. Nothing done')
                 sk = import_sklearn.sklearn.decomposition.SparsePCA(
                     output_dimension, **kwargs)
                 loadings = sk.fit_transform(
                     dc[:, signal_mask][navigation_mask, :])
                 factors = sk.components_.T
 
-            elif algorithm == 'mini_batch_sparse_pca':
+            elif algorithm == u'mini_batch_sparse_pca':
                 if import_sklearn.sklearn_installed is False:
                     raise ImportError(
-                        'sklearn is not installed. Nothing done')
+                        u'sklearn is not installed. Nothing done')
                 sk = import_sklearn.sklearn.decomposition.MiniBatchSparsePCA(
                     output_dimension, **kwargs)
                 loadings = sk.fit_transform(
                     dc[:, signal_mask][navigation_mask, :])
                 factors = sk.components_.T
 
-            elif algorithm == 'mlpca' or algorithm == 'fast_mlpca':
-                print("Performing the MLPCA training")
+            elif algorithm == u'mlpca' or algorithm == u'fast_mlpca':
+                print u"Performing the MLPCA training"
                 if output_dimension is None:
                     raise ValueError(
-                        "For MLPCA it is mandatory to define the "
-                        "output_dimension")
+                        u"For MLPCA it is mandatory to define the "
+                        u"output_dimension")
                 if var_array is None and var_func is None:
-                    messages.information('No variance array provided.'
-                                         'Supposing poissonian data')
+                    messages.information(u'No variance array provided.'
+                                         u'Supposing poissonian data')
                     var_array = dc[:, signal_mask][navigation_mask, :]
 
                 if var_array is not None and var_func is not None:
                     raise ValueError(
-                        "You have defined both the var_func and var_array "
-                        "keywords."
-                        "Please, define just one of them")
+                        u"You have defined both the var_func and var_array "
+                        u"keywords."
+                        u"Please, define just one of them")
                 if var_func is not None:
-                    if hasattr(var_func, '__call__'):
+                    if hasattr(var_func, u'__call__'):
                         var_array = var_func(
                             dc[signal_mask, ...][:, navigation_mask])
                     else:
@@ -318,9 +320,9 @@ class MVA():
                                     signal_mask, navigation_mask])
                         except:
                             raise ValueError(
-                                'var_func must be either a function or an '
-                                'array defining the coefficients of a polynom')
-                if algorithm == 'mlpca':
+                                u'var_func must be either a function or an '
+                                u'array defining the coefficients of a polynom')
+                if algorithm == u'mlpca':
                     fast = False
                 else:
                     fast = True
@@ -332,8 +334,8 @@ class MVA():
                 explained_variance_ratio = S ** 2 / Sobj
                 explained_variance = S ** 2 / len(factors)
             else:
-                raise ValueError('Algorithm not recognised. '
-                                 'Nothing done')
+                raise ValueError(u'Algorithm not recognised. '
+                                 u'Nothing done')
 
             # We must calculate the ratio here because otherwise the sum
             # information can be lost if the user call
@@ -372,24 +374,24 @@ class MVA():
             # Reproject
             if mean is None:
                 mean = 0
-            if reproject in ('navigation', 'both'):
-                if algorithm not in ('nmf', 'sparse_pca',
-                                     'mini_batch_sparse_pca'):
+            if reproject in (u'navigation', u'both'):
+                if algorithm not in (u'nmf', u'sparse_pca',
+                                     u'mini_batch_sparse_pca'):
                     loadings_ = np.dot(dc[:, signal_mask] - mean, factors)
                 else:
                     loadings_ = sk.transform(dc[:, signal_mask])
                 target.loadings = loadings_
-            if reproject in ('signal', 'both'):
-                if algorithm not in ('nmf', 'sparse_pca',
-                                     'mini_batch_sparse_pca'):
+            if reproject in (u'signal', u'both'):
+                if algorithm not in (u'nmf', u'sparse_pca',
+                                     u'mini_batch_sparse_pca'):
                     factors = np.dot(np.linalg.pinv(loadings),
                                      dc[navigation_mask, :] - mean).T
                     target.factors = factors
                 else:
-                    messages.information("Reprojecting the signal is not yet "
-                                         "supported for this algorithm")
-                    if reproject == 'both':
-                        reproject = 'signal'
+                    messages.information(u"Reprojecting the signal is not yet "
+                                         u"supported for this algorithm")
+                    if reproject == u'both':
+                        reproject = u'signal'
                     else:
                         reproject = None
 
@@ -403,7 +405,7 @@ class MVA():
                 # Store the (inverted, as inputed) signal mask
                 target.signal_mask = ~signal_mask.reshape(
                     self.axes_manager._signal_shape_in_array)
-                if reproject not in ('both', 'signal'):
+                if reproject not in (u'both', u'signal'):
                     factors = np.zeros((dc.shape[-1], target.factors.shape[1]))
                     factors[signal_mask, :] = target.factors
                     factors[~signal_mask, :] = np.nan
@@ -412,7 +414,7 @@ class MVA():
                 # Store the (inverted, as inputed) navigation mask
                 target.navigation_mask = ~navigation_mask.reshape(
                     self.axes_manager._navigation_shape_in_array)
-                if reproject not in ('both', 'navigation'):
+                if reproject not in (u'both', u'navigation'):
                     loadings = np.zeros(
                         (dc.shape[0], target.loadings.shape[1]))
                     loadings[navigation_mask, :] = target.loadings
@@ -428,7 +430,7 @@ class MVA():
 
     def blind_source_separation(self,
                                 number_of_components=None,
-                                algorithm='sklearn_fastica',
+                                algorithm=u'sklearn_fastica',
                                 diff_order=1,
                                 diff_axes=None,
                                 factors=None,
@@ -437,7 +439,7 @@ class MVA():
                                 on_loadings=False,
                                 pretreatment=None,
                                 **kwargs):
-        """Blind source separation (BSS) on the result on the
+        u"""Blind source separation (BSS) on the result on the
         decomposition.
 
         Available algorithms: FastICA, JADE, CuBICA, and TDSEP
@@ -484,10 +486,10 @@ class MVA():
         lr = self.learning_results
 
         if factors is None:
-            if not hasattr(lr, 'factors') or lr.factors is None:
+            if not hasattr(lr, u'factors') or lr.factors is None:
                 raise AttributeError(
-                    'A decomposition must be performed before blind '
-                    'source seperation or factors must be provided.')
+                    u'A decomposition must be performed before blind '
+                    u'source seperation or factors must be provided.')
 
             else:
                 if on_loadings:
@@ -499,10 +501,10 @@ class MVA():
         if not isinstance(factors, Signal):
             if isinstance(factors, np.ndarray):
                 warnings.warn(
-                    "factors as numpy arrays will raise an error in "
-                    "HyperSpy 0.9 and newer. From them on only passing "
-                    "factors as HyperSpy Signal instances will be "
-                    "supported.",
+                    u"factors as numpy arrays will raise an error in "
+                    u"HyperSpy 0.9 and newer. From them on only passing "
+                    u"factors as HyperSpy Signal instances will be "
+                    u"supported.",
                     VisibleDeprecationWarning)
                 # We proceed supposing that the factors are spectra stacked
                 # over the last dimension to reproduce the deprecated
@@ -514,38 +516,38 @@ class MVA():
                 # Change next error message when removing the
                 # DeprecationWarning
                 raise ValueError(
-                    "`factors` must be either a Signal instance or a "
-                    "numpy array but an object of type %s was provided." %
+                    u"`factors` must be either a Signal instance or a "
+                    u"numpy array but an object of type %s was provided." %
                     type(factors))
 
         # Check factor dimensions
         if factors.axes_manager.navigation_dimension != 1:
-            raise ValueError("`factors` must have navigation dimension"
-                             "equal one, but the navigation dimension "
-                             "of the given factors is %i." %
+            raise ValueError(u"`factors` must have navigation dimension"
+                             u"equal one, but the navigation dimension "
+                             u"of the given factors is %i." %
                              factors.axes_manager.navigation_dimension
                              )
         elif factors.axes_manager.navigation_size < 2:
-            raise ValueError("`factors` must have navigation size"
-                             "greater than one, but the navigation "
-                             "size of the given factors is %i." %
+            raise ValueError(u"`factors` must have navigation size"
+                             u"greater than one, but the navigation "
+                             u"size of the given factors is %i." %
                              factors.axes_manager.navigation_size)
 
         # Check mask dimensions
         if mask is not None:
             ref_shape, space = (factors.axes_manager.signal_shape,
-                                "navigation" if on_loadings else "signal")
+                                u"navigation" if on_loadings else u"signal")
             if isinstance(mask, np.ndarray):
                 warnings.warn(
-                    "Bare numpy array masks are deprecated and will be removed"
-                    " in next HyperSpy 0.9.",
+                    u"Bare numpy array masks are deprecated and will be removed"
+                    u" in next HyperSpy 0.9.",
                     VisibleDeprecationWarning)
                 ref_shape = ref_shape[::-1]
                 if mask.shape != ref_shape:
                     raise ValueError(
-                        "The `mask` shape is not equal to the %s shape."
-                        "Mask shape: %s\tSignal shape in array: %s" %
-                        (space, str(mask.shape), str(ref_shape)))
+                        u"The `mask` shape is not equal to the %s shape."
+                        u"Mask shape: %s\tSignal shape in array: %s" %
+                        (space, unicode(mask.shape), unicode(ref_shape)))
                 else:
                     if on_loadings:
                         mask = self._get_navigation_signal(data=mask)
@@ -554,12 +556,12 @@ class MVA():
             elif isinstance(mask, Signal):
                 if mask.axes_manager.signal_shape != ref_shape:
                     raise ValueError(
-                        "The `mask` signal shape is not equal to the %s shape."
-                        " Mask shape: %s\t%s shape:%s" %
+                        u"The `mask` signal shape is not equal to the %s shape."
+                        u" Mask shape: %s\t%s shape:%s" %
                         (space,
-                         str(mask.axes_manager.signal_shape),
+                         unicode(mask.axes_manager.signal_shape),
                          space,
-                         str(ref_shape)))
+                         unicode(ref_shape)))
 
         # Note that we don't check the factor's signal dimension. This is on
         # purpose as an user may like to apply pretreaments that change their
@@ -576,16 +578,16 @@ class MVA():
                              for index in diff_axes]
         # Select components to separate
         if number_of_components is not None:
-            comp_list = range(number_of_components)
+            comp_list = xrange(number_of_components)
         elif comp_list is not None:
             number_of_components = len(comp_list)
         else:
             if lr.output_dimension is not None:
                 number_of_components = lr.output_dimension
-                comp_list = range(number_of_components)
+                comp_list = xrange(number_of_components)
             else:
                 raise ValueError(
-                    "No `number_of_components` or `comp_list` provided.")
+                    u"No `number_of_components` or `comp_list` provided.")
         factors = stack([factors.inav[i] for i in comp_list])
 
         # Apply differences pre-processing if requested.
@@ -603,13 +605,13 @@ class MVA():
                     [iaxis - 1 for iaxis in diff_axes]
                     if diff_axes is not None
                     else None)
-                mask.change_dtype("float")
+                mask.change_dtype(u"float")
                 mask.data[mask.data == 1] = np.nan
                 mask = get_derivative(mask,
                                       diff_axes=mask_diff_axes,
                                       diff_order=diff_order)
                 mask.data[np.isnan(mask.data)] = 1
-                mask.change_dtype("bool")
+                mask.change_dtype(u"bool")
 
         # Unfold in case the signal_dimension > 1
         factors.unfold()
@@ -623,17 +625,17 @@ class MVA():
         factors, invsqcovmat = centering_and_whitening(factors)
 
         # Perform actual BSS
-        if algorithm == 'orthomax':
+        if algorithm == u'orthomax':
             _, unmixing_matrix = orthomax(factors, **kwargs)
             unmixing_matrix = unmixing_matrix.T
 
-        elif algorithm == 'sklearn_fastica':
+        elif algorithm == u'sklearn_fastica':
             if not import_sklearn.sklearn_installed:
                 raise ImportError(
-                    "The optional package scikit learn is not installed "
-                    "and it is required for this feature.")
-            if 'tol' not in kwargs:
-                kwargs['tol'] = 1e-10
+                    u"The optional package scikit learn is not installed "
+                    u"and it is required for this feature.")
+            if u'tol' not in kwargs:
+                kwargs[u'tol'] = 1e-10
             lr.bss_node = import_sklearn.FastICA(
                 **kwargs)
             lr.bss_node.whiten = False
@@ -646,8 +648,8 @@ class MVA():
         else:
             if mdp_installed is False:
                 raise ImportError(
-                    'MDP is not installed. Nothing done')
-            temp_function = getattr(mdp.nodes, algorithm + "Node")
+                    u'MDP is not installed. Nothing done')
+            temp_function = getattr(mdp.nodes, algorithm + u"Node")
             lr.bss_node = temp_function(**kwargs)
             lr.bss_node.train(factors)
             unmixing_matrix = lr.bss_node.get_recmatrix()
@@ -667,8 +669,8 @@ class MVA():
         self._auto_reverse_bss_component(lr)
         lr.bss_algorithm = algorithm
 
-    def normalize_factors(self, which='bss', by='area', sort=True):
-        """Normalises the factors and modifies the loadings
+    def normalize_factors(self, which=u'bss', by=u'area', sort=True):
+        u"""Normalises the factors and modifies the loadings
         accordingly.
 
         Parameters
@@ -679,31 +681,31 @@ class MVA():
 
         """
         warnings.warn(
-            "This function is deprecated an will be removed in HyperSpy 0.9. "
-            "Use `normalize_decomposition_components` or "
-            "`normalize_bss_components` instead.", VisibleDeprecationWarning)
+            u"This function is deprecated an will be removed in HyperSpy 0.9. "
+            u"Use `normalize_decomposition_components` or "
+            u"`normalize_bss_components` instead.", VisibleDeprecationWarning)
 
-        if which == 'bss':
+        if which == u'bss':
             factors = self.learning_results.bss_factors
             loadings = self.learning_results.bss_loadings
             if factors is None:
-                raise UserWarning("This method can only be used after "
-                                  "a blind source separation operation")
-        elif which == 'decomposition':
+                raise UserWarning(u"This method can only be used after "
+                                  u"a blind source separation operation")
+        elif which == u'decomposition':
             factors = self.learning_results.factors
             loadings = self.learning_results.loadings
             if factors is None:
-                raise UserWarning("This method can only be used after"
-                                  "a decomposition operation")
+                raise UserWarning(u"This method can only be used after"
+                                  u"a decomposition operation")
         else:
-            raise ValueError("what must be bss or decomposition")
+            raise ValueError(u"what must be bss or decomposition")
 
-        if by == 'max':
+        if by == u'max':
             by = np.max
-        elif by == 'area':
+        elif by == u'area':
             by = np.sum
         else:
-            raise ValueError("by must be max or mean")
+            raise ValueError(u"by must be max or mean")
 
         _normalize_components(factors, loadings, by)
         sorting_indices = np.argsort(loadings.max(0))
@@ -711,9 +713,9 @@ class MVA():
         loadings[:] = loadings[:, sorting_indices]
         loadings[:] = loadings[:, sorting_indices]
 
-    def normalize_decomposition_components(self, target='factors',
+    def normalize_decomposition_components(self, target=u'factors',
                                            function=np.sum):
-        """Normalize decomposition components.
+        u"""Normalize decomposition components.
 
         Parameters
         ----------
@@ -724,21 +726,21 @@ class MVA():
             must have an `axis`.
 
         """
-        if target == 'factors':
+        if target == u'factors':
             target = self.learning_results.factors
             other = self.learning_results.loadings
-        elif target == 'loadings':
+        elif target == u'loadings':
             target = self.learning_results.loadings
             other = self.learning_results.factors
         else:
-            raise ValueError("target must be \"factors\" or \"loadings\"")
+            raise ValueError(u"target must be \"factors\" or \"loadings\"")
         if target is None:
-            raise Exception("This method can only be used after "
-                            "decomposition operation.")
+            raise Exception(u"This method can only be used after "
+                            u"decomposition operation.")
         _normalize_components(target=target, other=other, function=function)
 
-    def normalize_bss_components(self, target='factors', function=np.sum):
-        """Normalize BSS components.
+    def normalize_bss_components(self, target=u'factors', function=np.sum):
+        u"""Normalize BSS components.
 
         Parameters
         ----------
@@ -749,21 +751,21 @@ class MVA():
             must have an `axis`.
 
         """
-        if target == 'factors':
+        if target == u'factors':
             target = self.learning_results.bss_factors
             other = self.learning_results.bss_loadings
-        elif target == 'loadings':
+        elif target == u'loadings':
             target = self.learning_results.bss_loadings
             other = self.learning_results.bss_factors
         else:
-            raise ValueError("target must be \"factors\" or \"loadings\"")
+            raise ValueError(u"target must be \"factors\" or \"loadings\"")
         if target is None:
-            raise Exception("This method can only be used after "
-                            "a blind source separation operation.")
+            raise Exception(u"This method can only be used after "
+                            u"a blind source separation operation.")
         _normalize_components(target=target, other=other, function=function)
 
     def reverse_decomposition_component(self, component_number):
-        """Reverse the decomposition component
+        u"""Reverse the decomposition component
 
         Parameters
         ----------
@@ -785,7 +787,7 @@ class MVA():
             target.loadings[:, i] *= -1
 
     def reverse_bss_component(self, component_number):
-        """Reverse the independent component
+        u"""Reverse the independent component
 
         Parameters
         ----------
@@ -822,16 +824,16 @@ class MVA():
 
     def _auto_reverse_bss_component(self, target):
         n_components = target.bss_factors.shape[1]
-        for i in range(n_components):
+        for i in xrange(n_components):
             minimum = np.nanmin(target.bss_loadings[:, i])
             maximum = np.nanmax(target.bss_loadings[:, i])
             if minimum < 0 and -minimum > maximum:
                 self.reverse_bss_component(i)
-                print("IC %i reversed" % i)
+                print u"IC %i reversed" % i
 
     @do_not_replot
     def _calculate_recmatrix(self, components=None, mva_type=None,):
-        """
+        u"""
         Rebuilds SIs from selected components
 
         Parameters
@@ -850,29 +852,29 @@ class MVA():
 
         target = self.learning_results
 
-        if mva_type.lower() == 'decomposition':
+        if mva_type.lower() == u'decomposition':
             factors = target.factors
             loadings = target.loadings.T
-        elif mva_type.lower() == 'bss':
+        elif mva_type.lower() == u'bss':
             factors = target.bss_factors
             loadings = target.bss_loadings.T
         if components is None:
             a = np.dot(factors, loadings)
-            signal_name = 'model from %s with %i components' % (
+            signal_name = u'model from %s with %i components' % (
                 mva_type, factors.shape[1])
-        elif hasattr(components, '__iter__'):
+        elif hasattr(components, u'__iter__'):
             tfactors = np.zeros((factors.shape[0], len(components)))
             tloadings = np.zeros((len(components), loadings.shape[1]))
-            for i in range(len(components)):
+            for i in xrange(len(components)):
                 tfactors[:, i] = factors[:, components[i]]
                 tloadings[i, :] = loadings[components[i], :]
             a = np.dot(tfactors, tloadings)
-            signal_name = 'model from %s with components %s' % (
+            signal_name = u'model from %s with components %s' % (
                 mva_type, components)
         else:
             a = np.dot(factors[:, :components],
                        loadings[:components, :])
-            signal_name = 'model from %s with %i components' % (
+            signal_name = u'model from %s with %i components' % (
                 mva_type, components)
 
         self._unfolded4decomposition = self.unfold()
@@ -890,7 +892,7 @@ class MVA():
         return sc
 
     def get_decomposition_model(self, components=None):
-        """Return the spectrum generated with the selected number of principal
+        u"""Return the spectrum generated with the selected number of principal
         components
 
         Parameters
@@ -905,11 +907,11 @@ class MVA():
         Signal instance
         """
         rec = self._calculate_recmatrix(components=components,
-                                        mva_type='decomposition')
+                                        mva_type=u'decomposition')
         return rec
 
     def get_bss_model(self, components=None):
-        """Return the spectrum generated with the selected number of
+        u"""Return the spectrum generated with the selected number of
         independent components
 
         Parameters
@@ -924,11 +926,11 @@ class MVA():
         rec : Signal instance
 
         """
-        rec = self._calculate_recmatrix(components=components, mva_type='bss',)
+        rec = self._calculate_recmatrix(components=components, mva_type=u'bss',)
         return rec
 
     def get_explained_variance_ratio(self):
-        """Return the explained variation ratio of the PCA components as a
+        u"""Return the explained variation ratio of the PCA components as a
         Spectrum.
 
         Returns
@@ -947,18 +949,18 @@ class MVA():
         from hyperspy._signals.spectrum import Spectrum
         target = self.learning_results
         if target.explained_variance_ratio is None:
-            raise AttributeError("The explained_variance_ratio attribute is "
-                                 "`None`, did you forget to perform a PCA "
-                                 "decomposition?")
+            raise AttributeError(u"The explained_variance_ratio attribute is "
+                                 u"`None`, did you forget to perform a PCA "
+                                 u"decomposition?")
         s = Spectrum(target.explained_variance_ratio)
         s.metadata.General.title = self.metadata.General.title + \
-            "\nPCA Scree Plot"
-        s.axes_manager[-1].name = 'Principal component index'
-        s.axes_manager[-1].units = ''
+            u"\nPCA Scree Plot"
+        s.axes_manager[-1].name = u'Principal component index'
+        s.axes_manager[-1].units = u''
         return s
 
     def plot_explained_variance_ratio(self, n=50, log=True):
-        """Plot the decomposition explained variance ratio vs index number.
+        u"""Plot the decomposition explained variance ratio vs index number.
 
         Parameters
         ----------
@@ -986,17 +988,17 @@ class MVA():
         ax = s._plot.signal_plot.ax
         # ax.plot(range(n), target.explained_variance_ratio[:n], 'o',
         #         label=label)
-        ax.set_ylabel("Explained variance ratio")
+        ax.set_ylabel(u"Explained variance ratio")
         ax.margins(0.05)
         ax.autoscale()
-        ax.lines[0].set_marker("o")
-        ax.lines[0].set_linestyle("None")
+        ax.lines[0].set_marker(u"o")
+        ax.lines[0].set_linestyle(u"None")
         if log is True:
             ax.semilogy()
         return ax
 
     def plot_cumulative_explained_variance_ratio(self, n=50):
-        """Plot the principal components explained variance up to the
+        u"""Plot the principal components explained variance up to the
         given number
 
         Parameters
@@ -1010,16 +1012,16 @@ class MVA():
             target.explained_variance)
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        ax.scatter(range(n), cumu[:n])
-        ax.set_xlabel('Principal component')
-        ax.set_ylabel('Cumulative explained variance ratio')
+        ax.scatter(xrange(n), cumu[:n])
+        ax.set_xlabel(u'Principal component')
+        ax.set_ylabel(u'Cumulative explained variance ratio')
         plt.draw()
         plt.show()
         return ax
 
     def normalize_poissonian_noise(self, navigation_mask=None,
                                    signal_mask=None):
-        """
+        u"""
         Scales the SI following Surf. Interface Anal. 2004; 36: 203–212
         to "normalize" the poissonian data for decomposition analysis
 
@@ -1029,8 +1031,8 @@ class MVA():
         signal_mask  : boolen numpy array
         """
         messages.information(
-            "Scaling the data to normalize the (presumably)"
-            " Poissonian noise")
+            u"Scaling the data to normalize the (presumably)"
+            u" Poissonian noise")
         with self.unfolded():
             # The rest of the code assumes that the first data axis
             # is the navigation axis. We transpose the data if that is not the
@@ -1051,15 +1053,15 @@ class MVA():
             # Checks if any is negative
             if (aG < 0).any() or (bH < 0).any():
                 raise ValueError(
-                    "Data error: negative values\n"
-                    "Are you sure that the data follow a poissonian "
-                    "distribution?")
+                    u"Data error: negative values\n"
+                    u"Are you sure that the data follow a poissonian "
+                    u"distribution?")
 
             self._root_aG = np.sqrt(aG)[:, np.newaxis]
             self._root_bH = np.sqrt(bH)[np.newaxis, :]
             # We first disable numpy's warning when the result of an
             # operation produces nans
-            np.seterr(invalid='ignore')
+            np.seterr(invalid=u'ignore')
             dc[:, signal_mask][navigation_mask, :] /= (self._root_aG *
                                                        self._root_bH)
             # Enable numpy warning
@@ -1069,8 +1071,8 @@ class MVA():
                 np.nan_to_num(dc[:, signal_mask][navigation_mask, :])
 
     def undo_treatments(self):
-        """Undo normalize_poissonian_noise"""
-        print("Undoing data pre-treatments")
+        u"""Undo normalize_poissonian_noise"""
+        print u"Undoing data pre-treatments"
         self.data = self._data_before_treatments
         del self._data_before_treatments
 
@@ -1099,7 +1101,7 @@ class LearningResults(object):
     signal_mask = None
 
     def save(self, filename, overwrite=None):
-        """Save the result of the decomposition and demixing analysis
+        u"""Save the result of the decomposition and demixing analysis
         Parameters
         ----------
         filename : string
@@ -1113,7 +1115,7 @@ class LearningResults(object):
                 getattr(
                     self,
                     v),
-                types.MethodType) and not v.startswith('_')]:
+                types.MethodType) and not v.startswith(u'_')]:
             kwargs[attribute] = self.__getattribute__(attribute)
         # Check overwrite
         if overwrite is None:
@@ -1123,7 +1125,7 @@ class LearningResults(object):
             np.savez(filename, **kwargs)
 
     def load(self, filename):
-        """Load the results of a previous decomposition and
+        u"""Load the results of a previous decomposition and
          demixing analysis from a file.
         Parameters
         ----------
@@ -1131,77 +1133,77 @@ class LearningResults(object):
         """
         decomposition = np.load(filename)
         for key, value in decomposition.items():
-            if value.dtype == np.dtype('object'):
+            if value.dtype == np.dtype(u'object'):
                 value = None
             setattr(self, key, value)
-        print("\n%s loaded correctly" % filename)
+        print u"\n%s loaded correctly" % filename
         # For compatibility with old version ##################
-        if hasattr(self, 'algorithm'):
+        if hasattr(self, u'algorithm'):
             self.decomposition_algorithm = self.algorithm
             del self.algorithm
-        if hasattr(self, 'V'):
+        if hasattr(self, u'V'):
             self.explained_variance = self.V
             del self.V
-        if hasattr(self, 'w'):
+        if hasattr(self, u'w'):
             self.unmixing_matrix = self.w
             del self.w
-        if hasattr(self, 'variance2one'):
+        if hasattr(self, u'variance2one'):
             del self.variance2one
-        if hasattr(self, 'centered'):
+        if hasattr(self, u'centered'):
             del self.centered
-        if hasattr(self, 'pca_algorithm'):
+        if hasattr(self, u'pca_algorithm'):
             self.decomposition_algorithm = self.pca_algorithm
             del self.pca_algorithm
-        if hasattr(self, 'ica_algorithm'):
+        if hasattr(self, u'ica_algorithm'):
             self.bss_algorithm = self.ica_algorithm
             del self.ica_algorithm
-        if hasattr(self, 'v'):
+        if hasattr(self, u'v'):
             self.loadings = self.v
             del self.v
-        if hasattr(self, 'scores'):
+        if hasattr(self, u'scores'):
             self.loadings = self.scores
             del self.scores
-        if hasattr(self, 'pc'):
+        if hasattr(self, u'pc'):
             self.loadings = self.pc
             del self.pc
-        if hasattr(self, 'ica_scores'):
+        if hasattr(self, u'ica_scores'):
             self.bss_loadings = self.ica_scores
             del self.ica_scores
-        if hasattr(self, 'ica_factors'):
+        if hasattr(self, u'ica_factors'):
             self.bss_factors = self.ica_factors
             del self.ica_factors
         #######################################################
         # Output_dimension is an array after loading, convert it to int
-        if hasattr(self, 'output_dimension') and self.output_dimension \
+        if hasattr(self, u'output_dimension') and self.output_dimension \
                 is not None:
             self.output_dimension = int(self.output_dimension)
         self.summary()
 
     def summary(self):
-        """Prints a summary of the decomposition and demixing parameters
+        u"""Prints a summary of the decomposition and demixing parameters
          to the stdout
         """
-        print()
-        print("Decomposition parameters:")
-        print("-------------------------")
-        print("Decomposition algorithm : ", self.decomposition_algorithm)
-        print("Poissonian noise normalization : %s" % \
-            self.poissonian_noise_normalized)
-        print("Output dimension : %s" % self.output_dimension)
-        print("Centre : %s" % self.centre)
+        print
+        print u"Decomposition parameters:"
+        print u"-------------------------"
+        print u"Decomposition algorithm : ", self.decomposition_algorithm
+        print u"Poissonian noise normalization : %s" % \
+            self.poissonian_noise_normalized
+        print u"Output dimension : %s" % self.output_dimension
+        print u"Centre : %s" % self.centre
         if self.bss_algorithm is not None:
-            print()
-            print("Demixing parameters:")
-            print("---------------------")
-            print("BSS algorithm : %s" % self.bss_algorithm)
-            print("Number of components : %i" % len(self.unmixing_matrix))
+            print
+            print u"Demixing parameters:"
+            print u"---------------------"
+            print u"BSS algorithm : %s" % self.bss_algorithm
+            print u"Number of components : %i" % len(self.unmixing_matrix)
 
     def crop_decomposition_dimension(self, n):
-        """
+        u"""
         Crop the score matrix up to the given number.
         It is mainly useful to save memory and reduce the storage size
         """
-        print("trimming to %i dimensions" % n)
+        print u"trimming to %i dimensions" % n
         self.loadings = self.loadings[:, :n]
         if self.explained_variance is not None:
             self.explained_variance = self.explained_variance[:n]

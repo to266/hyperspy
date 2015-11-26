@@ -17,7 +17,7 @@
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
 
-"""
+u"""
 
 Components that can be used to define a model for e.g. curve fitting.
 

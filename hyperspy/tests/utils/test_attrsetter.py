@@ -26,46 +26,46 @@ from hyperspy.misc.utils import DictionaryTreeBrowser
 class DummyThing(object):
 
     def __init__(self):
-        self.name = 'Dummy'
+        self.name = u'Dummy'
         self.another = None
 
     def multiply(self):
         self.another = self.__class__()
 
 
-class TestAttrSetter:
+class TestAttrSetter(object):
 
     def setUp(self):
         tree = DictionaryTreeBrowser(
             {
-                "Node1": {"leaf11": 11,
-                          "Node11": {"leaf111": 111},
+                u"Node1": {u"leaf11": 11,
+                          u"Node11": {u"leaf111": 111},
                           },
-                "Node2": {"leaf21": 21,
-                          "Node21": {"leaf211": 211},
+                u"Node2": {u"leaf21": 21,
+                          u"Node21": {u"leaf211": 211},
                           },
-                "Leaf3": 3
+                u"Leaf3": 3
             })
         self.tree = tree
         self.dummy = DummyThing()
 
     def test_dtb_settattr(self):
         t = self.tree
-        attrsetter(t, 'Node1.leaf11', 119)
+        attrsetter(t, u'Node1.leaf11', 119)
         nt.assert_equal(t.Node1.leaf11, 119)
-        attrsetter(t, 'Leaf3', 39)
+        attrsetter(t, u'Leaf3', 39)
         nt.assert_equal(t.Leaf3, 39)
 
     @nt.raises(AttributeError)
     def test_wrong_item(self):
         t = self.tree
-        attrsetter(t, 'random.name.with.more.than.one', 13)
+        attrsetter(t, u'random.name.with.more.than.one', 13)
 
     def test_dummy(self):
         d = self.dummy
         d.multiply()
-        attrsetter(d, 'another.name', 'New dummy')
-        nt.assert_equal(d.another.name, 'New dummy')
+        attrsetter(d, u'another.name', u'New dummy')
+        nt.assert_equal(d.another.name, u'New dummy')
         d.another.multiply()
-        attrsetter(d, 'another.another.name', 'super New dummy')
-        nt.assert_equal(d.another.another.name, 'super New dummy')
+        attrsetter(d, u'another.another.name', u'super New dummy')
+        nt.assert_equal(d.another.another.name, u'super New dummy')

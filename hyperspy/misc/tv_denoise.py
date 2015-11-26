@@ -2,11 +2,12 @@
 # Modified by the HyperSpy developers to add _tv_denoise_1d
 
 
+from __future__ import division
 import numpy as np
 
 
 def _tv_denoise_3d(im, weight=100, eps=2.e-4, keep_type=False, n_iter_max=200):
-    """
+    u"""
     Perform total-variation denoising on 3-D arrays
 
     Parameters
@@ -99,7 +100,7 @@ def _tv_denoise_3d(im, weight=100, eps=2.e-4, keep_type=False, n_iter_max=200):
 
 
 def _tv_denoise_2d(im, weight=50, eps=2.e-4, keep_type=False, n_iter_max=200):
-    """
+    u"""
     Perform total-variation denoising
 
     Parameters
@@ -195,7 +196,7 @@ def _tv_denoise_2d(im, weight=50, eps=2.e-4, keep_type=False, n_iter_max=200):
 
 
 def _tv_denoise_1d(im, weight=50, eps=2.e-4, keep_type=False, n_iter_max=200):
-    """
+    u"""
     Perform total-variation denoising
 
     Parameters
@@ -285,7 +286,7 @@ def _tv_denoise_1d(im, weight=50, eps=2.e-4, keep_type=False, n_iter_max=200):
 
 
 def tv_denoise(im, weight=50, eps=2.e-4, keep_type=False, n_iter_max=200):
-    """
+    u"""
     Perform total-variation denoising on 2-d and 3-d images
 
     Parameters
@@ -361,4 +362,4 @@ def tv_denoise(im, weight=50, eps=2.e-4, keep_type=False, n_iter_max=200):
         return _tv_denoise_3d(im, weight, eps, keep_type, n_iter_max)
     else:
         raise ValueError(
-            'only 2-d and 3-d images may be denoised with this function')
+            u'only 2-d and 3-d images may be denoised with this function')

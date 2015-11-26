@@ -31,25 +31,25 @@ def set_ets_toolkit(toolkit):
 
 # Get the backend from matplotlib
 backend = plt.get_backend()
-if ("WX" not in backend and
-        "Qt" not in backend):
-    if "inline" in backend:
-        if current_toolkit in ("wx", "qt4"):
+if (u"WX" not in backend and
+        u"Qt" not in backend):
+    if u"inline" in backend:
+        if current_toolkit in (u"wx", u"qt4"):
             try:
                 ip = get_ipython()
                 if ip is not None:
                     ip.enable_gui(current_toolkit)
                     set_ets_toolkit(current_toolkit)
             except:
-                set_ets_toolkit("null")
+                set_ets_toolkit(u"null")
     else:
-        set_ets_toolkit("null")
-elif "WX" in backend:
-    set_ets_toolkit("wx")
-elif "Qt" in backend:
-    set_ets_toolkit("qt4")
+        set_ets_toolkit(u"null")
+elif u"WX" in backend:
+    set_ets_toolkit(u"wx")
+elif u"Qt" in backend:
+    set_ets_toolkit(u"qt4")
 else:
-    if current_toolkit in ("wx", "qt4"):
+    if current_toolkit in (u"wx", u"qt4"):
         set_ets_toolkit(current_toolkit)
     else:
-        set_ets_toolkit("null")
+        set_ets_toolkit(u"null")

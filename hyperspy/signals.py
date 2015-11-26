@@ -1,4 +1,4 @@
-"""
+u"""
 The Signal class and its specilized subclasses:
 
     Signal

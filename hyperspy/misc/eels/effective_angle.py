@@ -1,8 +1,9 @@
+from __future__ import division
 import math
 
 
 def effective_angle(E0, E, alpha, beta):
-    """Calculates the effective collection angle
+    u"""Calculates the effective collection angle
 
     Parameters
     ----------

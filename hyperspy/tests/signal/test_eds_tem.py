@@ -16,6 +16,7 @@
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import division
 import numpy as np
 from nose.tools import assert_true, assert_equal, assert_dict_equal
 
@@ -25,7 +26,7 @@ from hyperspy.components import Gaussian
 from hyperspy.misc.eds import utils as utils_eds
 
 
-class Test_metadata:
+class Test_metadata(object):
 
     def setUp(self):
         # Create an empty spectrum
@@ -43,10 +44,10 @@ class Test_metadata:
             3.1 *
             2)
         # Check that metadata is unchanged
-        print(old_metadata, s.metadata)      # Capture for comparison on error
+        print old_metadata, s.metadata      # Capture for comparison on error
         assert_dict_equal(old_metadata.as_dictionary(),
                           s.metadata.as_dictionary(),
-                          "Source metadata changed")
+                          u"Source metadata changed")
 
     def test_rebin_live_time(self):
         s = self.signal
@@ -59,21 +60,21 @@ class Test_metadata:
             2 *
             2)
         # Check that metadata is unchanged
-        print(old_metadata, self.signal.metadata)    # Captured on error
+        print old_metadata, self.signal.metadata    # Captured on error
         assert_dict_equal(old_metadata.as_dictionary(),
                           self.signal.metadata.as_dictionary(),
-                          "Source metadata changed")
+                          u"Source metadata changed")
 
     def test_add_elements(self):
         s = self.signal
-        s.add_elements(['Al', 'Ni'])
-        assert_equal(s.metadata.Sample.elements, ['Al', 'Ni'])
-        s.add_elements(['Al', 'Ni'])
-        assert_equal(s.metadata.Sample.elements, ['Al', 'Ni'])
-        s.add_elements(["Fe", ])
-        assert_equal(s.metadata.Sample.elements, ['Al', "Fe", 'Ni'])
-        s.set_elements(['Al', 'Ni'])
-        assert_equal(s.metadata.Sample.elements, ['Al', 'Ni'])
+        s.add_elements([u'Al', u'Ni'])
+        assert_equal(s.metadata.Sample.elements, [u'Al', u'Ni'])
+        s.add_elements([u'Al', u'Ni'])
+        assert_equal(s.metadata.Sample.elements, [u'Al', u'Ni'])
+        s.add_elements([u"Fe", ])
+        assert_equal(s.metadata.Sample.elements, [u'Al', u"Fe", u'Ni'])
+        s.set_elements([u'Al', u'Ni'])
+        assert_equal(s.metadata.Sample.elements, [u'Al', u'Ni'])
 
     def test_default_param(self):
         s = self.signal
@@ -84,7 +85,7 @@ class Test_metadata:
 
     def test_SEM_to_TEM(self):
         s = self.signal.inav[0, 0]
-        signal_type = 'EDS_SEM'
+        signal_type = u'EDS_SEM'
         mp = s.metadata
         mp.Acquisition_instrument.TEM.Detector.EDS.energy_resolution_MnKa =\
             125.3
@@ -110,24 +111,24 @@ class Test_metadata:
                      energy_axis.scale)
 
 
-class Test_quantification:
+class Test_quantification(object):
 
     def setUp(self):
         s = EDSTEMSpectrum(np.ones([2, 1024]))
         energy_axis = s.axes_manager.signal_axes[0]
         energy_axis.scale = 1e-2
-        energy_axis.units = 'keV'
-        energy_axis.name = "Energy"
+        energy_axis.units = u'keV'
+        energy_axis.name = u"Energy"
         s.set_microscope_parameters(beam_energy=200,
                                     live_time=3.1, tilt_stage=0.0,
                                     azimuth_angle=None, elevation_angle=35,
                                     energy_resolution_MnKa=130)
-        elements = ['Al', 'Zn']
-        xray_lines = ['Al_Ka', 'Zn_Ka']
+        elements = [u'Al', u'Zn']
+        xray_lines = [u'Al_Ka', u'Zn_Ka']
         intensities = [300, 500]
         for i, xray_line in enumerate(xray_lines):
             gauss = Gaussian()
-            line_energy, FWHM = s._get_line_energy(xray_line, FWHM_MnKa='auto')
+            line_energy, FWHM = s._get_line_energy(xray_line, FWHM_MnKa=u'auto')
             gauss.centre.value = line_energy
             gauss.A.value = intensities[i]
             gauss.sigma.value = FWHM
@@ -161,7 +162,7 @@ class Test_quantification:
                       [1., 0., 0.]])))
 
 
-class Test_vacum_mask:
+class Test_vacum_mask(object):
 
     def setUp(self):
         s = Simulation(np.array([np.linspace(0.001, 0.5, 20)] * 100).T)
@@ -175,7 +176,7 @@ class Test_vacum_mask:
         assert_equal(s.vacuum_mask().data[-1], False)
 
 
-class Test_get_lines_intentisity:
+class Test_get_lines_intentisity(object):
 
     def test_with_signals_examples(self):
         from hyperspy.misc.example_signals_loading import \

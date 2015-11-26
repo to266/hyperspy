@@ -10,205 +10,205 @@ import collections
 class SphinxDocString(NumpyDocString):
 
     def __init__(self, docstring, config={}):
-        self.use_plots = config.get('use_plots', False)
+        self.use_plots = config.get(u'use_plots', False)
         NumpyDocString.__init__(self, docstring, config=config)
 
     # string conversion routines
-    def _str_header(self, name, symbol='`'):
-        return ['.. rubric:: ' + name, '']
+    def _str_header(self, name, symbol=u'`'):
+        return [u'.. rubric:: ' + name, u'']
 
     def _str_field_list(self, name):
-        return [':' + name + ':']
+        return [u':' + name + u':']
 
     def _str_indent(self, doc, indent=4):
         out = []
         for line in doc:
-            out += [' ' * indent + line]
+            out += [u' ' * indent + line]
         return out
 
     def _str_signature(self):
-        return ['']
-        if self['Signature']:
-            return ['``%s``' % self['Signature']] + ['']
+        return [u'']
+        if self[u'Signature']:
+            return [u'``%s``' % self[u'Signature']] + [u'']
         else:
-            return ['']
+            return [u'']
 
     def _str_summary(self):
-        return self['Summary'] + ['']
+        return self[u'Summary'] + [u'']
 
     def _str_extended_summary(self):
-        return self['Extended Summary'] + ['']
+        return self[u'Extended Summary'] + [u'']
 
     def _str_param_list(self, name):
         out = []
         if self[name]:
             out += self._str_field_list(name)
-            out += ['']
+            out += [u'']
             for param, param_type, desc in self[name]:
-                out += self._str_indent(['**%s** : %s' % (param.strip(),
+                out += self._str_indent([u'**%s** : %s' % (param.strip(),
                                                           param_type)])
-                out += ['']
+                out += [u'']
                 out += self._str_indent(desc, 8)
-                out += ['']
+                out += [u'']
         return out
 
     @property
     def _obj(self):
-        if hasattr(self, '_cls'):
+        if hasattr(self, u'_cls'):
             return self._cls
-        elif hasattr(self, '_f'):
+        elif hasattr(self, u'_f'):
             return self._f
         return None
 
     def _str_member_list(self, name):
-        """
+        u"""
         Generate a member listing, autosummary:: table where possible,
         and a table where not.
 
         """
         out = []
         if self[name]:
-            out += ['.. rubric:: %s' % name, '']
-            prefix = getattr(self, '_name', '')
+            out += [u'.. rubric:: %s' % name, u'']
+            prefix = getattr(self, u'_name', u'')
 
             if prefix:
-                prefix = '~%s.' % prefix
+                prefix = u'~%s.' % prefix
 
             autosum = []
             others = []
             for param, param_type, desc in self[name]:
                 param = param.strip()
                 if not self._obj or hasattr(self._obj, param):
-                    autosum += ["   %s%s" % (prefix, param)]
+                    autosum += [u"   %s%s" % (prefix, param)]
                 else:
                     others.append((param, param_type, desc))
 
             if autosum:
-                out += ['.. autosummary::', '   :toctree:', '']
+                out += [u'.. autosummary::', u'   :toctree:', u'']
                 out += autosum
 
             if others:
                 maxlen_0 = max([len(x[0]) for x in others])
                 maxlen_1 = max([len(x[1]) for x in others])
-                hdr = "=" * maxlen_0 + "  " + "=" * maxlen_1 + "  " + "=" * 10
-                fmt = '%%%ds  %%%ds  ' % (maxlen_0, maxlen_1)
+                hdr = u"=" * maxlen_0 + u"  " + u"=" * maxlen_1 + u"  " + u"=" * 10
+                fmt = u'%%%ds  %%%ds  ' % (maxlen_0, maxlen_1)
                 n_indent = maxlen_0 + maxlen_1 + 4
                 out += [hdr]
                 for param, param_type, desc in others:
                     out += [fmt % (param.strip(), param_type)]
                     out += self._str_indent(desc, n_indent)
                 out += [hdr]
-            out += ['']
+            out += [u'']
         return out
 
     def _str_section(self, name):
         out = []
         if self[name]:
             out += self._str_header(name)
-            out += ['']
-            content = textwrap.dedent("\n".join(self[name])).split("\n")
+            out += [u'']
+            content = textwrap.dedent(u"\n".join(self[name])).split(u"\n")
             out += content
-            out += ['']
+            out += [u'']
         return out
 
     def _str_see_also(self, func_role):
         out = []
-        if self['See Also']:
+        if self[u'See Also']:
             see_also = super(SphinxDocString, self)._str_see_also(func_role)
-            out = ['.. seealso::', '']
+            out = [u'.. seealso::', u'']
             out += self._str_indent(see_also[2:])
         return out
 
     def _str_warnings(self):
         out = []
-        if self['Warnings']:
-            out = ['.. warning::', '']
-            out += self._str_indent(self['Warnings'])
+        if self[u'Warnings']:
+            out = [u'.. warning::', u'']
+            out += self._str_indent(self[u'Warnings'])
         return out
 
     def _str_index(self):
-        idx = self['index']
+        idx = self[u'index']
         out = []
         if len(idx) == 0:
             return out
 
-        out += ['.. index:: %s' % idx.get('default', '')]
+        out += [u'.. index:: %s' % idx.get(u'default', u'')]
         for section, references in idx.items():
-            if section == 'default':
+            if section == u'default':
                 continue
-            elif section == 'refguide':
-                out += ['   single: %s' % (', '.join(references))]
+            elif section == u'refguide':
+                out += [u'   single: %s' % (u', '.join(references))]
             else:
-                out += ['   %s: %s' % (section, ','.join(references))]
+                out += [u'   %s: %s' % (section, u','.join(references))]
         return out
 
     def _str_references(self):
         out = []
-        if self['References']:
-            out += self._str_header('References')
-            if isinstance(self['References'], str):
-                self['References'] = [self['References']]
-            out.extend(self['References'])
-            out += ['']
+        if self[u'References']:
+            out += self._str_header(u'References')
+            if isinstance(self[u'References'], unicode):
+                self[u'References'] = [self[u'References']]
+            out.extend(self[u'References'])
+            out += [u'']
             # Latex collects all references to a separate bibliography,
             # so we need to insert links to it
-            if sphinx.__version__ >= "0.6":
-                out += ['.. only:: latex', '']
+            if sphinx.__version__ >= u"0.6":
+                out += [u'.. only:: latex', u'']
             else:
-                out += ['.. latexonly::', '']
+                out += [u'.. latexonly::', u'']
             items = []
-            for line in self['References']:
-                m = re.match(r'.. \[([a-z0-9._-]+)\]', line, re.I)
+            for line in self[u'References']:
+                m = re.match(ur'.. \[([a-z0-9._-]+)\]', line, re.I)
                 if m:
                     items.append(m.group(1))
-            out += ['   ' + ", ".join(["[%s]_" % item for item in items]), '']
+            out += [u'   ' + u", ".join([u"[%s]_" % item for item in items]), u'']
         return out
 
     def _str_examples(self):
-        examples_str = "\n".join(self['Examples'])
+        examples_str = u"\n".join(self[u'Examples'])
 
-        if (self.use_plots and 'import matplotlib' in examples_str
-                and 'plot::' not in examples_str):
+        if (self.use_plots and u'import matplotlib' in examples_str
+                and u'plot::' not in examples_str):
             out = []
-            out += self._str_header('Examples')
-            out += ['.. plot::', '']
-            out += self._str_indent(self['Examples'])
-            out += ['']
+            out += self._str_header(u'Examples')
+            out += [u'.. plot::', u'']
+            out += self._str_indent(self[u'Examples'])
+            out += [u'']
             return out
         else:
-            return self._str_section('Examples')
+            return self._str_section(u'Examples')
 
-    def __str__(self, indent=0, func_role="obj"):
+    def __str__(self, indent=0, func_role=u"obj"):
         out = []
         out += self._str_signature()
-        out += self._str_index() + ['']
+        out += self._str_index() + [u'']
         out += self._str_summary()
         out += self._str_extended_summary()
-        for param_list in ('Parameters', 'Returns', 'Other Parameters',
-                           'Raises', 'Warns'):
+        for param_list in (u'Parameters', u'Returns', u'Other Parameters',
+                           u'Raises', u'Warns'):
             out += self._str_param_list(param_list)
         out += self._str_warnings()
         out += self._str_see_also(func_role)
-        out += self._str_section('Notes')
+        out += self._str_section(u'Notes')
         out += self._str_references()
         out += self._str_examples()
-        for param_list in ('Attributes', 'Methods'):
+        for param_list in (u'Attributes', u'Methods'):
             out += self._str_member_list(param_list)
         out = self._str_indent(out, indent)
-        return '\n'.join(out)
+        return u'\n'.join(out)
 
 
 class SphinxFunctionDoc(SphinxDocString, FunctionDoc):
 
     def __init__(self, obj, doc=None, config={}):
-        self.use_plots = config.get('use_plots', False)
+        self.use_plots = config.get(u'use_plots', False)
         FunctionDoc.__init__(self, obj, doc=doc, config=config)
 
 
 class SphinxClassDoc(SphinxDocString, ClassDoc):
 
     def __init__(self, obj, doc=None, func_doc=None, config={}):
-        self.use_plots = config.get('use_plots', False)
+        self.use_plots = config.get(u'use_plots', False)
         ClassDoc.__init__(self, obj, doc=doc, func_doc=None, config=config)
 
 
@@ -222,17 +222,17 @@ class SphinxObjDoc(SphinxDocString):
 def get_doc_object(obj, what=None, doc=None, config={}):
     if what is None:
         if inspect.isclass(obj):
-            what = 'class'
+            what = u'class'
         elif inspect.ismodule(obj):
-            what = 'module'
+            what = u'module'
         elif isinstance(obj, collections.Callable):
-            what = 'function'
+            what = u'function'
         else:
-            what = 'object'
-    if what == 'class':
+            what = u'object'
+    if what == u'class':
         return SphinxClassDoc(obj, func_doc=SphinxFunctionDoc, doc=doc,
                               config=config)
-    elif what in ('function', 'method'):
+    elif what in (u'function', u'method'):
         return SphinxFunctionDoc(obj, doc=doc, config=config)
     else:
         if doc is None:

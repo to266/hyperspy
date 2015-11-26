@@ -25,8 +25,8 @@ from hyperspy.component import Component
 class Spline(Component):
 
     def __init__(self, tck):
-        Component.__init__(self, ('c', 'dump'))
-        self._whitelist['tck'] = ('init', tck)
+        Component.__init__(self, (u'c', u'dump'))
+        self._whitelist[u'tck'] = (u'init', tck)
         self.t, self.c.value, self.k = tck
         self.dump.free = False
 

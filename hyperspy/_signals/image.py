@@ -22,9 +22,9 @@ from hyperspy.signal import Signal
 
 class Image(Signal):
 
+    u"""
     """
-    """
-    _record_by = "image"
+    _record_by = u"image"
 
     def __init__(self, *args, **kw):
         super(Image, self).__init__(*args, **kw)
@@ -34,7 +34,7 @@ class Image(Signal):
             self.axes_manager.set_signal_dimension(2)
 
     def to_spectrum(self):
-        """Returns the image as a spectrum.
+        u"""Returns the image as a spectrum.
 
         See Also
         --------
@@ -47,17 +47,17 @@ class Image(Signal):
     def plot(self,
              colorbar=True,
              scalebar=True,
-             scalebar_color="white",
+             scalebar_color=u"white",
              axes_ticks=None,
              auto_contrast=True,
              saturated_pixels=0,
              vmin=None,
              vmax=None,
              no_nans=False,
-             centre_colormap="auto",
+             centre_colormap=u"auto",
              **kwargs
              ):
-        """Plot image.
+        u"""Plot image.
 
         For multidimensional datasets an optional figure,
         the "navigator", with a cursor to navigate that data is

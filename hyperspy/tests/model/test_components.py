@@ -5,7 +5,7 @@ import hyperspy.api as hs
 from hyperspy.model import Model
 
 
-class TestPowerLaw:
+class TestPowerLaw(object):
 
     def setUp(self):
         s = hs.signals.Spectrum(np.empty(1024))
@@ -68,7 +68,7 @@ class TestPowerLaw:
         nt.assert_almost_equal(g.r.value, 4.0017522876514304)
 
 
-class TestOffset:
+class TestOffset(object):
 
     def setUp(self):
         s = hs.signals.Spectrum(np.empty(10))
@@ -101,7 +101,7 @@ class TestOffset:
         nt.assert_almost_equal(g.offset.value, 10)
 
 
-class TestPolynomial:
+class TestPolynomial(object):
 
     def setUp(self):
         s = hs.signals.Spectrum(np.empty(1024))
@@ -151,7 +151,7 @@ class TestPolynomial:
         p = hs.model.components.Polynomial(order=2)
         model.append(p)
         p.estimate_parameters(s, 0, 100, only_current=False)
-        np.testing.assert_allclose(p.coefficients.map['values'],
+        np.testing.assert_allclose(p.coefficients.map[u'values'],
                                    np.tile([0.5, 2, 3], (10, 1)))
 
     def test_3d_signal(self):
@@ -161,11 +161,11 @@ class TestPolynomial:
         p = hs.model.components.Polynomial(order=2)
         model.append(p)
         p.estimate_parameters(s, 0, 100, only_current=False)
-        np.testing.assert_allclose(p.coefficients.map['values'],
+        np.testing.assert_allclose(p.coefficients.map[u'values'],
                                    np.tile([0.5, 2, 3], (2, 5, 1)))
 
 
-class TestGaussian:
+class TestGaussian(object):
 
     def setUp(self):
         s = hs.signals.Spectrum(np.empty(1024))
@@ -205,20 +205,20 @@ class TestGaussian:
         nt.assert_almost_equal(g.centre.value, 1)
 
 
-class TestExpression:
+class TestExpression(object):
 
     def setUp(self):
         self.g = hs.model.components.Expression(
-            expression="height * exp(-(x - x0) ** 2 * 4 * log(2)/ fwhm ** 2)",
-            name="Gaussian",
-            position="x0",
+            expression=u"height * exp(-(x - x0) ** 2 * 4 * log(2)/ fwhm ** 2)",
+            name=u"Gaussian",
+            position=u"x0",
             height=1,
             fwhm=1,
             x0=0,
-            module="numpy")
+            module=u"numpy")
 
     def test_name(self):
-        nt.assert_equal(self.g.name, "Gaussian")
+        nt.assert_equal(self.g.name, u"Gaussian")
 
     def test_position(self):
         nt.assert_is(self.g._position, self.g.x0)
@@ -242,7 +242,7 @@ class TestExpression:
             0.00033845077175778578)
 
 
-class TestScalableFixedPattern:
+class TestScalableFixedPattern(object):
 
     def setUp(self):
         s = hs.signals.Spectrum(np.linspace(0., 100., 10))

@@ -1,4 +1,4 @@
-"""Plotting funtions.
+u"""Plotting funtions.
 
 Functions:
 

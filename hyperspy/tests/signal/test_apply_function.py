@@ -5,7 +5,7 @@ import nose.tools
 import hyperspy.api as hs
 
 
-class TestImage:
+class TestImage(object):
 
     def setup(self):
         self.im = hs.signals.Image(np.arange(0., 18).reshape((2, 3, 3)))
@@ -61,7 +61,7 @@ class TestImage:
               [0., 14.76776695, 0.]]])))
 
 
-class TestSpectrum:
+class TestSpectrum(object):
 
     def setup(self):
         self.s = hs.signals.Spectrum(np.arange(0., 6).reshape((2, 3)))

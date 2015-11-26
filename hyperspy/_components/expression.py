@@ -1,8 +1,9 @@
 from functools import wraps
 from hyperspy.component import Component
+from itertools import izip
 
 _CLASS_DOC = \
-    """%s component (created with Expression).
+    u"""%s component (created with Expression).
 
 .. math::
 
@@ -21,9 +22,9 @@ def _fill_function_args(fn):
 
 class Expression(Component):
 
-    def __init__(self, expression, name, position=None, module="numpy",
+    def __init__(self, expression, name, position=None, module=u"numpy",
                  **kwargs):
-        """Create a component from a string expression.
+        u"""Create a component from a string expression.
 
         It automatically generates the partial derivatives and the
         class docstring.
@@ -76,10 +77,10 @@ class Expression(Component):
         self.compile_function(module=module)
         # Initialise component
         Component.__init__(self, self._parameter_strings)
-        self._whitelist['expression'] = ('init', expression)
-        self._whitelist['name'] = ('init', name)
-        self._whitelist['position'] = ('init', position)
-        self._whitelist['module'] = ('init', module)
+        self._whitelist[u'expression'] = (u'init', expression)
+        self._whitelist[u'name'] = (u'init', name)
+        self._whitelist[u'position'] = (u'init', position)
+        self._whitelist[u'module'] = (u'init', module)
         self.name = name
         # Set the position parameter
         if position:
@@ -87,7 +88,7 @@ class Expression(Component):
         # Set the initial value of the parameters
         if kwargs:
             for kwarg, value in kwargs.items():
-                setattr(getattr(self, kwarg), 'value', value)
+                setattr(getattr(self, kwarg), u'value', value)
 
         self.__doc__ = _CLASS_DOC % (name,
                                      sympy.latex(sympy.sympify(expression)))
@@ -95,24 +96,24 @@ class Expression(Component):
     def function(self, x):
         return self._f(x, *[p.value for p in self.parameters])
 
-    def compile_function(self, module="numpy"):
+    def compile_function(self, module=u"numpy"):
         import sympy
         from sympy.utilities.lambdify import lambdify
         expr = sympy.sympify(self._str_expression)
 
         rvars = sympy.symbols([s.name for s in expr.free_symbols], real=True)
         real_expr = expr.subs(
-            {orig: real_ for (orig, real_) in zip(expr.free_symbols, rvars)})
+            dict((orig, real_) for (orig, real_) in izip(expr.free_symbols, rvars)))
         # just replace with the assumption that all our variables are real
         expr = real_expr
 
         eval_expr = expr.evalf()
         # Extract parameters
         parameters = [
-            symbol for symbol in expr.free_symbols if symbol.name != "x"]
+            symbol for symbol in expr.free_symbols if symbol.name != u"x"]
         parameters.sort(key=lambda x: x.name)  # to have a reliable order
         # Extract x
-        x, = [symbol for symbol in expr.free_symbols if symbol.name == "x"]
+        x, = [symbol for symbol in expr.free_symbols if symbol.name == u"x"]
         # Create compiled function
         self._f = lambdify([x] + parameters, eval_expr,
                            modules=module, dummify=False)
@@ -121,7 +122,7 @@ class Expression(Component):
         for parameter in parameters:
             grad_expr = sympy.diff(eval_expr, parameter)
             setattr(self,
-                    "_f_grad_%s" % parameter.name,
+                    u"_f_grad_%s" % parameter.name,
                     lambdify([x] + parameters,
                              grad_expr.evalf(),
                              modules=module,
@@ -129,11 +130,11 @@ class Expression(Component):
                     )
 
             setattr(self,
-                    "grad_%s" % parameter.name,
+                    u"grad_%s" % parameter.name,
                     _fill_function_args(
                         getattr(
                             self,
-                            "_f_grad_%s" %
+                            u"_f_grad_%s" %
                             parameter.name)).__get__(
                         self,
                         Expression)

@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 import scipy.interpolate
 import scipy.signal
@@ -6,7 +7,7 @@ import scipy.signal
 def find_peaks_ohaver(y, x=None, slope_thresh=0., amp_thresh=None,
                       medfilt_radius=5, maxpeakn=30000, peakgroup=10,
                       subchannel=True,):
-    """Find peaks along a 1D line.
+    u"""Find peaks along a 1D line.
 
     Function to locate the positive peaks in a noisy x-y data set.
 
@@ -92,12 +93,12 @@ def find_peaks_ohaver(y, x=None, slope_thresh=0., amp_thresh=None,
     else:
         d = np.gradient(y)
     n = np.round(peakgroup / 2 + 1)
-    peak_dt = np.dtype([('position', np.float),
-                        ('height', np.float),
-                        ('width', np.float)])
+    peak_dt = np.dtype([(u'position', np.float),
+                        (u'height', np.float),
+                        (u'width', np.float)])
     P = np.array([], dtype=peak_dt)
     peak = 0
-    for j in range(len(y) - 4):
+    for j in xrange(len(y) - 4):
         if np.sign(d[j]) > np.sign(d[j + 1]):  # Detects zero-crossing
             if np.sign(d[j + 1]) == 0:
                 continue
@@ -113,7 +114,7 @@ def find_peaks_ohaver(y, x=None, slope_thresh=0., amp_thresh=None,
                         xx = np.zeros(peakgroup)
                         yy = np.zeros(peakgroup)
                         s = 0
-                        for k in range(peakgroup):
+                        for k in xrange(peakgroup):
                             groupindex = j + k - n + 1
                             if groupindex < 1:
                                 xx = xx[1:]
@@ -163,8 +164,8 @@ def find_peaks_ohaver(y, x=None, slope_thresh=0., amp_thresh=None,
     # return only the part of the array that contains peaks
     # (not the whole maxpeakn x 3 array)
     if len(P) > maxpeakn:
-        minh = np.sort(P['height'])[-maxpeakn]
-        P = P[P['height'] >= minh]
+        minh = np.sort(P[u'height'])[-maxpeakn]
+        P = P[P[u'height'] >= minh]
 
     # Sorts the values as a function of position
     P.sort(0)

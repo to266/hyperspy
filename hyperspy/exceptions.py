@@ -21,7 +21,7 @@
 
 class ByteOrderError(Exception):
 
-    def __init__(self, order=''):
+    def __init__(self, order=u''):
         self.byte_order = order
 
     def __str__(self):
@@ -30,7 +30,7 @@ class ByteOrderError(Exception):
 
 class DM3FileVersionError(Exception):
 
-    def __init__(self, value=''):
+    def __init__(self, value=u''):
         self.dm3_version = value
 
     def __str__(self):
@@ -39,7 +39,7 @@ class DM3FileVersionError(Exception):
 
 class DM3TagError(Exception):
 
-    def __init__(self, value=''):
+    def __init__(self, value=u''):
         self.dm3_tag = value
 
     def __str__(self):
@@ -48,7 +48,7 @@ class DM3TagError(Exception):
 
 class DM3DataTypeError(Exception):
 
-    def __init__(self, value=''):
+    def __init__(self, value=u''):
         self.dm3_dtype = value
 
     def __str__(self):
@@ -57,7 +57,7 @@ class DM3DataTypeError(Exception):
 
 class DM3TagTypeError(Exception):
 
-    def __init__(self, value=''):
+    def __init__(self, value=u''):
         self.dm3_tagtype = value
 
     def __str__(self):
@@ -66,7 +66,7 @@ class DM3TagTypeError(Exception):
 
 class DM3TagIDError(Exception):
 
-    def __init__(self, value=''):
+    def __init__(self, value=u''):
         self.dm3_tagID = value
 
     def __str__(self):
@@ -75,7 +75,7 @@ class DM3TagIDError(Exception):
 
 class ImageIDError(Exception):
 
-    def __init__(self, value=''):
+    def __init__(self, value=u''):
         self.image_id = value
 
     def __str__(self):
@@ -84,7 +84,7 @@ class ImageIDError(Exception):
 
 class ImageModeError(Exception):
 
-    def __init__(self, value=''):
+    def __init__(self, value=u''):
         self.mode = value
 
     def __str__(self):
@@ -103,7 +103,7 @@ class ShapeError(Exception):
 class NoInteractiveError(Exception):
 
     def __init__(self):
-        self.error = "HyperSpy must run in interactive mode to use this feature"
+        self.error = u"HyperSpy must run in interactive mode to use this feature"
 
     def __str__(self):
         return repr(self.error)
@@ -112,8 +112,8 @@ class NoInteractiveError(Exception):
 class WrongObjectError(Exception):
 
     def __init__(self, is_str, must_be_str):
-        self.error = ("A object of type %s was given, but a %s" % (
-            is_str, must_be_str) + " object is required")
+        self.error = (u"A object of type %s was given, but a %s" % (
+            is_str, must_be_str) + u" object is required")
 
     def __str__(self):
         return repr(self.error)
@@ -122,10 +122,10 @@ class WrongObjectError(Exception):
 class MissingParametersError(Exception):
 
     def __init__(self, parameters):
-        par_str = ''
+        par_str = u''
         for par in parameters:
-            par_str += '%s,' % par
-        self.error = "The following parameters are missing: %s" % par_str
+            par_str += u'%s,' % par
+        self.error = u"The following parameters are missing: %s" % par_str
         # Remove the last comma
         self.error = self.error[:-1]
 
@@ -147,7 +147,7 @@ class SignalDimensionError(Exception):
     def __init__(self, output_dimension, expected_output_dimension):
         self.output_dimension = output_dimension
         self.expected_output_dimension = expected_output_dimension
-        self.msg = 'output dimension=%i, %i expected' % (
+        self.msg = u'output dimension=%i, %i expected' % (
             self.output_dimension, self.expected_output_dimension)
 
     def __str__(self):
@@ -162,7 +162,7 @@ class NavigationDimensionError(Exception):
         self.navigation_dimension = navigation_dimension
         self.expected_navigation_dimension = \
             expected_navigation_dimension
-        self.msg = 'navigation dimension=%i, %s expected' % (
+        self.msg = u'navigation dimension=%i, %s expected' % (
             self.navigation_dimension, self.expected_navigation_dimension)
 
     def __str__(self):
@@ -174,7 +174,7 @@ class SignalSizeError(Exception):
     def __init__(self, signal_size, expected_signal_size):
         self.signal_size = signal_size
         self.expected_signal_size = expected_signal_size
-        self.msg = 'signal_size=%i, %i expected' % (
+        self.msg = u'signal_size=%i, %i expected' % (
             self.signal_size, self.expected_signal_size)
 
     def __str__(self):
@@ -186,5 +186,5 @@ class NavigationSizeError(Exception):
     def __init__(self, navigation_size, expected_navigation_size):
         self.navigation_size = navigation_size
         self.expected_navigation_size = expected_navigation_size
-        self.msg = 'navigation_size =%i, %i expected' % (
+        self.msg = u'navigation_size =%i, %i expected' % (
             self.navigation_size, self.expected_navigation_size)

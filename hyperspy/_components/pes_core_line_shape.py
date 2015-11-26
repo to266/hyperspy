@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 import math
 
@@ -26,11 +27,11 @@ sqrt2pi = np.sqrt(2 * np.pi)
 
 class PESCoreLineShape(Component):
 
-    """
+    u"""
     """
 
     def __init__(self, A=1., FWHM=1., origin=0.):
-        Component.__init__(self, ['A', 'FWHM', 'origin', 'ab', 'shirley'])
+        Component.__init__(self, [u'A', u'FWHM', u'origin', u'ab', u'shirley'])
         self.shirley.free = False
         self.ab.value = 0
         self.ab.free = False
@@ -59,7 +60,7 @@ class PESCoreLineShape(Component):
         self.Shirley = False
 
     def function(self, x):
-        """
+        u"""
         Given an one dimensional array x containing the energies at which
         you want to evaluate the background model, returns the background
         model for the current parameters.

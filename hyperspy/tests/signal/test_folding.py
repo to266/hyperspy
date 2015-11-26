@@ -1,10 +1,11 @@
+from __future__ import with_statement
 import nose.tools as nt
 import numpy as np
 
 from hyperspy.signal import Signal
 
 
-class TestSignalFolding:
+class TestSignalFolding(object):
 
     def setUp(self):
         self.s = Signal(np.empty((2, 3, 4, 5)))
@@ -24,7 +25,7 @@ class TestSignalFolding:
 
     def test_unfolded_repr(self):
         self.s.unfold()
-        nt.assert_true("unfolded" in repr(self.s))
+        nt.assert_true(u"unfolded" in repr(self.s))
 
     def test_unfold_navigation_by_keyword(self):
         s = self.s.deepcopy()
@@ -126,7 +127,7 @@ class TestSignalFolding:
                         self.s.axes_manager.signal_shape)
 
 
-class TestSignalVarianceFolding:
+class TestSignalVarianceFolding(object):
 
     def setUp(self):
         self.s = Signal(np.empty((2, 3, 4, 5)))

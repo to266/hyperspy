@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 
 from hyperspy.component import Component
@@ -23,15 +24,15 @@ from hyperspy.component import Component
 
 class RC(Component):
 
-    """
+    u"""
     """
 
     def __init__(self, V=1, V0=0, tau=1.):
-        Component.__init__(self, ('Vmax', 'V0', 'tau'))
+        Component.__init__(self, (u'Vmax', u'V0', u'tau'))
         self.Vmax.value, self.V0.value, self.tau.value = V, V0, tau
 
     def function(self, x):
-        """
+        u"""
         """
         Vmax = self.Vmax.value
         V0 = self.V0.value

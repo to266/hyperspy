@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import with_statement
+from __future__ import division
 import numpy as np
 
 from hyperspy.component import Component
@@ -24,7 +26,7 @@ from hyperspy.misc.utils import ordinal
 
 class Polynomial(Component):
 
-    """n-order polynomial component.
+    u"""n-order polynomial component.
 
     Polynomial component defined by the coefficients parameters which is an
     array of len the order of the polynomial.
@@ -40,8 +42,8 @@ class Polynomial(Component):
     """
 
     def __init__(self, order=2):
-        Component.__init__(self, ['coefficients', ])
-        self._whitelist['order'] = ('init', order)
+        Component.__init__(self, [u'coefficients', ])
+        self._whitelist[u'order'] = (u'init', order)
         self.coefficients._number_of_elements = order + 1
         self.coefficients.value = np.zeros((order + 1,))
         self.coefficients.grad = self.grad_coefficients
@@ -65,14 +67,14 @@ class Polynomial(Component):
             return x * 0
 
     def __repr__(self):
-        text = "%s order Polynomial component" % ordinal(
+        text = u"%s order Polynomial component" % ordinal(
             self.get_polynomial_order())
         if self.name:
-            text = "%s (%s)" % (self.name, text)
-        return "<%s>" % text
+            text = u"%s (%s)" % (self.name, text)
+        return u"<%s>" % text
 
     def estimate_parameters(self, signal, x1, x2, only_current=False):
-        """Estimate the parameters by the two area method
+        u"""Estimate the parameters by the two area method
 
         Parameters
         ----------
@@ -119,9 +121,9 @@ class Polynomial(Component):
                     cmaps = cmaps.T       # Transpose back if needed
                 # Shape needed to fit coefficients.map:
                 cmap_shape = nav_shape + (self.get_polynomial_order() + 1, )
-                self.coefficients.map['values'][:] = cmaps.reshape(cmap_shape)
+                self.coefficients.map[u'values'][:] = cmaps.reshape(cmap_shape)
                 if binned is True:
-                    self.coefficients.map["values"] /= axis.scale
-                self.coefficients.map['is_set'][:] = True
+                    self.coefficients.map[u"values"] /= axis.scale
+                self.coefficients.map[u'is_set'][:] = True
             self.fetch_stored_values()
             return True

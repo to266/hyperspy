@@ -1,4 +1,4 @@
-"""
+u"""
 
 This module is deprecated and will be removed in HyperSpy 0.10,
 plese use :mod:`~hyperspy.api` instead.
@@ -22,7 +22,7 @@ def get_configuration_directory_path():
 
 
 def create_model(signal, *args, **kwargs):
-    """Create a model object
+    u"""Create a model object
 
     Any extra argument is passes to the Model constructor.
 
@@ -61,7 +61,7 @@ def create_model(signal, *args, **kwargs):
     """
     import warnings
     warnings.warn(
-        "This function is deprecated and will be removed in HyperSpy 0.9. "
-        "Please use the equivalent `Signal.create_model` method "
-        "instead.", VisibleDeprecationWarning)
+        u"This function is deprecated and will be removed in HyperSpy 0.9. "
+        u"Please use the equivalent `Signal.create_model` method "
+        u"instead.", VisibleDeprecationWarning)
     return signal.create_model(*args, **kwargs)

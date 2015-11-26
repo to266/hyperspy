@@ -1,4 +1,4 @@
-"""Markers that can be added to `Signal` plots.
+u"""Markers that can be added to `Signal` plots.
 
 Example
 -------

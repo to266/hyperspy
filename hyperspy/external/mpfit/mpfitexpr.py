@@ -1,4 +1,4 @@
-"""
+u"""
 	Copyright (C) 2009 Sergey Koposov
 
     This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import scipy
 
 def mpfitexpr(func, x, y, err, start_params, check=True, full_output=False,
               imports=None, **kw):
-    """Fit the used defined expression to the data
+    u"""Fit the used defined expression to the data
     Input:
     - func: string with the function definition
     - x: x vector
@@ -48,7 +48,7 @@ def mpfitexpr(func, x, y, err, start_params, check=True, full_output=False,
 
     """
 
-    hash = {'numpy': numpy, 'scipy': scipy}
+    hash = {u'numpy': numpy, u'scipy': scipy}
 
     if imports is not None:
         for i in imports:
@@ -56,9 +56,9 @@ def mpfitexpr(func, x, y, err, start_params, check=True, full_output=False,
             hash[i] = __import__(i)
 
     def myfunc(p, fjac=None, x=None, y=None, err=None):
-        return [0, eval('(y-(%s))/err' % func, hash, locals())]
+        return [0, eval(u'(y-(%s))/err' % func, hash, locals())]
 
-    myre = "[^a-zA-Z]p\[(\d+)\]"
+    myre = u"[^a-zA-Z]p\[(\d+)\]"
     r = re.compile(myre)
     maxp = -1
     for m in re.finditer(r, func):
@@ -66,13 +66,13 @@ def mpfitexpr(func, x, y, err, start_params, check=True, full_output=False,
         maxp = curp if curp > maxp else maxp
     if check:
         if maxp == -1:
-            raise Exception("wrong function format")
+            raise Exception(u"wrong function format")
         if maxp + 1 != len(start_params):
             raise Exception(
-                "the length of the start_params != the length of the parameter verctor of the function")
-    fa = {'x': x, 'y': y, 'err': err}
+                u"the length of the start_params != the length of the parameter verctor of the function")
+    fa = {u'x': x, u'y': y, u'err': err}
     res = mpfit.mpfit(myfunc, start_params, functkw=fa, **kw)
-    yfit = eval(func, globals(), {'x': x, 'p': res.params})
+    yfit = eval(func, globals(), {u'x': x, u'p': res.params})
     if full_output:
         return res, yfit
     else:

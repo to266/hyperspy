@@ -23,7 +23,7 @@ from hyperspy.gui.tools import SpectrumRangeSelector
 
 
 def simple_decorator(decorator):
-    """This decorator can be used to turn simple functions
+    u"""This decorator can be used to turn simple functions
     into well-behaved decorators, so long as the decorators
     are fairly simple. If a decorator expects a function and
     returns a function (no descriptors), and if it doesn't

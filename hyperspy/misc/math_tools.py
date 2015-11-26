@@ -1,3 +1,4 @@
+from __future__ import division
 import math
 
 import numpy as np
@@ -17,7 +18,7 @@ def closest_nice_number(number):
 
 
 def get_linear_interpolation(p1, p2, x):
-    """Given two points in 2D returns y for a given x for y = ax + b
+    u"""Given two points in 2D returns y for a given x for y = ax + b
 
     Parameters
     ----------
@@ -38,7 +39,7 @@ def get_linear_interpolation(p1, p2, x):
 
 
 def order_of_magnitude(number):
-    """Order of magnitude of the given number
+    u"""Order of magnitude of the given number
 
     Parameters
     ----------
@@ -52,12 +53,12 @@ def order_of_magnitude(number):
 
 
 def isfloat(number):
-    """Check if a number or array is of float type.
+    u"""Check if a number or array is of float type.
 
     This is necessary because e.g. isinstance(np.float32(2), float) is False.
 
     """
-    if hasattr(number, "dtype"):
+    if hasattr(number, u"dtype"):
         return np.issubdtype(number, np.float)
     else:
         return isinstance(number, float)

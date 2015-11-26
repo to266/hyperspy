@@ -1,4 +1,4 @@
-"""
+u"""
 Bayesian Block implementation
 =============================
 
@@ -10,13 +10,14 @@ References
 ----------
 .. [1] http://adsabs.harvard.edu/abs/2012arXiv1207.5578S
 """
+from __future__ import division
 import numpy as np
 # TODO: implement other fitness functions from appendix B of Scargle 2012
 
 
 class FitnessFunc(object):
 
-    """Base class for fitness functions
+    u"""Base class for fitness functions
 
     Each fitness function class has the following:
     - fitness(...) : compute fitness function.
@@ -29,7 +30,7 @@ class FitnessFunc(object):
         self.gamma = gamma
 
     def validate_input(self, t, x, sigma):
-        """Check that input is valid"""
+        u"""Check that input is valid"""
         pass
 
     def fitness(**kwargs):
@@ -46,7 +47,7 @@ class FitnessFunc(object):
         return 4 - np.log(73.53 * self.p0 * (N ** -0.478))
 
     def gamma_prior(self, N, Ntot):
-        """Basic prior, parametrized by gamma (eq. 3 in Scargle 2012)"""
+        u"""Basic prior, parametrized by gamma (eq. 3 in Scargle 2012)"""
         if self.gamma == 1:
             return 0
         else:
@@ -57,12 +58,12 @@ class FitnessFunc(object):
     # the method fitness().  This allows more efficient computation below.
     @property
     def args(self):
-        return self.fitness.__code__.co_varnames[1:]
+        return self.fitness.func_code.co_varnames[1:]
 
 
 class Events(FitnessFunc):
 
-    """Fitness for binned or unbinned events
+    u"""Fitness for binned or unbinned events
 
     Parameters
     ----------
@@ -88,7 +89,7 @@ class Events(FitnessFunc):
 
 class RegularEvents(FitnessFunc):
 
-    """Fitness for regular events
+    u"""Fitness for regular events
 
     This is for data which has a fundamental "tick" length, so that all
     measured values are multiples of this tick length.  In each tick, there
@@ -109,7 +110,7 @@ class RegularEvents(FitnessFunc):
 
     def validate_input(self, t, x, sigma):
         if not np.all(np.logical_or(x == 0, x == 1)):
-            raise ValueError("Regular events must have only 0 and 1 in x")
+            raise ValueError(u"Regular events must have only 0 and 1 in x")
 
     def fitness(self, T_k, N_k):
         # Eq. 75 of Scargle 2012
@@ -119,8 +120,8 @@ class RegularEvents(FitnessFunc):
         eps = 1E-8
         if np.any(N_over_M > 1 + eps):
             import warnings
-            warnings.warn('regular events: N/M > 1.  '
-                          'Is the time step correct?')
+            warnings.warn(u'regular events: N/M > 1.  '
+                          u'Is the time step correct?')
 
         one_m_NM = 1 - N_over_M
         N_over_M[N_over_M <= 0] = 1
@@ -131,7 +132,7 @@ class RegularEvents(FitnessFunc):
 
 class PointMeasures(FitnessFunc):
 
-    """Fitness for point measures
+    u"""Fitness for point measures
 
     Parameters
     ----------
@@ -160,8 +161,8 @@ class PointMeasures(FitnessFunc):
 
 
 def bayesian_blocks(t, x=None, sigma=None,
-                    fitness='events', **kwargs):
-    """Bayesian Blocks Implementation
+                    fitness=u'events', **kwargs):
+    u"""Bayesian Blocks Implementation
 
     This is a flexible implementation of the Bayesian Blocks algorithm
     described in Scargle 2012 [1]_
@@ -246,23 +247,23 @@ def bayesian_blocks(t, x=None, sigma=None,
         sigma = np.asarray(sigma)
 
     # verify the fitness function
-    if fitness == 'events':
+    if fitness == u'events':
         if x is not None and np.any(x % 1 > 0):
-            raise ValueError("x must be integer counts for fitness='events'")
+            raise ValueError(u"x must be integer counts for fitness='events'")
         fitfunc = Events(**kwargs)
-    elif fitness == 'regular_events':
+    elif fitness == u'regular_events':
         if x is not None and (np.any(x % 1 > 0) or np.any(x > 1)):
-            raise ValueError("x must be 0 or 1 for fitness='regular_events'")
+            raise ValueError(u"x must be 0 or 1 for fitness='regular_events'")
         fitfunc = RegularEvents(**kwargs)
-    elif fitness == 'measures':
+    elif fitness == u'measures':
         if x is None:
-            raise ValueError("x must be specified for fitness='measures'")
+            raise ValueError(u"x must be specified for fitness='measures'")
         fitfunc = PointMeasures(**kwargs)
     else:
-        if not (hasattr(fitness, 'args') and
-                hasattr(fitness, 'fitness') and
-                hasattr(fitness, 'prior')):
-            raise ValueError("fitness not understood")
+        if not (hasattr(fitness, u'args') and
+                hasattr(fitness, u'fitness') and
+                hasattr(fitness, u'prior')):
+            raise ValueError(u"fitness not understood")
         fitfunc = fitness
 
     # find unique values of t
@@ -274,7 +275,7 @@ def bayesian_blocks(t, x=None, sigma=None,
     # if x is not specified, x will be counts at each time
     if x is None:
         if sigma is not None:
-            raise ValueError("If sigma is specified, x must be specified")
+            raise ValueError(u"If sigma is specified, x must be specified")
 
         if len(unq_t) == len(t):
             x = np.ones_like(t)
@@ -289,11 +290,11 @@ def bayesian_blocks(t, x=None, sigma=None,
         x = np.asarray(x)
 
         if len(t) != len(x):
-            raise ValueError("Size of t and x does not match")
+            raise ValueError(u"Size of t and x does not match")
 
         if len(unq_t) != len(t):
-            raise ValueError("Repeated values in t not supported when "
-                             "x is specified")
+            raise ValueError(u"Repeated values in t not supported when "
+                             u"x is specified")
         t = unq_t
         x = x[unq_ind]
 
@@ -302,7 +303,7 @@ def bayesian_blocks(t, x=None, sigma=None,
     if sigma is not None:
         sigma = np.asarray(sigma)
         if sigma.shape not in [(), (1,), (N,)]:
-            raise ValueError('sigma does not match the shape of x')
+            raise ValueError(u'sigma does not match the shape of x')
     else:
         sigma = 1
 
@@ -310,11 +311,11 @@ def bayesian_blocks(t, x=None, sigma=None,
     fitfunc.validate_input(t, x, sigma)
 
     # compute values needed for computation, below
-    if 'a_k' in fitfunc.args:
+    if u'a_k' in fitfunc.args:
         ak_raw = np.ones_like(x) / (sigma * sigma)
-    if 'b_k' in fitfunc.args:
+    if u'b_k' in fitfunc.args:
         bk_raw = x / (sigma * sigma)
-    if 'c_k' in fitfunc.args:
+    if u'c_k' in fitfunc.args:
         ck_raw = x * x / (sigma * sigma)
 
     # create length-(N + 1) array of cell edges
@@ -330,29 +331,29 @@ def bayesian_blocks(t, x=None, sigma=None,
     #-----------------------------------------------------------------
     # Start with first data cell; add one cell at each iteration
     #-----------------------------------------------------------------
-    for R in range(N):
+    for R in xrange(N):
         # Compute fit_vec : fitness of putative last block (end at R)
         kwds = {}
 
         # T_k: width/duration of each block
-        if 'T_k' in fitfunc.args:
-            kwds['T_k'] = block_length[:R + 1] - block_length[R + 1]
+        if u'T_k' in fitfunc.args:
+            kwds[u'T_k'] = block_length[:R + 1] - block_length[R + 1]
 
         # N_k: number of elements in each block
-        if 'N_k' in fitfunc.args:
-            kwds['N_k'] = np.cumsum(x[:R + 1][::-1])[::-1]
+        if u'N_k' in fitfunc.args:
+            kwds[u'N_k'] = np.cumsum(x[:R + 1][::-1])[::-1]
 
         # a_k: eq. 31
-        if 'a_k' in fitfunc.args:
-            kwds['a_k'] = 0.5 * np.cumsum(ak_raw[:R + 1][::-1])[::-1]
+        if u'a_k' in fitfunc.args:
+            kwds[u'a_k'] = 0.5 * np.cumsum(ak_raw[:R + 1][::-1])[::-1]
 
         # b_k: eq. 32
-        if 'b_k' in fitfunc.args:
-            kwds['b_k'] = - np.cumsum(bk_raw[:R + 1][::-1])[::-1]
+        if u'b_k' in fitfunc.args:
+            kwds[u'b_k'] = - np.cumsum(bk_raw[:R + 1][::-1])[::-1]
 
         # c_k: eq. 33
-        if 'c_k' in fitfunc.args:
-            kwds['c_k'] = 0.5 * np.cumsum(ck_raw[:R + 1][::-1])[::-1]
+        if u'c_k' in fitfunc.args:
+            kwds[u'c_k'] = 0.5 * np.cumsum(ck_raw[:R + 1][::-1])[::-1]
 
         # evaluate fitness function
         fit_vec = fitfunc.fitness(**kwds)

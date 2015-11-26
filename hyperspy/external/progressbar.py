@@ -32,7 +32,7 @@
 # DAMAGE.
 
 
-"""Text progressbar library for python.
+u"""Text progressbar library for python.
 
 This library provides a text mode progressbar. This is tipically used
 to display the progress of a long running operation, providing a
@@ -52,10 +52,11 @@ The progressbar module is very easy to use, yet very powerful. And
 automatically supports features like auto-resizing when available.
 """
 
-__author__ = "Nilton Volpato"
-__author_email__ = "first-name dot last-name @ gmail.com"
-__date__ = "2006-05-07"
-__version__ = "2.2"
+from __future__ import division
+__author__ = u"Nilton Volpato"
+__author_email__ = u"first-name dot last-name @ gmail.com"
+__date__ = u"2006-05-07"
+__version__ = u"2.2"
 
 # Changelog
 #
@@ -94,7 +95,7 @@ def running_from_terminal():
 
 class ProgressBarWidget(object):
 
-    """This is an element of ProgressBar formatting.
+    u"""This is an element of ProgressBar formatting.
 
     The ProgressBar object will call it's update value when an update
     is needed. It's size may change between call, but the results will
@@ -102,7 +103,7 @@ class ProgressBarWidget(object):
     """
 
     def update(self, pbar):
-        """Returns the string representing the widget.
+        u"""Returns the string representing the widget.
 
         The parameter pbar is a reference to the calling ProgressBar,
         where one can access attributes of the class for knowing how
@@ -114,7 +115,7 @@ class ProgressBarWidget(object):
 
 class ProgressBarWidgetHFill(object):
 
-    """This is a variable width element of ProgressBar formatting.
+    u"""This is a variable width element of ProgressBar formatting.
 
     The ProgressBar object will call it's update value, informing the
     width this object must the made. This is like TeX \\hfill, it will
@@ -124,7 +125,7 @@ class ProgressBarWidgetHFill(object):
     """
 
     def update(self, pbar, width):
-        """Returns the string representing the widget.
+        u"""Returns the string representing the widget.
 
         The parameter pbar is a reference to the calling ProgressBar,
         where one can access attributes of the class for knowing how
@@ -136,31 +137,31 @@ class ProgressBarWidgetHFill(object):
 
 
 def format_time(seconds):
-    return time.strftime('%H:%M:%S', time.gmtime(seconds))
+    return time.strftime(u'%H:%M:%S', time.gmtime(seconds))
 
 
 class ETA(ProgressBarWidget):
 
-    """Widget for the Estimated Time of Arrival"""
+    u"""Widget for the Estimated Time of Arrival"""
 
     def update(self, pbar):
         if pbar.currval == 0:
-            return 'ETA:  --:--:--'
+            return u'ETA:  --:--:--'
         elif pbar.finished:
-            return 'Time: %s' % format_time(pbar.seconds_elapsed)
+            return u'Time: %s' % format_time(pbar.seconds_elapsed)
         else:
             elapsed = pbar.seconds_elapsed
             eta = elapsed * pbar.maxval / pbar.currval - elapsed
-            return 'ETA:  %s' % format_time(eta)
+            return u'ETA:  %s' % format_time(eta)
 
 
 class FileTransferSpeed(ProgressBarWidget):
 
-    """Widget for showing the transfer speed (useful for file transfer)."""
+    u"""Widget for showing the transfer speed (useful for file transfer)."""
 
     def __init__(self):
-        self.fmt = '%6.2f %s'
-        self.units = ['B', 'K', 'M', 'G', 'T', 'P']
+        self.fmt = u'%6.2f %s'
+        self.units = [u'B', u'K', u'M', u'G', u'T', u'P']
 
     def update(self, pbar):
         if pbar.seconds_elapsed < 2e-6:  # == 0:
@@ -172,14 +173,14 @@ class FileTransferSpeed(ProgressBarWidget):
             if spd < 1000:
                 break
             spd /= 1000
-        return self.fmt % (spd, u + '/s')
+        return self.fmt % (spd, u + u'/s')
 
 
 class RotatingMarker(ProgressBarWidget):
 
-    """A rotating marker for filling the bar of progress."""
+    u"""A rotating marker for filling the bar of progress."""
 
-    def __init__(self, markers='|/-\\'):
+    def __init__(self, markers=u'|/-\\'):
         self.markers = markers
         self.curmark = -1
 
@@ -192,23 +193,23 @@ class RotatingMarker(ProgressBarWidget):
 
 class Percentage(ProgressBarWidget):
 
-    """Just the percentage done."""
+    u"""Just the percentage done."""
 
     def update(self, pbar):
-        return '%3d%%' % pbar.percentage()
+        return u'%3d%%' % pbar.percentage()
 
 
 class Bar(ProgressBarWidgetHFill):
 
-    """The bar of progress. It will strech to fill the line."""
+    u"""The bar of progress. It will strech to fill the line."""
 
-    def __init__(self, marker='#', left='|', right='|'):
+    def __init__(self, marker=u'#', left=u'|', right=u'|'):
         self.marker = marker
         self.left = left
         self.right = right
 
     def _format_marker(self, pbar):
-        if isinstance(self.marker, str):
+        if isinstance(self.marker, unicode):
             return self.marker
         else:
             return self.marker.update(pbar)
@@ -224,7 +225,7 @@ class Bar(ProgressBarWidgetHFill):
 
 class ReverseBar(Bar):
 
-    """The reverse bar of progress, or bar of regress. :)"""
+    u"""The reverse bar of progress, or bar of regress. :)"""
 
     def update(self, pbar, width):
         percent = pbar.percentage()
@@ -234,10 +235,10 @@ class ReverseBar(Bar):
         bar = (self.left + (m * marked_width).rjust(int(cwidth)) + self.right)
         return bar
 
-default_widgets = [Percentage(), ' ', Bar()]
+default_widgets = [Percentage(), u' ', Bar()]
 
 
-class DummyProgressBar:
+class DummyProgressBar(object):
 
     def __init__(self):
         return
@@ -250,7 +251,7 @@ class DummyProgressBar:
     def finish():
         return
 
-    def __next__(self):
+    def next(self):
         return
 
     @staticmethod
@@ -260,7 +261,7 @@ class DummyProgressBar:
 
 class ProgressBar(object):
 
-    """This is the ProgressBar class, it updates and prints the bar.
+    u"""This is the ProgressBar class, it updates and prints the bar.
 
     The term_width parameter may be an integer. Or None, in which case
     it will try to guess it, if it fails it will default to 80 columns.
@@ -320,11 +321,11 @@ class ProgressBar(object):
             self.fd = sys.stderr
 
     def handle_resize(self, signum, frame):
-        h, w = array('h', ioctl(self.fd, termios.TIOCGWINSZ, '\0' * 8))[:2]
+        h, w = array(u'h', ioctl(self.fd, termios.TIOCGWINSZ, u'\0' * 8))[:2]
         self.term_width = w
 
     def percentage(self):
-        """Returns the percentage of the progress."""
+        u"""Returns the percentage of the progress."""
         return self.currval * 100.0 / self.maxval
 
     def _format_widgets(self):
@@ -337,7 +338,7 @@ class ProgressBar(object):
                 r.append(w)
                 hfill_inds.append(i)
                 num_hfill += 1
-            elif isinstance(w, str):
+            elif isinstance(w, unicode):
                 r.append(w)
                 currwidth += len(w)
             else:
@@ -351,13 +352,13 @@ class ProgressBar(object):
         return r
 
     def _format_line(self):
-        return ''.join(self._format_widgets()).ljust(int(self.term_width))
+        return u''.join(self._format_widgets()).ljust(int(self.term_width))
 
     def _need_update(self):
         return int(self.percentage()) != int(self.prev_percentage)
 
     def update(self, value):
-        """Updates the progress bar to a new value."""
+        u"""Updates the progress bar to a new value."""
         assert 0 <= value <= self.maxval
         self.currval = value
         if not self._need_update() or self.finished:
@@ -370,25 +371,25 @@ class ProgressBar(object):
 
     def _print_ipython(self):
         value = self.currval
-        print('\r', self._format_line(), end=' ')
+        print u'\r', self._format_line(),
         sys.stdout.flush()
         if value == self.maxval:
             self.finished = True
-            print("\n")
+            print u"\n"
 
     def _print_terminal(self):
         value = self.currval
         if value != self.maxval:
-            self.fd.write(self._format_line() + '\r')
+            self.fd.write(self._format_line() + u'\r')
         else:
             self.finished = True
-            self.fd.write(self._format_line() + '\n')
+            self.fd.write(self._format_line() + u'\n')
 
-    def __next__(self):
+    def next(self):
         self.update(self.currval + 1)
 
     def start(self):
-        """Start measuring time, and prints the bar at 0%.
+        u"""Start measuring time, and prints the bar at 0%.
 
         It returns self so you can use it like this:
         >>> pbar = ProgressBar().start()
@@ -402,29 +403,29 @@ class ProgressBar(object):
         return self
 
     def finish(self):
-        """Used to tell the progress is finished."""
+        u"""Used to tell the progress is finished."""
         self.update(self.maxval)
         if self.signal_set:
             signal.signal(signal.SIGWINCH, signal.SIG_DFL)
 
 
-class MyBar:
+class MyBar(object):
 
-    """Encapsulation of a nice progress bar"""
+    u"""Encapsulation of a nice progress bar"""
 
     def __init__(self, text):
         self.text = text
 
     def init(self, max):
-        widgets = [self.text, ' ', Percentage(), ' ', Bar(), ' ', ETA()]
+        widgets = [self.text, u' ', Percentage(), u' ', Bar(), u' ', ETA()]
         self.pbar = ProgressBar(widgets=widgets, maxval=max).start()
 
     def update(self, i):
         self.pbar.update(i)
 
 
-def progressbar(text="calculating", maxval=100, disabled=False):
-    """
+def progressbar(text=u"calculating", maxval=100, disabled=False):
+    u"""
     Returns a useful default progressbar.
 
     Examples
@@ -440,71 +441,71 @@ def progressbar(text="calculating", maxval=100, disabled=False):
     if disabled:
         return DummyProgressBar()
     else:
-        widgets = [text, " ", Percentage(), ' ', Bar(), ' ', ETA()]
+        widgets = [text, u" ", Percentage(), u' ', Bar(), u' ', ETA()]
         return ProgressBar(widgets=widgets, maxval=maxval).start()
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
 
     def example1():
-        widgets = ['Test: ', Percentage(), ' ', Bar(marker=RotatingMarker()),
-                   ' ', ETA(), ' ', FileTransferSpeed()]
+        widgets = [u'Test: ', Percentage(), u' ', Bar(marker=RotatingMarker()),
+                   u' ', ETA(), u' ', FileTransferSpeed()]
         pbar = ProgressBar(widgets=widgets, maxval=10000000).start()
         pbar.clear_output = False
-        for i in range(1000000):
+        for i in xrange(1000000):
             # do something
             pbar.update(10 * i + 1)
         pbar.finish()
-        print()
+        print
 
     def example2():
         class CrazyFileTransferSpeed(FileTransferSpeed):
 
-            """It's bigger between 45 and 80 percent"""
+            u"""It's bigger between 45 and 80 percent"""
 
             def update(self, pbar):
                 if 45 < pbar.percentage() < 80:
-                    return 'Bigger Now ' + FileTransferSpeed.update(self, pbar)
+                    return u'Bigger Now ' + FileTransferSpeed.update(self, pbar)
                 else:
                     return FileTransferSpeed.update(self, pbar)
 
         widgets = [
             CrazyFileTransferSpeed(),
-            ' <<<',
+            u' <<<',
             Bar(),
-            '>>> ',
+            u'>>> ',
             Percentage(),
-            ' ',
+            u' ',
             ETA()]
         pbar = ProgressBar(widgets=widgets, maxval=10000000)
         # maybe do something
         pbar.start()
-        for i in range(2000000):
+        for i in xrange(2000000):
             # do something
             pbar.update(5 * i + 1)
         pbar.finish()
-        print()
+        print
 
     def example3():
-        widgets = [Bar('>'), ' ', ETA(), ' ', ReverseBar('<')]
+        widgets = [Bar(u'>'), u' ', ETA(), u' ', ReverseBar(u'<')]
         pbar = ProgressBar(widgets=widgets, maxval=10000000).start()
-        for i in range(1000000):
+        for i in xrange(1000000):
             # do something
             pbar.update(10 * i + 1)
         pbar.finish()
-        print()
+        print
 
     def example4():
-        widgets = ['Test: ', Percentage(), ' ',
-                   Bar(marker='0', left='[', right=']'),
-                   ' ', ETA(), ' ', FileTransferSpeed()]
+        widgets = [u'Test: ', Percentage(), u' ',
+                   Bar(marker=u'0', left=u'[', right=u']'),
+                   u' ', ETA(), u' ', FileTransferSpeed()]
         pbar = ProgressBar(widgets=widgets, maxval=500)
         pbar.start()
-        for i in range(100, 500 + 1, 50):
+        for i in xrange(100, 500 + 1, 50):
             time.sleep(0.2)
             pbar.update(i)
         pbar.finish()
-        print()
+        print
 
     example1()
     example2()

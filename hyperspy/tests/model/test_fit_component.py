@@ -24,7 +24,7 @@ from hyperspy._signals.spectrum import Spectrum
 from hyperspy.components import Gaussian
 
 
-class TestFitOneComponent:
+class TestFitOneComponent(object):
 
     def setUp(self):
         g = Gaussian()
@@ -57,7 +57,7 @@ class TestFitOneComponent:
         self.model.fit_component(self.g)
 
 
-class TestFitSeveralComponent:
+class TestFitSeveralComponent(object):
 
     def setUp(self):
         gs1 = Gaussian()

@@ -1,4 +1,5 @@
 
+from __future__ import division
 import numpy as np
 from nose.tools import assert_almost_equal
 import nose.tools
@@ -7,11 +8,11 @@ import hyperspy.api as hs
 from hyperspy.misc.elements import elements_db
 
 
-class TestWeightToFromAtomic:
+class TestWeightToFromAtomic(object):
 
     def setUp(self):
         # TiO2
-        self.elements = ("Ti", "O")
+        self.elements = (u"Ti", u"O")
         natoms = (1, 2)
         self.at = [100 * nat / float(sum(natoms)) for nat in natoms]
         atomic_weight = np.array(
@@ -31,7 +32,7 @@ class TestWeightToFromAtomic:
         assert_almost_equal(cat[1], self.wt[1])
 
     def test_multi_dim(self):
-        elements = ("Cu", "Sn")
+        elements = (u"Cu", u"Sn")
         wt = np.array([[[88] * 2] * 3, [[12] * 2] * 3])
         at = hs.material.weight_to_atomic(wt, elements)
         nose.tools.assert_true(np.allclose(
@@ -42,7 +43,7 @@ class TestWeightToFromAtomic:
 
 def test_density_of_mixture():
     # Bronze
-    elements = ("Cu", "Sn")
+    elements = (u"Cu", u"Sn")
     wt = (88., 12.)
     densities = np.array(
         [elements_db[element].Physical_properties.density_gcm3 for element in
@@ -52,7 +53,7 @@ def test_density_of_mixture():
     density = volumes.sum() / 100.
     assert_almost_equal(
         density, hs.material.density_of_mixture_of_pure_elements(
-            wt, elements, mean='weighted'))
+            wt, elements, mean=u'weighted'))
 
     volumes = wt / densities
     density = 100. / volumes.sum()

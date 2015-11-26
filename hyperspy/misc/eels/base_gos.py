@@ -1,5 +1,6 @@
 
 
+from __future__ import division
 import numpy as np
 
 from hyperspy.misc.math_tools import get_linear_interpolation
@@ -13,30 +14,30 @@ class GOSBase(object):
         subshell = self.subshell
         # Convert to the "GATAN" nomenclature
         if (element in elements) is not True:
-            raise ValueError("The given element " + element +
-                             " is not in the database.")
-        elif subshell not in elements[element]['Atomic_properties']['Binding_energies']:
+            raise ValueError(u"The given element " + element +
+                             u" is not in the database.")
+        elif subshell not in elements[element][u'Atomic_properties'][u'Binding_energies']:
             raise ValueError(
-                "The given subshell " + subshell +
-                " is not in the database.\n" +
-                "The available subshells are:\n" +
-                str(list(elements[element]['Atomic_properties']['subshells'].keys())))
+                u"The given subshell " + subshell +
+                u" is not in the database.\n" +
+                u"The available subshells are:\n" +
+                unicode(list(elements[element][u'Atomic_properties'][u'subshells'].keys())))
 
         self.onset_energy = \
             elements[
                 element][
-                'Atomic_properties'][
-                'Binding_energies'][
+                u'Atomic_properties'][
+                u'Binding_energies'][
                 subshell][
-                'onset_energy (eV)']
+                u'onset_energy (eV)']
         self.subshell_factor = \
             elements[
                 element][
-                'Atomic_properties'][
-                'Binding_energies'][
+                u'Atomic_properties'][
+                u'Binding_energies'][
                 subshell][
-                'factor']
-        self.Z = elements[element]['General_properties']['Z']
+                u'factor']
+        self.Z = elements[element][u'General_properties'][u'Z']
         self.element_dict = elements[element]
 
     def get_parametrized_qaxis(self, k1, k2, n):

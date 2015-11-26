@@ -23,21 +23,21 @@ from hyperspy.signal import Signal
 
 
 class Simulation(Signal):
-    _signal_origin = "simulation"
+    _signal_origin = u"simulation"
 
     def __init__(self, *args, **kwargs):
         super(Simulation, self).__init__(*args, **kwargs)
 
     @auto_replot
     def add_poissonian_noise(self, **kwargs):
-        """Add Poissonian noise to the data"""
+        u"""Add Poissonian noise to the data"""
         original_type = self.data.dtype
         self.data = np.random.poisson(self.data, **kwargs).astype(
             original_type)
 
     @auto_replot
     def add_gaussian_noise(self, std):
-        """Add Gaussian noise to the data
+        u"""Add Gaussian noise to the data
         Parameters
         ----------
         std : float

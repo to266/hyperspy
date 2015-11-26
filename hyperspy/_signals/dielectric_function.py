@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 from scipy import constants
 from scipy.integrate import simps, cumtrapz
@@ -25,14 +26,14 @@ from hyperspy.misc.eels.tools import eels_constant
 
 
 class DielectricFunction(Spectrum):
-    _signal_type = "DielectricFunction"
+    _signal_type = u"DielectricFunction"
 
     def __init__(self, *args, **kwards):
         Spectrum.__init__(self, *args, **kwards)
         self.metadata.Signal.binned = False
 
     def get_number_of_effective_electrons(self, nat, cumulative=False):
-        """Compute the number of effective electrons using the Bethe f-sum
+        u"""Compute the number of effective electrons using the Bethe f-sum
         rule.
 
         The Bethe f-sum rule gives rise to two definitions of the effective
@@ -70,7 +71,7 @@ class DielectricFunction(Spectrum):
 
         """
 
-        m0 = constants.value("electron mass")
+        m0 = constants.value(u"electron mass")
         epsilon0 = constants.epsilon_0    # Vacuum permittivity [F/m]
         hbar = constants.hbar     # Reduced Plank constant [J·s]
         k = 2 * epsilon0 * m0 / (np.pi * nat * hbar ** 2)
@@ -99,15 +100,15 @@ class DielectricFunction(Spectrum):
 
         # Prepare return
         neff1.metadata.General.title = (
-            r"$n_{\mathrm{eff}}\left(-\Im\left(\epsilon^{-1}\right)\right)$ "
-            "calculated from " +
+            ur"$n_{\mathrm{eff}}\left(-\Im\left(\epsilon^{-1}\right)\right)$ "
+            u"calculated from " +
             self.metadata.General.title +
-            " using the Bethe f-sum rule.")
+            u" using the Bethe f-sum rule.")
         neff2.metadata.General.title = (
-            r"$n_{\mathrm{eff}}\left(\epsilon_{2}\right)$ "
-            "calculated from " +
+            ur"$n_{\mathrm{eff}}\left(\epsilon_{2}\right)$ "
+            u"calculated from " +
             self.metadata.General.title +
-            " using the Bethe f-sum rule.")
+            u" using the Bethe f-sum rule.")
 
         return neff1, neff2
 
@@ -115,7 +116,7 @@ class DielectricFunction(Spectrum):
         data = ((-1 / self.data).imag * eels_constant(self, zlp, t).data *
                 self.axes_manager.signal_axes[0].scale)
         s = self._deepcopy_with_new_data(data)
-        s.set_signal_type("EELS")
-        s.metadata.General.title = ("EELS calculated from " +
+        s.set_signal_type(u"EELS")
+        s.metadata.General.title = (u"EELS calculated from " +
                                     self.metadata.General.title)
         return s

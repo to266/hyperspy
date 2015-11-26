@@ -28,10 +28,10 @@ from hyperspy.drawing import utils
 
 class SpectrumFigure(BlittedFigure):
 
-    """
+    u"""
     """
 
-    def __init__(self, title=""):
+    def __init__(self, title=u""):
         self.figure = None
         self.ax = None
         self.right_ax = None
@@ -42,24 +42,24 @@ class SpectrumFigure(BlittedFigure):
         self.right_axes_manager = None
 
         # Labels
-        self.xlabel = ''
-        self.ylabel = ''
+        self.xlabel = u''
+        self.ylabel = u''
         self.title = title
         self.create_figure()
         self.create_axis()
 
         # Color cycles
         self._color_cycles = {
-            'line': utils.ColorCycle(),
-            'step': utils.ColorCycle(),
-            'scatter': utils.ColorCycle(), }
+            u'line': utils.ColorCycle(),
+            u'step': utils.ColorCycle(),
+            u'scatter': utils.ColorCycle(), }
 
     def create_figure(self):
         self.figure = utils.create_figure(
-            window_title="Figure " + self.title if self.title
+            window_title=u"Figure " + self.title if self.title
             else None)
         utils.on_figure_window_close(self.figure, self.close)
-        self.figure.canvas.mpl_connect('draw_event', self._on_draw)
+        self.figure.canvas.mpl_connect(u'draw_event', self._on_draw)
 
     def create_axis(self):
         self.ax = self.figure.add_subplot(111)
@@ -74,14 +74,14 @@ class SpectrumFigure(BlittedFigure):
             self.right_ax.hspy_fig = self
             self.right_ax.yaxis.set_animated(True)
 
-    def add_line(self, line, ax='left'):
-        if ax == 'left':
+    def add_line(self, line, ax=u'left'):
+        if ax == u'left':
             line.ax = self.ax
             if line.axes_manager is None:
                 line.axes_manager = self.axes_manager
             self.ax_lines.append(line)
             line.sf_lines = self.ax_lines
-        elif ax == 'right':
+        elif ax == u'right':
             line.ax = self.right_ax
             self.right_ax_lines.append(line)
             line.sf_lines = self.right_ax_lines
@@ -120,7 +120,7 @@ class SpectrumFigure(BlittedFigure):
         plt.xlim(np.min(x_axis_lower_lims), np.max(x_axis_upper_lims))
         # To be discussed
         self.axes_manager.connect(self.update)
-        if hasattr(self.figure, 'tight_layout'):
+        if hasattr(self.figure, u'tight_layout'):
             try:
                 self.figure.tight_layout()
             except:
@@ -151,7 +151,7 @@ class SpectrumFigure(BlittedFigure):
 
 class SpectrumLine(object):
 
-    """Line that can be added to SpectrumFigure.
+    u"""Line that can be added to SpectrumFigure.
 
     Attributes
     ----------
@@ -193,7 +193,7 @@ class SpectrumLine(object):
         self.text = None
         self.text_position = (-0.1, 1.05,)
         self._line_properties = {}
-        self.type = "line"
+        self.type = u"line"
 
     @property
     def line_properties(self):
@@ -201,13 +201,13 @@ class SpectrumLine(object):
 
     @line_properties.setter
     def line_properties(self, kwargs):
-        if 'type' in kwargs:
-            self.type = kwargs['type']
-            del kwargs['type']
+        if u'type' in kwargs:
+            self.type = kwargs[u'type']
+            del kwargs[u'type']
 
-        if 'color' in kwargs:
-            color = kwargs['color']
-            del kwargs['color']
+        if u'color' in kwargs:
+            color = kwargs[u'color']
+            del kwargs[u'color']
             self.color = color
 
         for key, item in kwargs.items():
@@ -229,25 +229,25 @@ class SpectrumLine(object):
     @type.setter
     def type(self, value):
         lp = {}
-        if value == 'scatter':
-            lp['marker'] = 'o'
-            lp['linestyle'] = 'None'
-            lp['markersize'] = 1
+        if value == u'scatter':
+            lp[u'marker'] = u'o'
+            lp[u'linestyle'] = u'None'
+            lp[u'markersize'] = 1
 
-        elif value == 'line':
-            lp['linestyle'] = '-'
-            lp['marker'] = "None"
-            lp['markersize'] = None
-            lp['drawstyle'] = "default"
-        elif value == 'step':
-            lp['drawstyle'] = 'steps-mid'
-            lp['marker'] = "None"
-            lp['markersize'] = None
+        elif value == u'line':
+            lp[u'linestyle'] = u'-'
+            lp[u'marker'] = u"None"
+            lp[u'markersize'] = None
+            lp[u'drawstyle'] = u"default"
+        elif value == u'step':
+            lp[u'drawstyle'] = u'steps-mid'
+            lp[u'marker'] = u"None"
+            lp[u'markersize'] = None
         else:
             raise ValueError(
-                "`type` must be one of "
-                "{\'scatter\', \'line\', \'step\'}"
-                "but %s was given" % value)
+                u"`type` must be one of "
+                u"{\'scatter\', \'line\', \'step\'}"
+                u"but %s was given" % value)
         self._type = value
         self.line_properties = lp
         if self.color is not None:
@@ -255,24 +255,24 @@ class SpectrumLine(object):
 
     @property
     def color(self):
-        if 'color' in self.line_properties:
-            return self.line_properties['color']
-        elif 'markeredgecolor' in self.line_properties:
-            return self.line_properties['markeredgecolor']
+        if u'color' in self.line_properties:
+            return self.line_properties[u'color']
+        elif u'markeredgecolor' in self.line_properties:
+            return self.line_properties[u'markeredgecolor']
         else:
             return None
 
     @color.setter
     def color(self, color):
-        if self._type == 'scatter':
+        if self._type == u'scatter':
             self.set_line_properties(markeredgecolor=color)
-            if 'color' in self._line_properties:
-                del self._line_properties['color']
+            if u'color' in self._line_properties:
+                del self._line_properties[u'color']
         else:
-            if color is None and 'color' in self._line_properties:
-                del self._line_properties['color']
+            if color is None and u'color' in self._line_properties:
+                del self._line_properties[u'color']
             else:
-                self._line_properties['color'] = color
+                self._line_properties[u'color'] = color
             self.set_line_properties(markeredgecolor=None)
 
         if self.line is not None:
@@ -297,7 +297,7 @@ class SpectrumLine(object):
             if self.text is not None:
                 self.text.remove()
             self.text = self.ax.text(*self.text_position,
-                                     s=str(self.axes_manager.indices),
+                                     s=unicode(self.axes_manager.indices),
                                      transform=self.ax.transAxes,
                                      fontsize=12,
                                      color=self.line.get_color(),
@@ -305,7 +305,7 @@ class SpectrumLine(object):
         self.ax.figure.canvas.draw()
 
     def update(self, force_replot=False):
-        """Update the current spectrum figure"""
+        u"""Update the current spectrum figure"""
         if self.auto_update is False:
             return
         if force_replot is True:
@@ -351,7 +351,7 @@ class SpectrumLine(object):
 
 
 def _plot_component(factors, idx, ax=None, cal_axis=None,
-                    comp_label='PC'):
+                    comp_label=u'PC'):
     if ax is None:
         ax = plt.gca()
     if cal_axis is not None:
@@ -359,13 +359,13 @@ def _plot_component(factors, idx, ax=None, cal_axis=None,
         plt.xlabel(cal_axis.units)
     else:
         x = np.arange(factors.shape[0])
-        plt.xlabel('Channel index')
-    ax.plot(x, factors[:, idx], label='%s %i' % (comp_label, idx))
+        plt.xlabel(u'Channel index')
+    ax.plot(x, factors[:, idx], label=u'%s %i' % (comp_label, idx))
     return ax
 
 
 def _plot_loading(loadings, idx, axes_manager, ax=None,
-                  comp_label='PC', no_nans=True, calibrate=True,
+                  comp_label=u'PC', no_nans=True, calibrate=True,
                   cmap=plt.cm.gray):
     if ax is None:
         ax = plt.gca()
@@ -381,9 +381,9 @@ def _plot_loading(loadings, idx, axes_manager, ax=None,
                       axes_manager._axes[1].high_value,
                       axes_manager._axes[1].low_value)
         im = ax.imshow(loadings[idx].reshape(shape), cmap=cmap, extent=extent,
-                       interpolation='nearest')
+                       interpolation=u'nearest')
         div = make_axes_locatable(ax)
-        cax = div.append_axes("right", size="5%", pad=0.05)
+        cax = div.append_axes(u"right", size=u"5%", pad=0.05)
         plt.colorbar(im, cax=cax)
     elif axes_manager.navigation_dimension == 1:
         if calibrate:
@@ -392,4 +392,4 @@ def _plot_loading(loadings, idx, axes_manager, ax=None,
             x = np.arange(axes_manager._axes[0].size)
         ax.step(x, loadings[idx])
     else:
-        messages.warning_exit('View not supported')
+        messages.warning_exit(u'View not supported')

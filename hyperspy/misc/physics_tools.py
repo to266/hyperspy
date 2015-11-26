@@ -1,8 +1,9 @@
+from __future__ import division
 import numpy as np
 
 
 def bragg_scattering_angle(d, E0=100):
-    """Calculate the first order bragg diffraction semiangle.
+    u"""Calculate the first order bragg diffraction semiangle.
 
     Parameters
     ----------
@@ -26,7 +27,7 @@ def bragg_scattering_angle(d, E0=100):
 
 
 def effective_Z(Z_list, exponent=2.94):
-    """Effective atomic number of a compound or mixture.
+    u"""Effective atomic number of a compound or mixture.
 
     Exponent = 2.94 for X-ray absorption.
 

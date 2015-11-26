@@ -1,4 +1,4 @@
-"""Extract reference documentation from the NumPy source tree.
+u"""Extract reference documentation from the NumPy source tree.
 
 """
 
@@ -13,12 +13,12 @@ import collections
 
 class Reader(object):
 
-    """A line-based string reader.
+    u"""A line-based string reader.
 
     """
 
     def __init__(self, data):
-        """
+        u"""
         Parameters
         ----------
         data : str
@@ -28,7 +28,7 @@ class Reader(object):
         if isinstance(data, list):
             self._str = data
         else:
-            self._str = data.split('\n')  # store string as list of lines
+            self._str = data.split(u'\n')  # store string as list of lines
 
         self.reset()
 
@@ -44,7 +44,7 @@ class Reader(object):
             self._l += 1
             return out
         else:
-            return ''
+            return u''
 
     def seek_next_non_empty_line(self):
         for l in self[self._l:]:
@@ -82,35 +82,35 @@ class Reader(object):
         if self._l + n < len(self._str):
             return self[self._l + n]
         else:
-            return ''
+            return u''
 
     def is_empty(self):
-        return not ''.join(self._str).strip()
+        return not u''.join(self._str).strip()
 
 
 class NumpyDocString(object):
 
     def __init__(self, docstring, config={}):
-        docstring = textwrap.dedent(docstring).split('\n')
+        docstring = textwrap.dedent(docstring).split(u'\n')
 
         self._doc = Reader(docstring)
         self._parsed_data = {
-            'Signature': '',
-            'Summary': [''],
-            'Extended Summary': [],
-            'Parameters': [],
-            'Returns': [],
-            'Raises': [],
-            'Warns': [],
-            'Other Parameters': [],
-            'Attributes': [],
-            'Methods': [],
-            'See Also': [],
-            'Notes': [],
-            'Warnings': [],
-            'References': '',
-            'Examples': '',
-            'index': {}
+            u'Signature': u'',
+            u'Summary': [u''],
+            u'Extended Summary': [],
+            u'Parameters': [],
+            u'Returns': [],
+            u'Raises': [],
+            u'Warns': [],
+            u'Other Parameters': [],
+            u'Attributes': [],
+            u'Methods': [],
+            u'See Also': [],
+            u'Notes': [],
+            u'Warnings': [],
+            u'References': u'',
+            u'Examples': u'',
+            u'index': {}
         }
 
         self._parse()
@@ -120,7 +120,7 @@ class NumpyDocString(object):
 
     def __setitem__(self, key, val):
         if key not in self._parsed_data:
-            warn("Unknown section %s" % key)
+            warn(u"Unknown section %s" % key)
         else:
             self._parsed_data[key] = val
 
@@ -132,11 +132,11 @@ class NumpyDocString(object):
 
         l1 = self._doc.peek().strip()  # e.g. Parameters
 
-        if l1.startswith('.. index::'):
+        if l1.startswith(u'.. index::'):
             return True
 
         l2 = self._doc.peek(1).strip()  # ---------- or ==========
-        return l2.startswith('-' * len(l1)) or l2.startswith('=' * len(l1))
+        return l2.startswith(u'-' * len(l1)) or l2.startswith(u'=' * len(l1))
 
     def _strip(self, doc):
         i = 0
@@ -156,7 +156,7 @@ class NumpyDocString(object):
 
         while not self._is_at_section() and not self._doc.eof():
             if not self._doc.peek(-1).strip():  # previous line was empty
-                section += ['']
+                section += [u'']
 
             section += self._doc.read_to_next_empty_line()
 
@@ -167,7 +167,7 @@ class NumpyDocString(object):
             data = self._read_to_next_section()
             name = data[0].strip()
 
-            if name.startswith('..'):  # index section
+            if name.startswith(u'..'):  # index section
                 yield name, data[1:]
             elif len(data) < 2:
                 yield StopIteration
@@ -179,10 +179,10 @@ class NumpyDocString(object):
         params = []
         while not r.eof():
             header = r.read().strip()
-            if ' : ' in header:
-                arg_name, arg_type = header.split(' : ')[:2]
+            if u' : ' in header:
+                arg_name, arg_type = header.split(u' : ')[:2]
             else:
-                arg_name, arg_type = header, ''
+                arg_name, arg_type = header, u''
 
             desc = r.read_to_next_unindented_line()
             desc = dedent_lines(desc)
@@ -191,11 +191,11 @@ class NumpyDocString(object):
 
         return params
 
-    _name_rgx = re.compile(r"^\s*(:(?P<role>\w+):`(?P<name>[a-zA-Z0-9_.-]+)`|"
-                           r" (?P<name2>[a-zA-Z0-9_.-]+))\s*", re.X)
+    _name_rgx = re.compile(ur"^\s*(:(?P<role>\w+):`(?P<name>[a-zA-Z0-9_.-]+)`|"
+                           ur" (?P<name2>[a-zA-Z0-9_.-]+))\s*", re.X)
 
     def _parse_see_also(self, content):
-        """
+        u"""
         func_name : Descriptive text
             continued text
         another_func_name : Descriptive text
@@ -205,7 +205,7 @@ class NumpyDocString(object):
         items = []
 
         def parse_item_name(text):
-            """Match ':role:`name`' or 'name'"""
+            u"""Match ':role:`name`' or 'name'"""
             m = self._name_rgx.match(text)
             if m:
                 g = m.groups()
@@ -213,7 +213,7 @@ class NumpyDocString(object):
                     return g[3], None
                 else:
                     return g[2], g[1]
-            raise ValueError("%s is not a item name" % text)
+            raise ValueError(u"%s is not a item name" % text)
 
         def push_item(name, rest):
             if not name:
@@ -230,17 +230,17 @@ class NumpyDocString(object):
                 continue
 
             m = self._name_rgx.match(line)
-            if m and line[m.end():].strip().startswith(':'):
+            if m and line[m.end():].strip().startswith(u':'):
                 push_item(current_func, rest)
                 current_func, line = line[:m.end()], line[m.end():]
-                rest = [line.split(':', 1)[1].strip()]
+                rest = [line.split(u':', 1)[1].strip()]
                 if not rest[0]:
                     rest = []
-            elif not line.startswith(' '):
+            elif not line.startswith(u' '):
                 push_item(current_func, rest)
                 current_func = None
-                if ',' in line:
-                    for func in line.split(','):
+                if u',' in line:
+                    for func in line.split(u','):
                         if func.strip():
                             push_item(func, [])
                 elif line.strip():
@@ -251,7 +251,7 @@ class NumpyDocString(object):
         return items
 
     def _parse_index(self, section, content):
-        """
+        u"""
         .. index: default
            :refguide: something, else, and more
 
@@ -260,76 +260,76 @@ class NumpyDocString(object):
             return [s.strip() for s in lst]
 
         out = {}
-        section = section.split('::')
+        section = section.split(u'::')
         if len(section) > 1:
-            out['default'] = strip_each_in(section[1].split(','))[0]
+            out[u'default'] = strip_each_in(section[1].split(u','))[0]
         for line in content:
-            line = line.split(':')
+            line = line.split(u':')
             if len(line) > 2:
-                out[line[1]] = strip_each_in(line[2].split(','))
+                out[line[1]] = strip_each_in(line[2].split(u','))
         return out
 
     def _parse_summary(self):
-        """Grab signature (if given) and summary"""
+        u"""Grab signature (if given) and summary"""
         if self._is_at_section():
             return
 
         summary = self._doc.read_to_next_empty_line()
-        summary_str = " ".join([s.strip() for s in summary]).strip()
-        if re.compile('^([\w., ]+=)?\s*[\w\.]+\(.*\)$').match(summary_str):
-            self['Signature'] = summary_str
+        summary_str = u" ".join([s.strip() for s in summary]).strip()
+        if re.compile(u'^([\w., ]+=)?\s*[\w\.]+\(.*\)$').match(summary_str):
+            self[u'Signature'] = summary_str
             if not self._is_at_section():
-                self['Summary'] = self._doc.read_to_next_empty_line()
+                self[u'Summary'] = self._doc.read_to_next_empty_line()
         else:
-            self['Summary'] = summary
+            self[u'Summary'] = summary
 
         if not self._is_at_section():
-            self['Extended Summary'] = self._read_to_next_section()
+            self[u'Extended Summary'] = self._read_to_next_section()
 
     def _parse(self):
         self._doc.reset()
         self._parse_summary()
 
         for (section, content) in self._read_sections():
-            if not section.startswith('..'):
-                section = ' '.join([s.capitalize()
-                                   for s in section.split(' ')])
-            if section in ('Parameters', 'Returns', 'Raises', 'Warns',
-                           'Other Parameters', 'Attributes', 'Methods'):
+            if not section.startswith(u'..'):
+                section = u' '.join([s.capitalize()
+                                   for s in section.split(u' ')])
+            if section in (u'Parameters', u'Returns', u'Raises', u'Warns',
+                           u'Other Parameters', u'Attributes', u'Methods'):
                 self[section] = self._parse_param_list(content)
-            elif section.startswith('.. index::'):
-                self['index'] = self._parse_index(section, content)
-            elif section == 'See Also':
-                self['See Also'] = self._parse_see_also(content)
+            elif section.startswith(u'.. index::'):
+                self[u'index'] = self._parse_index(section, content)
+            elif section == u'See Also':
+                self[u'See Also'] = self._parse_see_also(content)
             else:
                 self[section] = content
 
     # string conversion routines
 
-    def _str_header(self, name, symbol='-'):
+    def _str_header(self, name, symbol=u'-'):
         return [name, len(name) * symbol]
 
     def _str_indent(self, doc, indent=4):
         out = []
         for line in doc:
-            out += [' ' * indent + line]
+            out += [u' ' * indent + line]
         return out
 
     def _str_signature(self):
-        if self['Signature']:
-            return [self['Signature'].replace('*', '\*')] + ['']
+        if self[u'Signature']:
+            return [self[u'Signature'].replace(u'*', u'\*')] + [u'']
         else:
-            return ['']
+            return [u'']
 
     def _str_summary(self):
-        if self['Summary']:
-            return self['Summary'] + ['']
+        if self[u'Summary']:
+            return self[u'Summary'] + [u'']
         else:
             return []
 
     def _str_extended_summary(self):
-        if self['Extended Summary']:
-            return self['Extended Summary'] + ['']
+        if self[u'Extended Summary']:
+            return self[u'Extended Summary'] + [u'']
         else:
             return []
 
@@ -338,9 +338,9 @@ class NumpyDocString(object):
         if self[name]:
             out += self._str_header(name)
             for param, param_type, desc in self[name]:
-                out += ['%s : %s' % (param, param_type)]
+                out += [u'%s : %s' % (param, param_type)]
                 out += self._str_indent(desc)
-            out += ['']
+            out += [u'']
         return out
 
     def _str_section(self, name):
@@ -348,125 +348,125 @@ class NumpyDocString(object):
         if self[name]:
             out += self._str_header(name)
             out += self[name]
-            out += ['']
+            out += [u'']
         return out
 
     def _str_see_also(self, func_role):
-        if not self['See Also']:
+        if not self[u'See Also']:
             return []
         out = []
-        out += self._str_header("See Also")
+        out += self._str_header(u"See Also")
         last_had_desc = True
-        for func, desc, role in self['See Also']:
+        for func, desc, role in self[u'See Also']:
             if role:
-                link = ':%s:`%s`' % (role, func)
+                link = u':%s:`%s`' % (role, func)
             elif func_role:
-                link = ':%s:`%s`' % (func_role, func)
+                link = u':%s:`%s`' % (func_role, func)
             else:
-                link = "`%s`_" % func
+                link = u"`%s`_" % func
             if desc or last_had_desc:
-                out += ['']
+                out += [u'']
                 out += [link]
             else:
-                out[-1] += ", %s" % link
+                out[-1] += u", %s" % link
             if desc:
-                out += self._str_indent([' '.join(desc)])
+                out += self._str_indent([u' '.join(desc)])
                 last_had_desc = True
             else:
                 last_had_desc = False
-        out += ['']
+        out += [u'']
         return out
 
     def _str_index(self):
-        idx = self['index']
+        idx = self[u'index']
         out = []
-        out += ['.. index:: %s' % idx.get('default', '')]
+        out += [u'.. index:: %s' % idx.get(u'default', u'')]
         for section, references in idx.items():
-            if section == 'default':
+            if section == u'default':
                 continue
-            out += ['   :%s: %s' % (section, ', '.join(references))]
+            out += [u'   :%s: %s' % (section, u', '.join(references))]
         return out
 
-    def __str__(self, func_role=''):
+    def __str__(self, func_role=u''):
         out = []
         out += self._str_signature()
         out += self._str_summary()
         out += self._str_extended_summary()
-        for param_list in ('Parameters', 'Returns', 'Other Parameters',
-                           'Raises', 'Warns'):
+        for param_list in (u'Parameters', u'Returns', u'Other Parameters',
+                           u'Raises', u'Warns'):
             out += self._str_param_list(param_list)
-        out += self._str_section('Warnings')
+        out += self._str_section(u'Warnings')
         out += self._str_see_also(func_role)
-        for s in ('Notes', 'References', 'Examples'):
+        for s in (u'Notes', u'References', u'Examples'):
             out += self._str_section(s)
-        for param_list in ('Attributes', 'Methods'):
+        for param_list in (u'Attributes', u'Methods'):
             out += self._str_param_list(param_list)
         out += self._str_index()
-        return '\n'.join(out)
+        return u'\n'.join(out)
 
 
-def indent(str, indent=4):
-    indent_str = ' ' * indent
-    if str is None:
+def indent(unicode, indent=4):
+    indent_str = u' ' * indent
+    if unicode is None:
         return indent_str
-    lines = str.split('\n')
-    return '\n'.join(indent_str + l for l in lines)
+    lines = unicode.split(u'\n')
+    return u'\n'.join(indent_str + l for l in lines)
 
 
 def dedent_lines(lines):
-    """Deindent a list of lines maximally"""
-    return textwrap.dedent("\n".join(lines)).split("\n")
+    u"""Deindent a list of lines maximally"""
+    return textwrap.dedent(u"\n".join(lines)).split(u"\n")
 
 
-def header(text, style='-'):
-    return text + '\n' + style * len(text) + '\n'
+def header(text, style=u'-'):
+    return text + u'\n' + style * len(text) + u'\n'
 
 
 class FunctionDoc(NumpyDocString):
 
-    def __init__(self, func, role='func', doc=None, config={}):
+    def __init__(self, func, role=u'func', doc=None, config={}):
         self._f = func
         self._role = role  # e.g. "func" or "meth"
 
         if doc is None:
             if func is None:
-                raise ValueError("No function or docstring given")
-            doc = inspect.getdoc(func) or ''
+                raise ValueError(u"No function or docstring given")
+            doc = inspect.getdoc(func) or u''
         NumpyDocString.__init__(self, doc)
 
-        if not self['Signature'] and func is not None:
+        if not self[u'Signature'] and func is not None:
             func, func_name = self.get_func()
             try:
                 # try to read signature
                 argspec = inspect.getargspec(func)
                 argspec = inspect.formatargspec(*argspec)
-                argspec = argspec.replace('*', '\*')
-                signature = '%s%s' % (func_name, argspec)
-            except TypeError as e:
-                signature = '%s()' % func_name
-            self['Signature'] = signature
+                argspec = argspec.replace(u'*', u'\*')
+                signature = u'%s%s' % (func_name, argspec)
+            except TypeError, e:
+                signature = u'%s()' % func_name
+            self[u'Signature'] = signature
 
     def get_func(self):
-        func_name = getattr(self._f, '__name__', self.__class__.__name__)
+        func_name = getattr(self._f, u'__name__', self.__class__.__name__)
         if inspect.isclass(self._f):
-            func = getattr(self._f, '__call__', self._f.__init__)
+            func = getattr(self._f, u'__call__', self._f.__init__)
         else:
             func = self._f
         return func, func_name
 
     def __str__(self):
-        out = ''
+        out = u''
 
         func, func_name = self.get_func()
-        signature = self['Signature'].replace('*', '\*')
+        signature = self[u'Signature'].replace(u'*', u'\*')
 
-        roles = {'func': 'function',
-                 'meth': 'method'}
+        roles = {u'func': u'function',
+                 u'meth': u'method'}
 
         if self._role:
             if self._role not in roles:
-                print("Warning: invalid role %s" % self._role)
-            out += '.. %s:: %s\n    \n\n' % (roles.get(self._role, ''),
+                print u"Warning: invalid role %s" % self._role
+            out += u'.. %s:: %s\n    \n\n' % (roles.get(self._role, u''),
                                              func_name)
 
         out += super(FunctionDoc, self).__str__(func_role=self._role)
@@ -475,31 +475,31 @@ class FunctionDoc(NumpyDocString):
 
 class ClassDoc(NumpyDocString):
 
-    extra_public_methods = ['__call__']
+    extra_public_methods = [u'__call__']
 
-    def __init__(self, cls, doc=None, modulename='', func_doc=FunctionDoc,
+    def __init__(self, cls, doc=None, modulename=u'', func_doc=FunctionDoc,
                  config={}):
         if not inspect.isclass(cls) and cls is not None:
-            raise ValueError("Expected a class or None, but got %r" % cls)
+            raise ValueError(u"Expected a class or None, but got %r" % cls)
         self._cls = cls
 
-        if modulename and not modulename.endswith('.'):
-            modulename += '.'
+        if modulename and not modulename.endswith(u'.'):
+            modulename += u'.'
         self._mod = modulename
 
         if doc is None:
             if cls is None:
-                raise ValueError("No class or documentation string given")
+                raise ValueError(u"No class or documentation string given")
             doc = pydoc.getdoc(cls)
 
         NumpyDocString.__init__(self, doc)
 
-        if config.get('show_class_members', True):
-            if not self['Methods']:
-                self['Methods'] = [(name, '', '')
+        if config.get(u'show_class_members', True):
+            if not self[u'Methods']:
+                self[u'Methods'] = [(name, u'', u'')
                                    for name in sorted(self.methods)]
-            if not self['Attributes']:
-                self['Attributes'] = [(name, '', '')
+            if not self[u'Attributes']:
+                self[u'Attributes'] = [(name, u'', u'')
                                       for name in sorted(self.properties)]
 
     @property
@@ -507,7 +507,7 @@ class ClassDoc(NumpyDocString):
         if self._cls is None:
             return []
         return [name for name, func in inspect.getmembers(self._cls)
-                if ((not name.startswith('_')
+                if ((not name.startswith(u'_')
                      or name in self.extra_public_methods)
                     and isinstance(func, collections.Callable))]
 
@@ -516,4 +516,4 @@ class ClassDoc(NumpyDocString):
         if self._cls is None:
             return []
         return [name for name, func in inspect.getmembers(self._cls)
-                if not name.startswith('_') and func is None]
+                if not name.startswith(u'_') and func is None]

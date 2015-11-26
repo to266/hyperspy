@@ -3,10 +3,11 @@ from hyperspy.misc.utils import attrsetter
 from hyperspy.misc.export_dictionary import parse_flag_string
 
 import numpy as np
+from itertools import izip
 
 
 def _slice_target(target, dims, both_slices, slice_nav=None, issignal=False):
-    """Slices the target if appropriate
+    u"""Slices the target if appropriate
 
     Parameters
     ----------
@@ -35,19 +36,19 @@ def _slice_target(target, dims, both_slices, slice_nav=None, issignal=False):
         if isinstance(target, np.ndarray):
             return np.atleast_1d(target[tuple(array_slices[:nav_dims])])
         raise ValueError(
-            'tried to slice with navigation dimensions, but was neither a signal nor an array')
+            u'tried to slice with navigation dimensions, but was neither a signal nor an array')
     if slice_nav is False:  # check explicitly
         if issignal:
             return target.isig[slices]
         if isinstance(target, np.ndarray):
             return np.atleast_1d(target[tuple(array_slices[-sig_dims:])])
         raise ValueError(
-            'tried to slice with signal dimensions, but was neither a signal nor an array')
+            u'tried to slice with signal dimensions, but was neither a signal nor an array')
     # return thing
 
 
 def copy_slice_from_whitelist(_from, _to, dims, both_slices, isNav):
-    """Copies things from one object to another, according to whitelist, slicing
+    u"""Copies things from one object to another, according to whitelist, slicing
     where required.
 
     Parameters
@@ -68,19 +69,19 @@ def copy_slice_from_whitelist(_from, _to, dims, both_slices, isNav):
 
     def make_slice_navigation_decision(flags, isnav):
         if isnav:
-            if 'inav' in flags:
+            if u'inav' in flags:
                 return True
             return None
-        if 'isig' in flags:
+        if u'isig' in flags:
             return False
         return None
 
     swl = None
-    if hasattr(_from, '_slicing_whitelist'):
+    if hasattr(_from, u'_slicing_whitelist'):
         swl = _from._slicing_whitelist
 
     for key, val in _from._whitelist.items():
-        if key == 'self':
+        if key == u'self':
             target = None
         else:
             target = attrgetter(key)(_from)
@@ -96,18 +97,18 @@ def copy_slice_from_whitelist(_from, _to, dims, both_slices, isNav):
         if swl is not None and key in swl:
             flags.extend(parse_flag_string(swl[key]))
 
-        if 'init' in flags:
+        if u'init' in flags:
             continue
-        if 'id' in flags:
+        if u'id' in flags:
             continue
-        if 'inav' in flags or 'isig' in flags:
+        if u'inav' in flags or u'isig' in flags:
             slice_nav = make_slice_navigation_decision(flags, isNav)
             result = _slice_target(
                 target,
                 dims,
                 both_slices,
                 slice_nav,
-                'sig' in flags)
+                u'sig' in flags)
             attrsetter(_to, key, result)
             continue
         else:
@@ -167,7 +168,7 @@ class FancySlicing(object):
             _orig_slices = tuple(_orig_slices)
 
         if len(_orig_slices) > len(idx):
-            raise IndexError("too many indices")
+            raise IndexError(u"too many indices")
 
         slices = np.array([slice(None,)] *
                           len(self.axes_manager._axes))
@@ -176,7 +177,7 @@ class FancySlicing(object):
             0, len(idx) - len(_orig_slices))
 
         array_slices = []
-        for slice_, axis in zip(slices, self.axes_manager._axes):
+        for slice_, axis in izip(slices, self.axes_manager._axes):
             if (isinstance(slice_, slice) or
                     len(self.axes_manager._axes) < 2):
                 array_slices.append(axis._get_array_slices(slice_))
@@ -190,7 +191,7 @@ class FancySlicing(object):
         array_slices = self._get_array_slices(slices, isNavigation)
         _obj = self._deepcopy_with_new_data(self.data[array_slices])
         _will_remove = []
-        for slice_, axis in zip(array_slices, _obj.axes_manager._axes):
+        for slice_, axis in izip(array_slices, _obj.axes_manager._axes):
             if (isinstance(slice_, slice) or
                     len(self.axes_manager._axes) < 2):
                 axis._slice_me(slice_)
@@ -201,11 +202,11 @@ class FancySlicing(object):
             for _i in _will_remove:
                 _obj._remove_axis(_i)
 
-        if hasattr(self, "_additional_slicing_targets"):
+        if hasattr(self, u"_additional_slicing_targets"):
             for ta in self._additional_slicing_targets:
                 try:
                     t = attrgetter(ta)(self)
-                    if hasattr(t, '_slicer'):
+                    if hasattr(t, u'_slicer'):
                         attrsetter(
                             _obj,
                             ta,

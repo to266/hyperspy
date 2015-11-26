@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 
 from hyperspy.component import Component
@@ -23,7 +24,7 @@ from hyperspy.component import Component
 
 class Lorentzian(Component):
 
-    """Cauchy-Lorentz distribution (a.k.a. Lorentzian function) component
+    u"""Cauchy-Lorentz distribution (a.k.a. Lorentzian function) component
 
     .. math::
 
@@ -43,7 +44,7 @@ class Lorentzian(Component):
     """
 
     def __init__(self, A=1., gamma=1., centre=0.):
-        Component.__init__(self, ('A', 'gamma', 'centre'))
+        Component.__init__(self, (u'A', u'gamma', u'centre'))
         self.A.value = A
         self.gamma.value = gamma
         self.centre.value = centre
@@ -64,7 +65,7 @@ class Lorentzian(Component):
         self.centre.grad = self.grad_centre
 
     def function(self, x):
-        """
+        u"""
         """
         A = self.A.value
         gamma = self.gamma.value
@@ -73,18 +74,18 @@ class Lorentzian(Component):
         return A / np.pi * (gamma / ((x - centre) ** 2 + gamma ** 2))
 
     def grad_A(self, x):
-        """
+        u"""
         """
         return self.function(x) / self.A.value
 
     def grad_gamma(self, x):
-        """
+        u"""
         """
         return self.A.value / (np.pi * (self.gamma.value ** 2 + (x - self.centre.value) ** 2)) - (
             (2 * self.A.value * self.gamma.value ** 2) / (np.pi * (self.gamma.value ** 2 + (x - self.centre.value) ** 2) ** 2))
 
     def grad_centre(self, x):
-        """
+        u"""
         """
         return (2 * (x - self.centre.value) * self.A.value * self.gamma.value ) / \
             (np.pi *

@@ -19,4 +19,4 @@
 
 import matplotlib
 
-matplotlib.rcParams["image.cmap"] = "gray"
+matplotlib.rcParams[u"image.cmap"] = u"gray"

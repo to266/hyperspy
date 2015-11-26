@@ -24,7 +24,7 @@ from hyperspy.component import Component
 
 class Offset(Component):
 
-    """Component to add a constant value in the y-axis
+    u"""Component to add a constant value in the y-axis
 
     f(x) = k + x
 
@@ -38,7 +38,7 @@ class Offset(Component):
     """
 
     def __init__(self, offset=0.):
-        Component.__init__(self, ('offset',))
+        Component.__init__(self, (u'offset',))
         self.offset.free = True
         self.offset.value = offset
 
@@ -56,7 +56,7 @@ class Offset(Component):
         return np.ones((len(x)))
 
     def estimate_parameters(self, signal, x1, x2, only_current=False):
-        """Estimate the parameters by the two area method
+        u"""Estimate the parameters by the two area method
 
         Parameters
         ----------
@@ -91,9 +91,9 @@ class Offset(Component):
             dc = signal.data
             gi = [slice(None), ] * len(dc.shape)
             gi[axis.index_in_array] = slice(i1, i2)
-            self.offset.map['values'][:] = dc[gi].mean(axis.index_in_array)
+            self.offset.map[u'values'][:] = dc[gi].mean(axis.index_in_array)
             if binned is True:
-                self.offset.map['values'] /= axis.scale
-            self.offset.map['is_set'][:] = True
+                self.offset.map[u'values'] /= axis.scale
+            self.offset.map[u'is_set'][:] = True
             self.fetch_stored_values()
             return True

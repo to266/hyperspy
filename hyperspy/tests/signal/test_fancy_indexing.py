@@ -26,7 +26,7 @@ from hyperspy.signal import Signal
 from hyperspy import signals
 
 
-class Test1D:
+class Test1D(object):
 
     def setUp(self):
         self.signal = Signal(np.arange(10))
@@ -104,7 +104,7 @@ class Test1D:
         assert_equal(s.data, self.data[-1])
 
 
-class Test3D_SignalDim0:
+class Test3D_SignalDim0(object):
 
     def setUp(self):
         self.signal = Signal(np.arange(24).reshape((2, 3, 4)))
@@ -131,7 +131,7 @@ class Test3D_SignalDim0:
         assert((s.inav[:].data == s.data).all())
 
 
-class Test3D_Navigate_0_and_1:
+class Test3D_Navigate_0_and_1(object):
 
     def setUp(self):
         self.signal = Signal(np.arange(24).reshape((2, 3, 4)))
@@ -176,7 +176,7 @@ class Test3D_Navigate_0_and_1:
 
     def test_signal_indexer_slice_variance_float(self):
         s1 = self.signal
-        s1.metadata.set_item("Signal.Noise_properties.variance", 1.2)
+        s1.metadata.set_item(u"Signal.Noise_properties.variance", 1.2)
         s1_1 = s1.isig[1:2]
         assert_equal(
             s1.metadata.Signal.Noise_properties.variance,
@@ -184,7 +184,7 @@ class Test3D_Navigate_0_and_1:
 
     def test_navigation_indexer_slice_variance_float(self):
         s1 = self.signal
-        s1.metadata.set_item("Signal.Noise_properties.variance", 1.2)
+        s1.metadata.set_item(u"Signal.Noise_properties.variance", 1.2)
         s1_1 = s1.inav[1:2]
         assert_equal(
             s1.metadata.Signal.Noise_properties.variance,
@@ -199,7 +199,7 @@ class Test3D_Navigate_0_and_1:
         assert_equal(s.data.shape, self.data[:, 0:1, :].shape)
 
 
-class Test3D_Navigate_1:
+class Test3D_Navigate_1(object):
 
     def setUp(self):
         self.signal = Signal(np.arange(24).reshape((2, 3, 4)))
@@ -231,7 +231,7 @@ class Test3D_Navigate_1:
         assert_true(isinstance(im.isig[0], signals.Spectrum))
 
 
-class TestFloatArguments:
+class TestFloatArguments(object):
 
     def setUp(self):
         self.signal = Signal(np.arange(10))
@@ -280,7 +280,7 @@ class TestFloatArguments:
                      self.signal.axes_manager._axes[0].scale * -2)
 
 
-class TestEllipsis:
+class TestEllipsis(object):
 
     def setUp(self):
         self.signal = Signal(np.arange(2 ** 4).reshape(

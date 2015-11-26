@@ -16,6 +16,7 @@
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import division
 import numpy as np
 import nose.tools
 
@@ -25,14 +26,14 @@ from hyperspy.components import Gaussian
 from hyperspy import utils
 
 
-class Test_metadata:
+class Test_metadata(object):
 
     def setUp(self):
         # Create an empty spectrum
         s = EDSSEMSpectrum(np.ones((4, 2, 1024)))
         s.axes_manager.signal_axes[0].scale = 1e-3
-        s.axes_manager.signal_axes[0].units = "keV"
-        s.axes_manager.signal_axes[0].name = "Energy"
+        s.axes_manager.signal_axes[0].units = u"keV"
+        s.axes_manager.signal_axes[0].name = u"Energy"
         s.metadata.Acquisition_instrument.SEM.Detector.EDS.live_time = 3.1
         s.metadata.Acquisition_instrument.SEM.beam_energy = 15.0
         s.metadata.Acquisition_instrument.SEM.tilt_stage = -38
@@ -49,10 +50,10 @@ class Test_metadata:
             3.1 *
             2)
         # Check that metadata is unchanged
-        print(old_metadata, s.metadata)      # Capture for comparison on error
+        print old_metadata, s.metadata      # Capture for comparison on error
         nose.tools.assert_dict_equal(old_metadata.as_dictionary(),
                                      s.metadata.as_dictionary(),
-                                     "Source metadata changed")
+                                     u"Source metadata changed")
 
     def test_rebin_live_time(self):
         s = self.signal
@@ -65,64 +66,64 @@ class Test_metadata:
             2 *
             2)
         # Check that metadata is unchanged
-        print(old_metadata, self.signal.metadata)    # Captured on error
+        print old_metadata, self.signal.metadata    # Captured on error
         nose.tools.assert_dict_equal(old_metadata.as_dictionary(),
                                      self.signal.metadata.as_dictionary(),
-                                     "Source metadata changed")
+                                     u"Source metadata changed")
 
     def test_add_elements(self):
         s = self.signal
-        s.add_elements(['Al', 'Ni'])
-        nose.tools.assert_equal(s.metadata.Sample.elements, ['Al', 'Ni'])
-        s.add_elements(['Al', 'Ni'])
-        nose.tools.assert_equal(s.metadata.Sample.elements, ['Al', 'Ni'])
-        s.add_elements(["Fe", ])
-        nose.tools.assert_equal(s.metadata.Sample.elements, ['Al', "Fe", 'Ni'])
-        s.set_elements(['Al', 'Ni'])
-        nose.tools.assert_equal(s.metadata.Sample.elements, ['Al', 'Ni'])
+        s.add_elements([u'Al', u'Ni'])
+        nose.tools.assert_equal(s.metadata.Sample.elements, [u'Al', u'Ni'])
+        s.add_elements([u'Al', u'Ni'])
+        nose.tools.assert_equal(s.metadata.Sample.elements, [u'Al', u'Ni'])
+        s.add_elements([u"Fe", ])
+        nose.tools.assert_equal(s.metadata.Sample.elements, [u'Al', u"Fe", u'Ni'])
+        s.set_elements([u'Al', u'Ni'])
+        nose.tools.assert_equal(s.metadata.Sample.elements, [u'Al', u'Ni'])
 
     def test_add_lines(self):
         s = self.signal
         s.add_lines(lines=())
         nose.tools.assert_equal(s.metadata.Sample.xray_lines, [])
-        s.add_lines(("Fe_Ln",))
-        nose.tools.assert_equal(s.metadata.Sample.xray_lines, ["Fe_Ln"])
-        s.add_lines(("Fe_Ln",))
-        nose.tools.assert_equal(s.metadata.Sample.xray_lines, ["Fe_Ln"])
-        s.add_elements(["Ti", ])
+        s.add_lines((u"Fe_Ln",))
+        nose.tools.assert_equal(s.metadata.Sample.xray_lines, [u"Fe_Ln"])
+        s.add_lines((u"Fe_Ln",))
+        nose.tools.assert_equal(s.metadata.Sample.xray_lines, [u"Fe_Ln"])
+        s.add_elements([u"Ti", ])
         s.add_lines(())
         nose.tools.assert_equal(
-            s.metadata.Sample.xray_lines, ['Fe_Ln', 'Ti_La'])
+            s.metadata.Sample.xray_lines, [u'Fe_Ln', u'Ti_La'])
         s.set_lines((), only_one=False, only_lines=False)
         nose.tools.assert_equal(s.metadata.Sample.xray_lines,
-                                ['Fe_La', 'Fe_Lb3', 'Fe_Ll', 'Fe_Ln', 'Ti_La',
-                                 'Ti_Lb3', 'Ti_Ll', 'Ti_Ln'])
+                                [u'Fe_La', u'Fe_Lb3', u'Fe_Ll', u'Fe_Ln', u'Ti_La',
+                                 u'Ti_Lb3', u'Ti_Ll', u'Ti_Ln'])
         s.metadata.Acquisition_instrument.SEM.beam_energy = 0.4
         s.set_lines((), only_one=False, only_lines=False)
-        nose.tools.assert_equal(s.metadata.Sample.xray_lines, ['Ti_Ll'])
+        nose.tools.assert_equal(s.metadata.Sample.xray_lines, [u'Ti_Ll'])
 
     def test_add_lines_auto(self):
         s = self.signal
         s.axes_manager.signal_axes[0].scale = 1e-2
-        s.set_elements(["Ti", "Al"])
-        s.set_lines(['Al_Ka'])
+        s.set_elements([u"Ti", u"Al"])
+        s.set_lines([u'Al_Ka'])
         nose.tools.assert_equal(
-            s.metadata.Sample.xray_lines, ['Al_Ka', 'Ti_Ka'])
+            s.metadata.Sample.xray_lines, [u'Al_Ka', u'Ti_Ka'])
 
         del s.metadata.Sample.xray_lines
-        s.set_elements(['Al', 'Ni'])
+        s.set_elements([u'Al', u'Ni'])
         s.add_lines()
         nose.tools.assert_equal(
-            s.metadata.Sample.xray_lines, ['Al_Ka', 'Ni_Ka'])
+            s.metadata.Sample.xray_lines, [u'Al_Ka', u'Ni_Ka'])
         s.metadata.Acquisition_instrument.SEM.beam_energy = 10.0
         s.set_lines([])
         nose.tools.assert_equal(
-            s.metadata.Sample.xray_lines, ['Al_Ka', 'Ni_La'])
+            s.metadata.Sample.xray_lines, [u'Al_Ka', u'Ni_La'])
         s.metadata.Acquisition_instrument.SEM.beam_energy = 200
-        s.set_elements(['Au', 'Ni'])
+        s.set_elements([u'Au', u'Ni'])
         s.set_lines([])
         nose.tools.assert_equal(s.metadata.Sample.xray_lines,
-                                ['Au_La', 'Ni_Ka'])
+                                [u'Au_La', u'Ni_Ka'])
 
     def test_default_param(self):
         s = self.signal
@@ -133,7 +134,7 @@ class Test_metadata:
 
     def test_SEM_to_TEM(self):
         s = self.signal.inav[0, 0]
-        signal_type = 'EDS_TEM'
+        signal_type = u'EDS_TEM'
         mp = s.metadata
         mp.Acquisition_instrument.SEM.Detector.EDS.energy_resolution_MnKa = \
             125.3
@@ -163,15 +164,15 @@ class Test_metadata:
         nose.tools.assert_equal(s.get_take_off_angle(), 12.886929785732487)
 
 
-class Test_get_lines_intentisity:
+class Test_get_lines_intentisity(object):
 
     def setUp(self):
         # Create an empty spectrum
         s = EDSSEMSpectrum(np.zeros((2, 2, 3, 100)))
         energy_axis = s.axes_manager.signal_axes[0]
         energy_axis.scale = 0.04
-        energy_axis.units = 'keV'
-        energy_axis.name = "Energy"
+        energy_axis.units = u'keV'
+        energy_axis.name = u"Energy"
         g = Gaussian()
         g.sigma.value = 0.05
         g.centre.value = 1.487
@@ -182,37 +183,37 @@ class Test_get_lines_intentisity:
 
     def test(self):
         s = self.signal
-        sAl = s.get_lines_intensity(["Al_Ka"],
+        sAl = s.get_lines_intensity([u"Al_Ka"],
                                     plot_result=False,
                                     integration_windows=5)[0]
         nose.tools.assert_true(
             np.allclose(24.99516, sAl.data[0, 0, 0], atol=1e-3))
-        sAl = s.inav[0].get_lines_intensity(["Al_Ka"],
+        sAl = s.inav[0].get_lines_intensity([u"Al_Ka"],
                                        plot_result=False,
                                        integration_windows=5)[0]
         nose.tools.assert_true(
             np.allclose(24.99516, sAl.data[0, 0], atol=1e-3))
-        sAl = s.inav[0, 0].get_lines_intensity(["Al_Ka"],
+        sAl = s.inav[0, 0].get_lines_intensity([u"Al_Ka"],
                                           plot_result=False,
                                           integration_windows=5)[0]
         nose.tools.assert_true(np.allclose(24.99516, sAl.data[0], atol=1e-3))
-        sAl = s.inav[0, 0, 0].get_lines_intensity(["Al_Ka"],
+        sAl = s.inav[0, 0, 0].get_lines_intensity([u"Al_Ka"],
                                              plot_result=False,
                                              integration_windows=5)[0]
         nose.tools.assert_true(np.allclose(24.99516, sAl.data, atol=1e-3))
         s.axes_manager[-1].offset = 1.0
-        sC = s.get_lines_intensity(["C_Ka"], plot_result=False)
+        sC = s.get_lines_intensity([u"C_Ka"], plot_result=False)
         nose.tools.assert_equal(len(sC), 0)
-        nose.tools.assert_true(sAl.metadata.Sample.elements, ["Al"])
-        nose.tools.assert_true(sAl.metadata.Sample.xray_lines, ["Al_Ka"])
+        nose.tools.assert_true(sAl.metadata.Sample.elements, [u"Al"])
+        nose.tools.assert_true(sAl.metadata.Sample.xray_lines, [u"Al_Ka"])
 
     def test_eV(self):
         s = self.signal
         energy_axis = s.axes_manager.signal_axes[0]
         energy_axis.scale = 40
-        energy_axis.units = 'eV'
+        energy_axis.units = u'eV'
 
-        sAl = s.get_lines_intensity(["Al_Ka"],
+        sAl = s.get_lines_intensity([u"Al_Ka"],
                                     plot_result=False,
                                     integration_windows=5)[0]
         nose.tools.assert_true(
@@ -220,19 +221,19 @@ class Test_get_lines_intentisity:
 
     def test_background_substraction(self):
         s = self.signal
-        intens = s.get_lines_intensity(["Al_Ka"], plot_result=False)[0].data
+        intens = s.get_lines_intensity([u"Al_Ka"], plot_result=False)[0].data
         s += 1.
         nose.tools.assert_true(np.allclose(s.estimate_background_windows(
-            xray_lines=["Al_Ka"])[0, 0], 1.25666201, atol=1e-3))
+            xray_lines=[u"Al_Ka"])[0, 0], 1.25666201, atol=1e-3))
         nose.tools.assert_true(np.allclose(s.get_lines_intensity(
-            ["Al_Ka"], background_windows=s.estimate_background_windows(
-                [4, 4], xray_lines=["Al_Ka"]), plot_result=False)[0].data,
+            [u"Al_Ka"], background_windows=s.estimate_background_windows(
+                [4, 4], xray_lines=[u"Al_Ka"]), plot_result=False)[0].data,
             intens, atol=1e-3))
 
     def test_estimate_integration_windows(self):
         s = self.signal
         nose.tools.assert_true(np.allclose(
-            s.estimate_integration_windows(3.0, ["Al_Ka"]),
+            s.estimate_integration_windows(3.0, [u"Al_Ka"]),
             [[1.371, 1.601]], atol=1e-2))
 
     def test_with_signals_examples(self):
@@ -243,15 +244,15 @@ class Test_get_lines_intentisity:
                     np.array([84163, 89063, 96117, 96700, 99075]))
 
 
-class Test_tools_bulk:
+class Test_tools_bulk(object):
 
     def setUp(self):
         s = EDSSEMSpectrum(np.ones(1024))
         s.metadata.Acquisition_instrument.SEM.beam_energy = 5.0
         energy_axis = s.axes_manager.signal_axes[0]
         energy_axis.scale = 0.01
-        energy_axis.units = 'keV'
-        s.set_elements(['Al', 'Zn'])
+        energy_axis.units = u'keV'
+        s.set_elements([u'Al', u'Zn'])
         s.add_lines()
         self.signal = s
 
@@ -261,7 +262,7 @@ class Test_tools_bulk:
         elec_range = utils.eds.electron_range(
             mp.Sample.elements[0],
             mp.Acquisition_instrument.SEM.beam_energy,
-            density='auto',
+            density=u'auto',
             tilt=mp.Acquisition_instrument.SEM.tilt_stage)
         nose.tools.assert_equal(elec_range, 0.41350651162374225)
 
@@ -275,30 +276,30 @@ class Test_tools_bulk:
         nose.tools.assert_equal(xr_range, 0.1900368800933955)
 
 
-class Test_energy_units:
+class Test_energy_units(object):
 
     def setUp(self):
         s = EDSSEMSpectrum(np.ones(1024))
         s.metadata.Acquisition_instrument.SEM.beam_energy = 5.0
-        s.axes_manager.signal_axes[0].units = 'keV'
+        s.axes_manager.signal_axes[0].units = u'keV'
         s.set_microscope_parameters(energy_resolution_MnKa=130)
         self.signal = s
 
     def test_beam_energy(self):
         s = self.signal
         nose.tools.assert_equal(s._get_beam_energy(), 5.0)
-        s.axes_manager.signal_axes[0].units = 'eV'
+        s.axes_manager.signal_axes[0].units = u'eV'
         nose.tools.assert_equal(s._get_beam_energy(), 5000.0)
-        s.axes_manager.signal_axes[0].units = 'keV'
+        s.axes_manager.signal_axes[0].units = u'keV'
 
     def test_line_energy(self):
         s = self.signal
-        nose.tools.assert_equal(s._get_line_energy('Al_Ka'), 1.4865)
-        s.axes_manager.signal_axes[0].units = 'eV'
-        nose.tools.assert_equal(s._get_line_energy('Al_Ka'), 1486.5)
-        s.axes_manager.signal_axes[0].units = 'keV'
+        nose.tools.assert_equal(s._get_line_energy(u'Al_Ka'), 1.4865)
+        s.axes_manager.signal_axes[0].units = u'eV'
+        nose.tools.assert_equal(s._get_line_energy(u'Al_Ka'), 1486.5)
+        s.axes_manager.signal_axes[0].units = u'keV'
 
-        nose.tools.assert_equal(s._get_line_energy('Al_Ka', FWHM_MnKa='auto'),
+        nose.tools.assert_equal(s._get_line_energy(u'Al_Ka', FWHM_MnKa=u'auto'),
                                 (1.4865, 0.07661266213883969))
-        nose.tools.assert_equal(s._get_line_energy('Al_Ka', FWHM_MnKa=128),
+        nose.tools.assert_equal(s._get_line_energy(u'Al_Ka', FWHM_MnKa=128),
                                 (1.4865, 0.073167615787314))

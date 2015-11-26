@@ -31,11 +31,11 @@ def _plot_quiver_scatter_overlay(image, axes_manager,
                                  char=None, ax=None, comp_label=None,
                                  img_cmap=plt.cm.gray,
                                  sc_cmap=plt.cm.gray,
-                                 quiver_color='white',
+                                 quiver_color=u'white',
                                  vector_scale=1,
                                  cbar_label=None
                                  ):
-    """quiver plot notes:
+    u"""quiver plot notes:
 
        The vector_scale parameter scales the quiver
            plot arrows.  The vector is defined as
@@ -58,30 +58,30 @@ def _plot_quiver_scatter_overlay(image, axes_manager,
                   axes[0].high_value,
                   axes[0].low_value)
         if shifts is not None:
-            slocs = shifts['location'].squeeze().copy()
-            shifts = shifts['shift'].squeeze().copy()
+            slocs = shifts[u'location'].squeeze().copy()
+            shifts = shifts[u'shift'].squeeze().copy()
             slocs[:, 0] = slocs[:, 0] * axes[0].scale + axes[0].offset
             slocs[:, 1] = slocs[:, 1] * axes[1].scale + axes[1].offset
             shifts[:, 0] = shifts[:, 0] * axes[0].scale + axes[0].offset
             shifts[:, 1] = shifts[:, 1] * axes[1].scale + axes[1].offset
         if char is not None:
-            clocs = char['location'].squeeze().copy()
+            clocs = char[u'location'].squeeze().copy()
             clocs[:, 0] = clocs[:, 0] * axes[0].scale + axes[0].offset
             clocs[:, 1] = clocs[:, 1] * axes[1].scale + axes[1].offset
-    ax.imshow(image, interpolation='nearest',
+    ax.imshow(image, interpolation=u'nearest',
               cmap=img_cmap, extent=extent)
     if comp_label:
         plt.title(comp_label)
     if shifts is not None:
         ax.quiver(slocs[:, 0], slocs[:, 1],
                   shifts[:, 0], shifts[:, 1],
-                  units='x', color=quiver_color,
-                  scale=vector_scale, scale_units='x')
+                  units=u'x', color=quiver_color,
+                  scale=vector_scale, scale_units=u'x')
     if char is not None:
         sc = ax.scatter(clocs[:, 0], clocs[:, 1],
-                        c=char['char'], cmap=sc_cmap)
+                        c=char[u'char'], cmap=sc_cmap)
         div = make_axes_locatable(ax)
-        cax = div.append_axes('right', size="5%", pad=0.05)
+        cax = div.append_axes(u'right', size=u"5%", pad=0.05)
         cb = plt.colorbar(sc, cax=cax)
         if cbar_label:
             cb.set_label(cbar_label)
@@ -105,10 +105,10 @@ def _plot_1D_component(factors, idx, axes_manager, ax=None,
         plt.xlabel(axis.units)
     else:
         x = np.arange(axis.size)
-        plt.xlabel('Channel index')
-    ax.plot(x, factors[:, idx], label='%s %i' % (comp_label, idx))
+        plt.xlabel(u'Channel index')
+    ax.plot(x, factors[:, idx], label=u'%s %i' % (comp_label, idx))
     if comp_label and not same_window:
-        plt.title('%s %s' % (comp_label, idx))
+        plt.title(u'%s %s' % (comp_label, idx))
     return ax
 
 
@@ -127,12 +127,12 @@ def _plot_2D_component(factors, idx, axes_manager,
                   axes[0].high_value,
                   axes[0].low_value)
     if comp_label:
-        plt.title('%s %s' % (comp_label, idx))
+        plt.title(u'%s %s' % (comp_label, idx))
     im = ax.imshow(factors[:, idx].reshape(shape),
-                   cmap=cmap, interpolation='nearest',
+                   cmap=cmap, interpolation=u'nearest',
                    extent=extent)
     div = make_axes_locatable(ax)
-    cax = div.append_axes("right", size="5%", pad=0.05)
+    cax = div.append_axes(u"right", size=u"5%", pad=0.05)
     plt.colorbar(im, cax=cax)
     return ax
 
@@ -157,17 +157,17 @@ def _plot_loading(loadings, idx, axes_manager, ax=None,
                       axes[1].low_value)
         im = ax.imshow(loadings[idx].reshape(shape),
                        cmap=cmap, extent=extent,
-                       interpolation='nearest')
+                       interpolation=u'nearest')
         if calibrate:
             plt.xlabel(axes[0].units)
             plt.ylabel(axes[1].units)
         else:
-            plt.xlabel('pixels')
-            plt.ylabel('pixels')
+            plt.xlabel(u'pixels')
+            plt.ylabel(u'pixels')
         if comp_label:
-            plt.title('%s %s' % (comp_label, idx))
+            plt.title(u'%s %s' % (comp_label, idx))
         div = make_axes_locatable(ax)
-        cax = div.append_axes("right", size="5%", pad=0.05)
+        cax = div.append_axes(u"right", size=u"5%", pad=0.05)
         plt.colorbar(im, cax=cax)
     elif axes_manager.navigation_dimension == 1:
         if calibrate:
@@ -175,16 +175,16 @@ def _plot_loading(loadings, idx, axes_manager, ax=None,
         else:
             x = np.arange(axes[0].size)
         ax.step(x, loadings[idx],
-                label='%s %s' % (comp_label, idx))
+                label=u'%s %s' % (comp_label, idx))
         if comp_label and not same_window:
-            plt.title('%s %s' % (comp_label, idx))
-        plt.ylabel('Score, Arb. Units')
+            plt.title(u'%s %s' % (comp_label, idx))
+        plt.ylabel(u'Score, Arb. Units')
         if calibrate:
             if axes[0].units is not Undefined:
                 plt.xlabel(axes[0].units)
             else:
-                plt.xlabel('depth')
+                plt.xlabel(u'depth')
         else:
-            plt.xlabel('depth')
+            plt.xlabel(u'depth')
     else:
-        messages.warning_exit('View not supported')
+        messages.warning_exit(u'View not supported')

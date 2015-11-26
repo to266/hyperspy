@@ -1,3 +1,4 @@
+from __future__ import division
 from numpy.testing import *
 import numpy as N
 import copy
@@ -31,29 +32,29 @@ def test_linfit():
                  2.7270851E+00, 5.5969253E+00, 5.6249280E+00,
                  0.787615, 3.2599759E+00, 2.9771762E+00,
                  4.5936475E+00])
-    ey = 0.07 * N.ones(y.shape, dtype='float64')
-    p0 = N.array([1.0, 1.0], dtype='float64')  # initial conditions
+    ey = 0.07 * N.ones(y.shape, dtype=u'float64')
+    p0 = N.array([1.0, 1.0], dtype=u'float64')  # initial conditions
     pactual = N.array([3.2, 1.78])  # actual values used to make data
-    parbase = {'value': 0., 'fixed': 0, 'limited': [0, 0], 'limits': [0., 0.]}
+    parbase = {u'value': 0., u'fixed': 0, u'limited': [0, 0], u'limits': [0., 0.]}
     parinfo = []
-    for i in range(len(pactual)):
+    for i in xrange(len(pactual)):
         parinfo.append(copy.deepcopy(parbase))
-    for i in range(len(pactual)):
-        parinfo[i]['value'] = p0[i]
-    fa = {'x': x, 'y': y, 'err': ey}
+    for i in xrange(len(pactual)):
+        parinfo[i][u'value'] = p0[i]
+    fa = {u'x': x, u'y': y, u'err': ey}
     m = mpfit(myfunctlin, p0, parinfo=parinfo, functkw=fa)
     if m.status <= 0:
-        print('error message = ', m.errmsg)
+        print u'error message = ', m.errmsg
     assert N.allclose(
-        m.params, N.array([3.20996572, -1.7709542], dtype='float64'))
+        m.params, N.array([3.20996572, -1.7709542], dtype=u'float64'))
     assert N.allclose(
-        m.perror, N.array([0.02221018, 0.01893756], dtype='float64'))
+        m.perror, N.array([0.02221018, 0.01893756], dtype=u'float64'))
     chisq = (myfunctlin(m.params, x=x, y=y, err=ey)[1] ** 2).sum()
 
     assert N.allclose(
         N.array(
-            [chisq], dtype='float64'), N.array(
-            [2.756284983], dtype='float64'))
+            [chisq], dtype=u'float64'), N.array(
+            [2.756284983], dtype=u'float64'))
     assert m.dof == 8
     return
 
@@ -67,15 +68,15 @@ def myfunctrosenbrock(p, fjac=None):
 
 
 def test_rosenbrock():
-    p0 = N.array([-1, 1.], dtype='float64')  # initial conditions
+    p0 = N.array([-1, 1.], dtype=u'float64')  # initial conditions
     pactual = N.array([1., 1.])  # actual minimum of the rosenbrock function
     m = mpfit(myfunctrosenbrock, p0)
     if m.status <= 0:
-        print('error message = ', m.errmsg)
+        print u'error message = ', m.errmsg
     assert m.status > 0
     assert N.allclose(m.params, pactual)
     assert N.allclose(m.fnorm, 0)
     return
 
-if __name__ == "__main__":
+if __name__ == u"__main__":
     run_module_suite()

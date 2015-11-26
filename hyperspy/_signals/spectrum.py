@@ -28,16 +28,16 @@ from hyperspy.gui.egerton_quantification import SpikesRemoval
 
 class Spectrum(Signal):
 
+    u"""
     """
-    """
-    _record_by = 'spectrum'
+    _record_by = u'spectrum'
 
     def __init__(self, *args, **kwargs):
         Signal.__init__(self, *args, **kwargs)
         self.axes_manager.set_signal_dimension(1)
 
     def to_image(self):
-        """Returns the spectrum as an image.
+        u"""Returns the spectrum as an image.
 
         See Also
         --------
@@ -51,15 +51,15 @@ class Spectrum(Signal):
         """
         if self.data.ndim < 2:
             raise DataDimensionError(
-                "A Signal dimension must be >= 2 to be converted to an Image")
+                u"A Signal dimension must be >= 2 to be converted to an Image")
         im = self.rollaxis(-1 + 3j, 0 + 3j)
-        im.metadata.Signal.record_by = "image"
+        im.metadata.Signal.record_by = u"image"
         im._assign_subclass()
         return im
 
     def _spikes_diagnosis(self, signal_mask=None,
                           navigation_mask=None):
-        """Plots a histogram to help in choosing the threshold for
+        u"""Plots a histogram to help in choosing the threshold for
         spikes removal.
 
         Parameters
@@ -95,25 +95,25 @@ class Spectrum(Signal):
         tmph.plot()
 
         # Customize plot appearance
-        plt.gca().set_title('')
+        plt.gca().set_title(u'')
         plt.gca().fill_between(tmph.axes_manager[0].axis,
                                tmph.data,
-                               facecolor='#fddbc7',
+                               facecolor=u'#fddbc7',
                                interpolate=True,
-                               color='none')
+                               color=u'none')
         ax = tmph._plot.signal_plot.ax
         axl = tmph._plot.signal_plot.ax_lines[0]
-        axl.set_line_properties(color='#b2182b')
-        plt.xlabel('Derivative magnitude')
-        plt.ylabel('Log(Counts)')
-        ax.set_yscale('log')
+        axl.set_line_properties(color=u'#b2182b')
+        plt.xlabel(u'Derivative magnitude')
+        plt.ylabel(u'Log(Counts)')
+        ax.set_yscale(u'log')
         ax.set_ylim(10 ** -1, plt.ylim()[1])
         ax.set_xlim(plt.xlim()[0], 1.1 * plt.xlim()[1])
         plt.draw()
 
     def spikes_removal_tool(self, signal_mask=None,
                             navigation_mask=None):
-        """Graphical interface to remove spikes from EELS spectra.
+        u"""Graphical interface to remove spikes from EELS spectra.
 
         Parameters
         ----------
@@ -137,7 +137,7 @@ class Spectrum(Signal):
         return sr
 
     def create_model(self, dictionary=None):
-        """Create a model for the current signal
+        u"""Create a model for the current signal
 
         Parameters
         __________

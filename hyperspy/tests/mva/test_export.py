@@ -4,7 +4,7 @@ from nose.tools import assert_equal
 from hyperspy import signals
 
 
-class TestMVAExport:
+class TestMVAExport(object):
 
     def setUp(self):
         s = signals.Spectrum(np.random.random((2, 3, 4, 5)))

@@ -32,28 +32,28 @@ def check_that_flags_make_sense(flags):
 # one of: fn, id, sig
     def do_error(f1, f2):
         raise ValueError(
-            'The flags "%s" and "%s" are not compatible' %
+            u'The flags "%s" and "%s" are not compatible' %
             (f1, f2))
-    if 'fn' in flags:
-        if 'id' in flags:
-            do_error('fn', 'id')
-        if 'sig' in flags:
-            do_error('fn', 'sig')
-    if 'id' in flags:
+    if u'fn' in flags:
+        if u'id' in flags:
+            do_error(u'fn', u'id')
+        if u'sig' in flags:
+            do_error(u'fn', u'sig')
+    if u'id' in flags:
         # fn done previously
-        if 'sig' in flags:
-            do_error('id', 'sig')
-        if 'init' in flags:
-            do_error('id', 'init')
+        if u'sig' in flags:
+            do_error(u'id', u'sig')
+        if u'init' in flags:
+            do_error(u'id', u'init')
     # all sig cases already covered
 
 
 def parse_flag_string(flags):
-    return flags.replace(' ', '').split(',')
+    return flags.replace(u' ', u'').split(u',')
 
 
 def export_to_dictionary(target, whitelist, dic, fullcopy=True):
-    """ Exports attributes of target from whitelist.keys() to dictionary dic
+    u""" Exports attributes of target from whitelist.keys() to dictionary dic
     All values are references only by default.
 
     Parameters
@@ -99,40 +99,40 @@ def export_to_dictionary(target, whitelist, dic, fullcopy=True):
             if fullcopy:
                 thing = deepcopy(thing)
             dic[key] = thing
-            whitelist_flags[key] = ''
+            whitelist_flags[key] = u''
             continue
 
         flags_str, value = value
         flags = parse_flag_string(flags_str)
         check_that_flags_make_sense(flags)
-        if key is 'self':
-            if 'id' not in flags:
+        if key is u'self':
+            if u'id' not in flags:
                 raise ValueError(
-                    'Key "self" is only available with flag "id" given')
+                    u'Key "self" is only available with flag "id" given')
             value = id(target)
         else:
-            if 'id' in flags:
+            if u'id' in flags:
                 value = id(attrgetter(key)(target))
 
         # here value is either id(thing), or None (all others except 'init'),
         # or something for init
-        if 'init' not in flags and value is None:
+        if u'init' not in flags and value is None:
             value = attrgetter(key)(target)
         # here value either id(thing), or an actual target to export
-        if 'sig' in flags:
+        if u'sig' in flags:
             if fullcopy:
                 from hyperspy.signal import Signal
                 if isinstance(value, Signal):
                     value = value._to_dictionary()
-                    value['data'] = deepcopy(value['data'])
-        elif 'fn' in flags:
+                    value[u'data'] = deepcopy(value[u'data'])
+        elif u'fn' in flags:
             if fullcopy:
                 if dill_avail:
                     value = (True, dill.dumps(value))
                 else:
 # Apparently this fails because Python does not guarantee backwards-compatibility for marshal, and pickle does
 # not work for our lambda functions. Hence drop marshal support and only work with dill package
-                    value = (False, marshal.dumps(value.__code__))
+                    value = (False, marshal.dumps(value.func_code))
             else:
                 value = (None, value)
         elif fullcopy:
@@ -141,16 +141,16 @@ def export_to_dictionary(target, whitelist, dic, fullcopy=True):
         dic[key] = value
         whitelist_flags[key] = flags_str
 
-    if '_whitelist' not in dic:
-        dic['_whitelist'] = {}
+    if u'_whitelist' not in dic:
+        dic[u'_whitelist'] = {}
     # the saved whitelist does not have any values, as they are saved in the
     # original dictionary. Have to restore then when loading from dictionary,
     # most notably all with 'init' flags!!
-    dic['_whitelist'].update(whitelist_flags)
+    dic[u'_whitelist'].update(whitelist_flags)
 
 
 def load_from_dictionary(target, dic):
-    """ Loads attributes of target to dictionary dic
+    u""" Loads attributes of target to dictionary dic
     The attribute list is read from dic['_whitelist'].keys()
 
     Parameters
@@ -176,12 +176,12 @@ def load_from_dictionary(target, dic):
 
     """
     new_whitelist = {}
-    for key, flags_str in dic['_whitelist'].items():
+    for key, flags_str in dic[u'_whitelist'].items():
         value = dic[key]
         flags = parse_flag_string(flags_str)
-        if 'id' not in flags:
+        if u'id' not in flags:
             value = reconstruct_object(flags, value)
-            if 'init' in flags:
+            if u'init' in flags:
                 new_whitelist[key] = (flags_str, value)
             else:
                 attrsetter(target, key, value)
@@ -189,37 +189,37 @@ def load_from_dictionary(target, dic):
                     new_whitelist[key] = (flags_str, None)
                 else:
                     new_whitelist[key] = None
-    if hasattr(target, '_whitelist'):
+    if hasattr(target, u'_whitelist'):
         if isinstance(target._whitelist, dict):
             target._whitelist.update(new_whitelist)
     else:
-        attrsetter(target, '_whitelist', new_whitelist)
+        attrsetter(target, u'_whitelist', new_whitelist)
 
 
 def reconstruct_object(flags, value):
-    """ Reconstructs the value (if necessary) after having saved it in a
+    u""" Reconstructs the value (if necessary) after having saved it in a
     dictionary
     """
     if not isinstance(flags, list):
         flags = parse_flag_string(flags)
-    if 'sig' in flags:
+    if u'sig' in flags:
         if isinstance(value, dict):
             from hyperspy.signal import Signal
             value = Signal(**value)
             value._assign_subclass()
         return value
-    if 'fn' in flags:
+    if u'fn' in flags:
         ifdill, thing = value
         if ifdill is None:
             return thing
-        if ifdill in [False, 'False']:
+        if ifdill in [False, u'False']:
             return types.FunctionType(marshal.loads(thing), globals())
-        if ifdill in [True, 'True']:
+        if ifdill in [True, u'True']:
             if not dill_avail:
-                raise ValueError("the dictionary was constructed using "
-                                 "\"dill\" package, which is not available on the system")
+                raise ValueError(u"the dictionary was constructed using "
+                                 u"\"dill\" package, which is not available on the system")
             else:
                 return dill.loads(thing)
         # should not be reached
-        raise ValueError("The object format is not recognized")
+        raise ValueError(u"The object format is not recognized")
     return value

@@ -16,29 +16,31 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import with_statement
 import os
 import warnings
 
 import traits.api as t
 from hyperspy.misc import rgb_tools
+from itertools import izip
 try:
     from skimage.external.tifffile import imsave, TiffFile
 except ImportError:
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
+        warnings.simplefilter(u"ignore")
         from hyperspy.external.tifffile import imsave, TiffFile
     warnings.warn(
-        "Failed to import the optional scikit image package. "
-        "Loading of some compressed images will be slow.\n")
+        u"Failed to import the optional scikit image package. "
+        u"Loading of some compressed images will be slow.\n")
 
 
 # Plugin characteristics
 # ----------------------
-format_name = 'TIFF'
-description = ('Import/Export standard image formats Christoph Gohlke\'s '
-               'tifffile library')
+format_name = u'TIFF'
+description = (u'Import/Export standard image formats Christoph Gohlke\'s '
+               u'tifffile library')
 full_support = False
-file_extensions = ['tif', 'tiff']
+file_extensions = [u'tif', u'tiff']
 default_extension = 0  # tif
 
 
@@ -47,27 +49,27 @@ writes = [(2, 0), (2, 1)]
 # ----------------------
 
 axes_label_codes = {
-    'X': "width",
-    'Y': "height",
-    'S': "sample",
-    'P': "plane",
-    'I': "image series",
-    'Z': "depth",
-    'C': "color|em-wavelength|channel",
-    'E': "ex-wavelength|lambda",
-    'T': "time",
-    'R': "region|tile",
-    'A': "angle",
-    'F': "phase",
-    'H': "lifetime",
-    'L': "exposure",
-    'V': "event",
-    'Q': t.Undefined,
-    '_': t.Undefined}
+    u'X': u"width",
+    u'Y': u"height",
+    u'S': u"sample",
+    u'P': u"plane",
+    u'I': u"image series",
+    u'Z': u"depth",
+    u'C': u"color|em-wavelength|channel",
+    u'E': u"ex-wavelength|lambda",
+    u'T': u"time",
+    u'R': u"region|tile",
+    u'A': u"angle",
+    u'F': u"phase",
+    u'H': u"lifetime",
+    u'L': u"exposure",
+    u'V': u"event",
+    u'Q': t.Undefined,
+    u'_': t.Undefined}
 
 
 def file_writer(filename, signal, **kwds):
-    """Writes data to tif using Christoph Gohlke's tifffile library
+    u"""Writes data to tif using Christoph Gohlke's tifffile library
 
         Parameters
         ----------
@@ -78,21 +80,21 @@ def file_writer(filename, signal, **kwds):
     data = signal.data
     if signal.is_rgbx is True:
         data = rgb_tools.rgbx2regular_array(data)
-        photometric = "rgb"
+        photometric = u"rgb"
     else:
-        photometric = "minisblack"
+        photometric = u"minisblack"
     if description not in kwds:
         if signal.metadata.General.title:
-            kwds['description'] = signal.metadata.General.title
+            kwds[u'description'] = signal.metadata.General.title
 
     imsave(filename, data,
-           software="hyperspy",
+           software=u"hyperspy",
            photometric=photometric,
            **kwds)
 
 
-def file_reader(filename, record_by='image', **kwds):
-    """Read data from tif files using Christoph Gohlke's tifffile
+def file_reader(filename, record_by=u'image', **kwds):
+    u"""Read data from tif files using Christoph Gohlke's tifffile
     library
 
     Parameters
@@ -105,32 +107,32 @@ def file_reader(filename, record_by='image', **kwds):
     """
     with TiffFile(filename, **kwds) as tiff:
         dc = tiff.asarray()
-        axes = tiff.series[0]['axes']
+        axes = tiff.series[0][u'axes']
         if tiff.is_rgb:
             dc = rgb_tools.regular_array2rgbx(dc)
             axes = axes[:-1]
         op = {}
         names = [axes_label_codes[axis] for axis in axes]
-        axes = [{'size': size,
-                 'name': str(name),
+        axes = [{u'size': size,
+                 u'name': unicode(name),
                  #'scale': scales[i],
                  #'offset' : origins[i],
                  #'units' : unicode(units[i]),
                  }
-                for size, name in zip(dc.shape, names)]
+                for size, name in izip(dc.shape, names)]
         op = {}
         for key, tag in tiff[0].tags.items():
             op[key] = tag.value
     return [
         {
-            'data': dc,
-            'original_metadata': op,
-            'metadata': {
-                'General': {
-                    'original_filename': os.path.split(filename)[1]},
-                "Signal": {
-                    'signal_type': "",
-                    'record_by': "image",
+            u'data': dc,
+            u'original_metadata': op,
+            u'metadata': {
+                u'General': {
+                    u'original_filename': os.path.split(filename)[1]},
+                u"Signal": {
+                    u'signal_type': u"",
+                    u'record_by': u"image",
                 },
             },
         }]

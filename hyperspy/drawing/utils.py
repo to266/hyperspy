@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import with_statement
+from __future__ import division
 import copy
 import itertools
 import textwrap
@@ -31,12 +33,13 @@ from hyperspy.misc.image_tools import (contrast_stretching,
                                        MPL_DIVERGING_COLORMAPS,
                                        centre_colormap_values)
 from hyperspy.defaults_parser import preferences
+from itertools import izip
 
 
 def create_figure(window_title=None,
                   _on_figure_window_close=None,
                   **kwargs):
-    """Create a matplotlib figure.
+    u"""Create a matplotlib figure.
 
     This function adds the possibility to execute another function
     when the figure is closed and to easily set the window title. Any
@@ -62,7 +65,7 @@ def create_figure(window_title=None,
 
 
 def on_figure_window_close(figure, function):
-    """Connects a close figure signal to a given function.
+    u"""Connects a close figure signal to a given function.
 
     Parameters
     ----------
@@ -72,21 +75,21 @@ def on_figure_window_close(figure, function):
 
     """
     backend = plt.get_backend()
-    if backend not in ("GTKAgg", "WXAgg", "TkAgg", "Qt4Agg"):
+    if backend not in (u"GTKAgg", u"WXAgg", u"TkAgg", u"Qt4Agg"):
         return
 
     window = figure.canvas.manager.window
-    if not hasattr(figure, '_on_window_close'):
+    if not hasattr(figure, u'_on_window_close'):
         figure._on_window_close = list()
     if function not in figure._on_window_close:
         figure._on_window_close.append(function)
 
-    if backend == 'GTKAgg':
+    if backend == u'GTKAgg':
         def function_wrapper(*args):
             function()
-        window.connect('destroy', function_wrapper)
+        window.connect(u'destroy', function_wrapper)
 
-    elif backend == 'WXAgg':
+    elif backend == u'WXAgg':
         # In linux the following code produces a segmentation fault
         # so it is enabled only for Windows
         import wx
@@ -98,24 +101,24 @@ def on_figure_window_close(figure, function):
             plt.close(figure)
         window.Bind(wx.EVT_CLOSE, function_wrapper)
 
-    elif backend == 'TkAgg':
+    elif backend == u'TkAgg':
         def function_wrapper(*args):
             # When using TK window.connect does not supports multiple functions
             for f in figure._on_window_close:
                 f()
-        figure.canvas.manager.window.bind("<Destroy>", function_wrapper)
+        figure.canvas.manager.window.bind(u"<Destroy>", function_wrapper)
 
-    elif backend == 'Qt4Agg':
+    elif backend == u'Qt4Agg':
         # PyQt
         # In PyQt window.connect supports multiple functions
         from IPython.external.qt_for_kernel import QtCore
-        window.connect(window, QtCore.SIGNAL('closing()'), function)
+        window.connect(window, QtCore.SIGNAL(u'closing()'), function)
     else:
-        raise AttributeError("The %s backend is not supported. " % backend)
+        raise AttributeError(u"The %s backend is not supported. " % backend)
 
 
-def plot_RGB_map(im_list, normalization='single', dont_plot=False):
-    """Plot 2 or 3 maps in RGB.
+def plot_RGB_map(im_list, normalization=u'single', dont_plot=False):
+    u"""Plot 2 or 3 maps in RGB.
 
     Parameters
     ----------
@@ -135,10 +138,10 @@ def plot_RGB_map(im_list, normalization='single', dont_plot=False):
     rgb[:, :, 1] = im_list[1].data.squeeze()
     if len(im_list) == 3:
         rgb[:, :, 2] = im_list[2].data.squeeze()
-    if normalization == 'single':
-        for i in range(rgb.shape[2]):
+    if normalization == u'single':
+        for i in xrange(rgb.shape[2]):
             rgb[:, :, i] /= rgb[:, :, i].max()
-    elif normalization == 'global':
+    elif normalization == u'global':
         rgb /= rgb.max()
     rgb = rgb.clip(0, rgb.max())
     if not dont_plot:
@@ -146,7 +149,7 @@ def plot_RGB_map(im_list, normalization='single', dont_plot=False):
         ax = figure.add_subplot(111)
         ax.frameon = False
         ax.set_axis_off()
-        ax.imshow(rgb, interpolation='nearest')
+        ax.imshow(rgb, interpolation=u'nearest')
 #        cursors.set_mpl_ax(ax)
         figure.canvas.draw()
     else:
@@ -154,7 +157,7 @@ def plot_RGB_map(im_list, normalization='single', dont_plot=False):
 
 
 def subplot_parameters(fig):
-    """Returns a list of the subplot parameters of a mpl figure.
+    u"""Returns a list of the subplot parameters of a mpl figure.
 
     Parameters
     ----------
@@ -174,9 +177,9 @@ def subplot_parameters(fig):
     return left, bottom, right, top, wspace, hspace
 
 
-class ColorCycle:
+class ColorCycle(object):
     _color_cycle = [mpl.colors.colorConverter.to_rgba(color) for color
-                    in ('b', 'g', 'r', 'c', 'm', 'y', 'k')]
+                    in (u'b', u'g', u'r', u'c', u'm', u'y', u'k')]
 
     def __init__(self):
         self.color_cycle = copy.copy(self._color_cycle)
@@ -187,9 +190,9 @@ class ColorCycle:
         return self.color_cycle.pop(0)
 
 
-def plot_signals(signal_list, sync=True, navigator="auto",
+def plot_signals(signal_list, sync=True, navigator=u"auto",
                  navigator_list=None, **kwargs):
-    """Plot several signals at the same time.
+    u"""Plot several signals at the same time.
 
     Parameters
     ----------
@@ -239,8 +242,8 @@ def plot_signals(signal_list, sync=True, navigator="auto",
     if navigator_list:
         if not (len(signal_list) == len(navigator_list)):
             raise ValueError(
-                "signal_list and navigator_list must"
-                " have the same size")
+                u"signal_list and navigator_list must"
+                u" have the same size")
 
     if sync:
         axes_manager_list = []
@@ -251,20 +254,20 @@ def plot_signals(signal_list, sync=True, navigator="auto",
             navigator_list = []
         if navigator is None:
             navigator_list.extend([None] * len(signal_list))
-        elif navigator is "slider":
-            navigator_list.append("slider")
+        elif navigator is u"slider":
+            navigator_list.append(u"slider")
             navigator_list.extend([None] * (len(signal_list) - 1))
         elif isinstance(navigator, hyperspy.signal.Signal):
             navigator_list.append(navigator)
             navigator_list.extend([None] * (len(signal_list) - 1))
-        elif navigator is "spectrum":
-            navigator_list.extend(["spectrum"] * len(signal_list))
-        elif navigator is "auto":
-            navigator_list.extend(["auto"] * len(signal_list))
+        elif navigator is u"spectrum":
+            navigator_list.extend([u"spectrum"] * len(signal_list))
+        elif navigator is u"auto":
+            navigator_list.extend([u"auto"] * len(signal_list))
         else:
             raise ValueError(
-                "navigator must be one of \"spectrum\",\"auto\","
-                " \"slider\", None, a Signal instance")
+                u"navigator must be one of \"spectrum\",\"auto\","
+                u" \"slider\", None, a Signal instance")
 
         # Check to see if the spectra have the same navigational shapes
         temp_shape_first = axes_manager_list[0].navigation_shape
@@ -272,15 +275,15 @@ def plot_signals(signal_list, sync=True, navigator="auto",
             temp_shape = axes_manager.navigation_shape
             if not (temp_shape_first == temp_shape):
                 raise ValueError(
-                    "The spectra does not have the same navigation shape")
+                    u"The spectra does not have the same navigation shape")
             axes_manager_list[i] = axes_manager.deepcopy()
             if i > 0:
-                for axis0, axisn in zip(axes_manager_list[0].navigation_axes,
+                for axis0, axisn in izip(axes_manager_list[0].navigation_axes,
                                         axes_manager_list[i].navigation_axes):
                     axes_manager_list[i]._axes[axisn.index_in_array] = axis0
             del axes_manager
 
-        for signal, navigator, axes_manager in zip(signal_list,
+        for signal, navigator, axes_manager in izip(signal_list,
                                                    navigator_list,
                                                    axes_manager_list):
             signal.plot(axes_manager=axes_manager,
@@ -292,7 +295,7 @@ def plot_signals(signal_list, sync=True, navigator="auto",
         if not navigator_list:
             navigator_list = []
             navigator_list.extend([navigator] * len(signal_list))
-        for signal, navigator in zip(signal_list, navigator_list):
+        for signal, navigator in izip(signal_list, navigator_list):
             signal.plot(navigator=navigator,
                         **kwargs)
 
@@ -305,35 +308,35 @@ def _make_heatmap_subplot(spectra):
     return im._plot.signal_plot.ax
 
 
-def _make_overlap_plot(spectra, ax, color="blue", line_style='-'):
-    if isinstance(color, str):
+def _make_overlap_plot(spectra, ax, color=u"blue", line_style=u'-'):
+    if isinstance(color, unicode):
         color = [color] * len(spectra)
-    if isinstance(line_style, str):
+    if isinstance(line_style, unicode):
         line_style = [line_style] * len(spectra)
     for spectrum_index, (spectrum, color, line_style) in enumerate(
-            zip(spectra, color, line_style)):
+            izip(spectra, color, line_style)):
         x_axis = spectrum.axes_manager.signal_axes[0]
         ax.plot(x_axis.axis, spectrum.data, color=color, ls=line_style)
     if len(spectra) > 1:
         _set_spectrum_xlabel(spectra[-1], ax)
-    ax.set_ylabel('Intensity')
+    ax.set_ylabel(u'Intensity')
     ax.autoscale(tight=True)
 
 
 def _make_cascade_subplot(
-        spectra, ax, color="blue", line_style='-', padding=1):
+        spectra, ax, color=u"blue", line_style=u'-', padding=1):
     max_value = 0
     for spectrum in spectra:
         spectrum_yrange = (np.nanmax(spectrum.data) -
                            np.nanmin(spectrum.data))
         if spectrum_yrange > max_value:
             max_value = spectrum_yrange
-    if isinstance(color, str):
+    if isinstance(color, unicode):
         color = [color] * len(spectra)
-    if isinstance(line_style, str):
+    if isinstance(line_style, unicode):
         line_style = [line_style] * len(spectra)
     for spectrum_index, (spectrum, color, line_style) in enumerate(
-            zip(spectra, color, line_style)):
+            izip(spectra, color, line_style)):
         x_axis = spectrum.axes_manager.signal_axes[0]
         data_to_plot = ((spectrum.data - spectrum.data.min()) /
                         float(max_value) + spectrum_index * padding)
@@ -344,39 +347,39 @@ def _make_cascade_subplot(
     ax.autoscale(tight=True)
 
 
-def _plot_spectrum(spectrum, ax, color="blue", line_style='-'):
+def _plot_spectrum(spectrum, ax, color=u"blue", line_style=u'-'):
     x_axis = spectrum.axes_manager.signal_axes[0]
     ax.plot(x_axis.axis, spectrum.data, color=color, ls=line_style)
 
 
 def _set_spectrum_xlabel(spectrum, ax):
     x_axis = spectrum.axes_manager.signal_axes[0]
-    ax.set_xlabel("%s (%s)" % (x_axis.name, x_axis.units))
+    ax.set_xlabel(u"%s (%s)" % (x_axis.name, x_axis.units))
 
 
 def plot_images(images,
                 cmap=None,
                 no_nans=False,
                 per_row=3,
-                label='auto',
+                label=u'auto',
                 labelwrap=30,
                 suptitle=None,
                 suptitle_fontsize=18,
-                colorbar='multi',
-                centre_colormap="auto",
+                colorbar=u'multi',
+                centre_colormap=u"auto",
                 saturated_pixels=0,
                 scalebar=None,
-                scalebar_color='white',
-                axes_decor='all',
+                scalebar_color=u'white',
+                axes_decor=u'all',
                 padding=None,
                 tight_layout=False,
-                aspect='auto',
+                aspect=u'auto',
                 min_asp=0.1,
                 namefrac_thresh=0.4,
                 fig=None,
                 *args,
                 **kwargs):
-    """Plot multiple images as sub-images in one figure.
+    u"""Plot multiple images as sub-images in one figure.
 
         Parameters
         ----------
@@ -506,16 +509,16 @@ def plot_images(images,
         ax = plt.gca()
         return ax
     elif not isinstance(images, (list, tuple, Signal)):
-        raise ValueError("images must be a list of image signals or "
-                         "multi-dimensional signal."
-                         " " + repr(type(images)) + " was given.")
+        raise ValueError(u"images must be a list of image signals or "
+                         u"multi-dimensional signal."
+                         u" " + repr(type(images)) + u" was given.")
 
     # Get default colormap from pyplot:
     if cmap is None:
         cmap = plt.get_cmap().name
     elif isinstance(cmap, mpl.colors.Colormap):
         cmap = cmap.name
-    if centre_colormap == "auto":
+    if centre_colormap == u"auto":
         if cmap in MPL_DIVERGING_COLORMAPS:
             centre_colormap = True
         else:
@@ -530,10 +533,10 @@ def plot_images(images,
     n = 0
     for i, sig in enumerate(images):
         if sig.axes_manager.signal_dimension != 2:
-            raise ValueError("This method only plots signals that are images. "
-                             "The signal dimension must be equal to 2. "
-                             "The signal at position " + repr(i) +
-                             " was " + repr(sig) + ".")
+            raise ValueError(u"This method only plots signals that are images. "
+                             u"The signal dimension must be equal to 2. "
+                             u"The signal at position " + repr(i) +
+                             u" was " + repr(sig) + u".")
         # increment n by the navigation size, or by 1 if the navigation size is
         # <= 0
         n += (sig.axes_manager.navigation_size
@@ -548,7 +551,7 @@ def plot_images(images,
 
     if label is None:
         pass
-    elif label is 'auto':
+    elif label is u'auto':
         # Use some heuristics to try to get base string of similar titles
         label_list = [x.metadata.General.title for x in images]
 
@@ -559,9 +562,9 @@ def plot_images(images,
         res[:, 0] = 1
 
         # j iterates the strings
-        for j in range(len(label_list)):
+        for j in xrange(len(label_list)):
             # i iterates length of substring test
-            for i in range(1, len(label_list[0]) + 1):
+            for i in xrange(1, len(label_list[0]) + 1):
                 # stores whether or not characters in title match
                 res[j, i] = label_list[0][:i] in label_list[j]
 
@@ -580,9 +583,9 @@ def plot_images(images,
         # trim off any '(' or ' ' characters at end of basename
         if div_num > 1:
             while True:
-                if basename[len(basename) - 1] == '(':
+                if basename[len(basename) - 1] == u'(':
                     basename = basename[:-1]
-                elif basename[len(basename) - 1] == ' ':
+                elif basename[len(basename) - 1] == u' ':
                     basename = basename[:-1]
                 else:
                     break
@@ -607,19 +610,19 @@ def plot_images(images,
         else:
             # there was not much overlap, so default back to 'titles' mode
             shared_titles = False
-            label = 'titles'
+            label = u'titles'
             div_num = 0
 
-    elif label is 'titles':
+    elif label is u'titles':
         # Set label_list to each image's pre-defined title
         label_list = [x.metadata.General.title for x in images]
 
-    elif isinstance(label, str):
+    elif isinstance(label, unicode):
         # Set label_list to an indexed list, based off of label
-        label_list = [label + " " + repr(num) for num in range(n)]
+        label_list = [label + u" " + repr(num) for num in xrange(n)]
 
     elif isinstance(label, list) and all(
-            isinstance(x, str) for x in label):
+            isinstance(x, unicode) for x in label):
         label_list = label
         user_labels = True
         # If list of labels is longer than the number of images, just use the
@@ -632,7 +635,7 @@ def plot_images(images,
 
     else:
         # catch all others to revert to default if bad input
-        print("Did not understand input of labels. Defaulting to image titles.")
+        print u"Did not understand input of labels. Defaulting to image titles."
         label_list = [x.metadata.General.title for x in images]
 
     # Determine appropriate number of images per row
@@ -642,7 +645,7 @@ def plot_images(images,
 
     # Set overall figure size and define figure (if not pre-existing)
     if fig is None:
-        k = max(plt.rcParams['figure.figsize']) / max(per_row, rows)
+        k = max(plt.rcParams[u'figure.figsize']) / max(per_row, rows)
         f = plt.figure(figsize=(tuple(k * i for i in (per_row, rows))))
     else:
         f = fig
@@ -663,11 +666,11 @@ def plot_images(images,
     non_rgb = list(itertools.compress(images, [not j for j in isrgb]))
     if len(non_rgb) is 0 and colorbar is not None:
         colorbar = None
-        print("Sorry, colorbar is not implemented for RGB images.")
+        print u"Sorry, colorbar is not implemented for RGB images."
 
     # Find global min and max values of all the non-rgb images for use with
     # 'single' scalebar
-    if colorbar is 'single':
+    if colorbar is u'single':
         global_max = max([i.data.max() for i in non_rgb])
         global_min = min([i.data.min() for i in non_rgb])
         g_vmin, g_vmax = contrast_stretching(i.data, saturated_pixels)
@@ -726,12 +729,12 @@ def plot_images(images,
             )
 
             if not isinstance(aspect, (int, float)) and aspect not in [
-                    'auto', 'square', 'equal']:
-                print('Did not understand aspect ratio input. ' \
-                      'Using \'auto\' as default.')
-                aspect = 'auto'
+                    u'auto', u'square', u'equal']:
+                print u'Did not understand aspect ratio input. ' \
+                      u'Using \'auto\' as default.'
+                aspect = u'auto'
 
-            if aspect is 'auto':
+            if aspect is u'auto':
                 if float(yaxis.size) / xaxis.size < min_asp:
                     factor = min_asp * float(xaxis.size) / yaxis.size
                 elif float(yaxis.size) / xaxis.size > min_asp ** -1:
@@ -739,19 +742,19 @@ def plot_images(images,
                 else:
                     factor = 1
                 asp = np.abs(factor * float(xaxis.scale) / yaxis.scale)
-            elif aspect is 'square':
+            elif aspect is u'square':
                 asp = abs(extent[1] - extent[0]) / abs(extent[3] - extent[2])
-            elif aspect is 'equal':
+            elif aspect is u'equal':
                 asp = 1
             elif isinstance(aspect, (int, float)):
                 asp = aspect
-            if 'interpolation' not in kwargs.keys():
-                kwargs['interpolation'] = 'nearest'
+            if u'interpolation' not in kwargs.keys():
+                kwargs[u'interpolation'] = u'nearest'
 
             # Plot image data, using vmin and vmax to set bounds,
             # or allowing them to be set automatically if using individual
             # colorbars
-            if colorbar is 'single' and not isrgb[i]:
+            if colorbar is u'single' and not isrgb[i]:
                 axes_im = ax.imshow(data,
                                     cmap=cmap, extent=extent,
                                     vmin=g_vmin, vmax=g_vmax,
@@ -771,22 +774,22 @@ def plot_images(images,
                     isinstance(yaxis.units, trait_base._Undefined) or \
                     isinstance(xaxis.name, trait_base._Undefined) or \
                     isinstance(yaxis.name, trait_base._Undefined):
-                if axes_decor is 'all':
+                if axes_decor is u'all':
                     warnings.warn(
-                        'Axes labels were requested, but one '
-                        'or both of the '
-                        'axes units and/or name are undefined. '
-                        'Axes decorations have been set to '
-                        '\'ticks\' instead.')
-                    axes_decor = 'ticks'
+                        u'Axes labels were requested, but one '
+                        u'or both of the '
+                        u'axes units and/or name are undefined. '
+                        u'Axes decorations have been set to '
+                        u'\'ticks\' instead.')
+                    axes_decor = u'ticks'
             # If all traits are defined, set labels as appropriate:
             else:
-                ax.set_xlabel(axes[0].name + " axis (" + axes[0].units + ")")
-                ax.set_ylabel(axes[1].name + " axis (" + axes[1].units + ")")
+                ax.set_xlabel(axes[0].name + u" axis (" + axes[0].units + u")")
+                ax.set_ylabel(axes[1].name + u" axis (" + axes[1].units + u")")
 
             if label:
                 if all_match:
-                    title = ''
+                    title = u''
                 elif shared_titles:
                     title = label_list[i][div_num - 1:]
                 else:
@@ -800,32 +803,32 @@ def plot_images(images,
                         title = label_list[i]
 
                 if ims.axes_manager.navigation_size > 1 and not user_labels:
-                    title += " %s" % str(ims.axes_manager.indices)
+                    title += u" %s" % unicode(ims.axes_manager.indices)
 
                 ax.set_title(textwrap.fill(title, labelwrap))
 
             # Set axes decorations based on user input
-            if axes_decor is 'off':
-                ax.axis('off')
-            elif axes_decor is 'ticks':
-                ax.set_xlabel('')
-                ax.set_ylabel('')
-            elif axes_decor is 'all':
+            if axes_decor is u'off':
+                ax.axis(u'off')
+            elif axes_decor is u'ticks':
+                ax.set_xlabel(u'')
+                ax.set_ylabel(u'')
+            elif axes_decor is u'all':
                 pass
             elif axes_decor is None:
-                ax.set_xlabel('')
-                ax.set_ylabel('')
+                ax.set_xlabel(u'')
+                ax.set_ylabel(u'')
                 ax.set_xticklabels([])
                 ax.set_yticklabels([])
 
             # If using independent colorbars, add them
-            if colorbar is 'multi' and not isrgb[i]:
+            if colorbar is u'multi' and not isrgb[i]:
                 div = make_axes_locatable(ax)
-                cax = div.append_axes("right", size="5%", pad=0.05)
+                cax = div.append_axes(u"right", size=u"5%", pad=0.05)
                 plt.colorbar(axes_im, cax=cax)
 
             # Add scalebars as necessary
-            if (scalelist and i in scalebar) or scalebar is 'all':
+            if (scalelist and i in scalebar) or scalebar is u'all':
                 ax.scalebar = Scale_Bar(
                     ax=ax,
                     units=axes[0].units,
@@ -834,9 +837,9 @@ def plot_images(images,
 
     # If using a single colorbar, add it, and do tight_layout, ensuring that
     # a colorbar is only added based off of non-rgb Images:
-    if colorbar is 'single':
+    if colorbar is u'single':
         foundim = None
-        for i in range(len(isrgb)):
+        for i in xrange(len(isrgb)):
             if (not isrgb[i]) and foundim is None:
                 foundim = i
 
@@ -862,15 +865,15 @@ def plot_images(images,
     if scalebar is None or scalebar is False:
         # Do nothing if no scalebars are called for
         pass
-    elif scalebar is 'all':
+    elif scalebar is u'all':
         # scalebars were taken care of in the plotting loop
         pass
     elif scalelist:
         # scalebars were taken care of in the plotting loop
         pass
     else:
-        raise ValueError("Did not understand scalebar input. Must be None, "
-                         "\'all\', or list of ints.")
+        raise ValueError(u"Did not understand scalebar input. Must be None, "
+                         u"\'all\', or list of ints.")
 
     # Adjust subplot spacing according to user's specification
     if padding is not None:
@@ -881,17 +884,17 @@ def plot_images(images,
 
 def plot_spectra(
         spectra,
-        style='default',
+        style=u'default',
         color=None,
         line_style=None,
         padding=1.,
         legend=None,
         legend_picking=True,
-        legend_loc='upper right',
+        legend_loc=u'upper right',
         fig=None,
         ax=None,
         **kwargs):
-    """Plot several spectra in the same figure.
+    u"""Plot several spectra in the same figure.
 
     Extra keyword arguments are passed to `matplotlib.figure`.
 
@@ -956,41 +959,41 @@ def plot_spectra(
     """
     import hyperspy.signal
 
-    if style == "default":
+    if style == u"default":
         style = preferences.Plot.default_style_to_compare_spectra
 
     if color is not None:
-        if hasattr(color, "__iter__"):
+        if hasattr(color, u"__iter__"):
             color = itertools.cycle(color)
-        elif isinstance(color, str):
+        elif isinstance(color, unicode):
             color = itertools.cycle([color])
         else:
-            raise ValueError("Color must be None, a valid matplotlib color "
-                             "string or a list of valid matplotlib colors.")
+            raise ValueError(u"Color must be None, a valid matplotlib color "
+                             u"string or a list of valid matplotlib colors.")
     else:
-        color = itertools.cycle(plt.rcParams['axes.color_cycle'])
+        color = itertools.cycle(plt.rcParams[u'axes.color_cycle'])
 
     if line_style is not None:
-        if hasattr(line_style, "__iter__"):
+        if hasattr(line_style, u"__iter__"):
             line_style = itertools.cycle(line_style)
-        elif isinstance(line_style, str):
+        elif isinstance(line_style, unicode):
             line_style = itertools.cycle([line_style])
         else:
-            raise ValueError("line_style must be None, a valid matplotlib"
-                             " line_style string or a list of valid matplotlib"
-                             " line_style.")
+            raise ValueError(u"line_style must be None, a valid matplotlib"
+                             u" line_style string or a list of valid matplotlib"
+                             u" line_style.")
     else:
-        line_style = ['-'] * len(spectra)
+        line_style = [u'-'] * len(spectra)
 
     if legend is not None:
-        if hasattr(legend, "__iter__"):
+        if hasattr(legend, u"__iter__"):
             legend = itertools.cycle(legend)
-        elif legend == 'auto':
+        elif legend == u'auto':
             legend = [spec.metadata.General.title for spec in spectra]
         else:
-            raise ValueError("legend must be None, 'auto' or a list of string")
+            raise ValueError(u"legend must be None, 'auto' or a list of string")
 
-    if style == 'overlap':
+    if style == u'overlap':
         if fig is None:
             fig = plt.figure(**kwargs)
         if ax is None:
@@ -1003,7 +1006,7 @@ def plot_spectra(
             plt.legend(legend, loc=legend_loc)
             if legend_picking is True:
                 animate_legend(figure=fig)
-    elif style == 'cascade':
+    elif style == u'cascade':
         if fig is None:
             fig = plt.figure(**kwargs)
         if ax is None:
@@ -1015,17 +1018,17 @@ def plot_spectra(
                               padding=padding)
         if legend is not None:
             plt.legend(legend, loc=legend_loc)
-    elif style == 'mosaic':
-        default_fsize = plt.rcParams["figure.figsize"]
+    elif style == u'mosaic':
+        default_fsize = plt.rcParams[u"figure.figsize"]
         figsize = (default_fsize[0], default_fsize[1] * len(spectra))
         fig, subplots = plt.subplots(
             len(spectra), 1, figsize=figsize, **kwargs)
         if legend is None:
             legend = [legend] * len(spectra)
-        for spectrum, ax, color, line_style, legend in zip(
+        for spectrum, ax, color, line_style, legend in izip(
                 spectra, subplots, color, line_style, legend):
             _plot_spectrum(spectrum, ax, color=color, line_style=line_style)
-            ax.set_ylabel('Intensity')
+            ax.set_ylabel(u'Intensity')
             if legend is not None:
                 ax.set_title(legend)
             if not isinstance(spectra, hyperspy.signal.Signal):
@@ -1034,20 +1037,20 @@ def plot_spectra(
             _set_spectrum_xlabel(spectrum, ax)
         fig.tight_layout()
 
-    elif style == 'heatmap':
+    elif style == u'heatmap':
         if not isinstance(spectra, hyperspy.signal.Signal):
             import hyperspy.utils
             spectra = hyperspy.utils.stack(spectra)
         with spectra.unfolded():
             ax = _make_heatmap_subplot(spectra)
-            ax.set_ylabel('Spectra')
-    ax = ax if style != "mosaic" else subplots
+            ax.set_ylabel(u'Spectra')
+    ax = ax if style != u"mosaic" else subplots
 
     return ax
 
 
-def animate_legend(figure='last'):
-    """Animate the legend of a figure.
+def animate_legend(figure=u'last'):
+    u"""Animate the legend of a figure.
 
     A spectrum can be toggle on and off by clicking on the legended line.
 
@@ -1063,7 +1066,7 @@ def animate_legend(figure='last'):
     Code inspired from legend_picking.py in the matplotlib gallery
 
     """
-    if figure == 'last':
+    if figure == u'last':
         figure = plt.gcf()
         ax = plt.gca()
     else:
@@ -1071,7 +1074,7 @@ def animate_legend(figure='last'):
     lines = ax.lines
     lined = dict()
     leg = ax.get_legend()
-    for legline, origline in zip(leg.get_lines(), lines):
+    for legline, origline in izip(leg.get_lines(), lines):
         legline.set_picker(5)  # 5 pts tolerance
         lined[legline] = origline
 
@@ -1090,20 +1093,20 @@ def animate_legend(figure='last'):
             legline.set_alpha(0.2)
         figure.canvas.draw()
 
-    figure.canvas.mpl_connect('pick_event', onpick)
+    figure.canvas.mpl_connect(u'pick_event', onpick)
 
     plt.show()
 
 
 def plot_histograms(signal_list,
-                    bins='freedman',
+                    bins=u'freedman',
                     range_bins=None,
                     color=None,
                     line_style=None,
-                    legend='auto',
+                    legend=u'auto',
                     fig=None,
                     **kwargs):
-    """Plot the histogram of every signal in the list in the same figure.
+    u"""Plot the histogram of every signal in the list in the same figure.
 
     This function creates a histogram for each signal and plot the list with
     the `utils.plot.plot_spectra` function.
@@ -1161,6 +1164,6 @@ def plot_histograms(signal_list,
         hists.append(obj.get_histogram(bins=bins,
                                        range_bins=range_bins, **kwargs))
     if line_style is None:
-        line_style = 'steps'
-    return plot_spectra(hists, style='overlap', color=color,
+        line_style = u'steps'
+    return plot_spectra(hists, style=u'overlap', color=color,
                         line_style=line_style, legend=legend, fig=fig)

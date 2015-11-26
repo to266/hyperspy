@@ -3,10 +3,10 @@ import numpy as np
 from hyperspy.misc.image_tools import contrast_stretching
 
 
-class TestImageStretching:
+class TestImageStretching(object):
 
     def setUp(self):
-        self.data = np.arange(11).astype("float")
+        self.data = np.arange(11).astype(u"float")
         self.data[-1] = np.nan
 
     def test_no_nans(self):

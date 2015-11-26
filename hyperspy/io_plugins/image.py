@@ -24,11 +24,11 @@ from hyperspy.misc.rgb_tools import regular_array2rgbx
 
 # Plugin characteristics
 # ----------------------
-format_name = 'Image'
-description = 'Import/Export standard image formats using PIL or freeimage'
+format_name = u'Image'
+description = u'Import/Export standard image formats using PIL or freeimage'
 full_support = False
-file_extensions = ['png', 'bmp', 'dib', 'gif', 'jpeg', 'jpe', 'jpg',
-                   'msp', 'pcx', 'ppm', "pbm", "pgm", 'xbm', 'spi', ]
+file_extensions = [u'png', u'bmp', u'dib', u'gif', u'jpeg', u'jpe', u'jpg',
+                   u'msp', u'pcx', u'ppm', u"pbm", u"pgm", u'xbm', u'spi', ]
 default_extension = 0  # png
 
 
@@ -38,8 +38,8 @@ writes = [(2, 0), ]
 
 
 # TODO Extend it to support SI
-def file_writer(filename, signal, file_format='png', **kwds):
-    """Writes data to any format supported by PIL
+def file_writer(filename, signal, file_format=u'png', **kwds):
+    u"""Writes data to any format supported by PIL
 
         Parameters
         ----------
@@ -53,7 +53,7 @@ def file_writer(filename, signal, file_format='png', **kwds):
 
 
 def file_reader(filename, **kwds):
-    """Read data from any format supported by PIL.
+    u"""Read data from any format supported by PIL.
 
     Parameters
     ----------
@@ -69,11 +69,11 @@ def file_reader(filename, **kwds):
             dc = dc[:, :, 0]
         else:
             dc = regular_array2rgbx(dc)
-    return [{'data': dc,
-             'metadata':
+    return [{u'data': dc,
+             u'metadata':
              {
-                 'General': {'original_filename': os.path.split(filename)[1]},
-                 "Signal": {'signal_type': "",
-                            'record_by': 'image', },
+                 u'General': {u'original_filename': os.path.split(filename)[1]},
+                 u"Signal": {u'signal_type': u"",
+                            u'record_by': u'image', },
              }
              }]

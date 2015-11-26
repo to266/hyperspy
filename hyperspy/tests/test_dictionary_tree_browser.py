@@ -5,49 +5,49 @@ from hyperspy.misc.utils import DictionaryTreeBrowser
 from hyperspy.signal import Signal
 
 
-class TestDictionaryBrowser:
+class TestDictionaryBrowser(object):
 
     def setUp(self):
         tree = DictionaryTreeBrowser(
             {
-                "Node1": {"leaf11": 11,
-                          "Node11": {"leaf111": 111},
+                u"Node1": {u"leaf11": 11,
+                          u"Node11": {u"leaf111": 111},
                           },
-                "Node2": {"leaf21": 21,
-                          "Node21": {"leaf211": 211},
+                u"Node2": {u"leaf21": 21,
+                          u"Node21": {u"leaf211": 211},
                           },
             })
         self.tree = tree
 
     def test_add_dictionary(self):
         self.tree.add_dictionary({
-            "Node1": {"leaf12": 12,
-                      "Node11": {"leaf111": 222,
-                                 "Node111": {"leaf1111": 1111}, },
+            u"Node1": {u"leaf12": 12,
+                      u"Node11": {u"leaf111": 222,
+                                 u"Node111": {u"leaf1111": 1111}, },
                       },
-            "Node3": {
-                "leaf31": 31},
+            u"Node3": {
+                u"leaf31": 31},
         })
         nose.tools.assert_equal(
-            {"Node1": {"leaf11": 11,
-                       "leaf12": 12,
-                       "Node11": {"leaf111": 222,
-                                  "Node111": {
-                                      "leaf1111": 1111},
+            {u"Node1": {u"leaf11": 11,
+                       u"leaf12": 12,
+                       u"Node11": {u"leaf111": 222,
+                                  u"Node111": {
+                                      u"leaf1111": 1111},
                                   },
                        },
-             "Node2": {"leaf21": 21,
-                       "Node21": {"leaf211": 211},
+             u"Node2": {u"leaf21": 21,
+                       u"Node21": {u"leaf211": 211},
                        },
-             "Node3": {"leaf31": 31},
+             u"Node3": {u"leaf31": 31},
              }, self.tree.as_dictionary())
 
     def test_add_signal_in_dictionary(self):
         tree = self.tree
         s = Signal([1., 2, 3])
-        s.axes_manager[0].name = 'x'
-        s.axes_manager[0].units = 'ly'
-        tree.add_dictionary({"_sig_signal name": s._to_dictionary()})
+        s.axes_manager[0].name = u'x'
+        s.axes_manager[0].units = u'ly'
+        tree.add_dictionary({u"_sig_signal name": s._to_dictionary()})
         nose.tools.assert_is_instance(tree.signal_name, Signal)
         nose.tools.assert_true(np.all(
             tree.signal_name.data == s.data
@@ -62,49 +62,49 @@ class TestDictionaryBrowser:
     def test_signal_to_dictionary(self):
         tree = self.tree
         s = Signal([1., 2, 3])
-        s.axes_manager[0].name = 'x'
-        s.axes_manager[0].units = 'ly'
-        tree.set_item('Some name', s)
+        s.axes_manager[0].name = u'x'
+        s.axes_manager[0].units = u'ly'
+        tree.set_item(u'Some name', s)
         d = tree.as_dictionary()
-        nose.tools.assert_true(np.all(d['_sig_Some name']['data'] == s.data))
-        d['_sig_Some name']['data'] = 0
+        nose.tools.assert_true(np.all(d[u'_sig_Some name'][u'data'] == s.data))
+        d[u'_sig_Some name'][u'data'] = 0
         nose.tools.assert_equal(
             {
-                "Node1": {
-                    "leaf11": 11,
-                    "Node11": {
-                        "leaf111": 111},
+                u"Node1": {
+                    u"leaf11": 11,
+                    u"Node11": {
+                        u"leaf111": 111},
                 },
-                "Node2": {
-                    "leaf21": 21,
-                    "Node21": {
-                        "leaf211": 211},
+                u"Node2": {
+                    u"leaf21": 21,
+                    u"Node21": {
+                        u"leaf211": 211},
                 },
-                "_sig_Some name": {
-                    'axes': [
+                u"_sig_Some name": {
+                    u'axes': [
                         {
-                            'name': 'x',
-                            'navigate': False,
-                                    'offset': 0.0,
-                                    'scale': 1.0,
-                                    'size': 3,
-                                    'units': 'ly'}],
-                    'data': 0,
-                    'learning_results': {},
-                    'metadata': {
-                        'General': {
-                            'title': ''},
-                        'Signal': {
-                            'binned': False,
-                            'record_by': '',
-                            'signal_origin': '',
-                            'signal_type': ''},
-                        '_HyperSpy': {
-                            'Folding': {
-                                'original_axes_manager': None,
-                                'original_shape': None,
-                                'unfolded': False,
-                                'signal_unfolded': False}}},
-                    'original_metadata': {},
-                    'tmp_parameters': {}}},
+                            u'name': u'x',
+                            u'navigate': False,
+                                    u'offset': 0.0,
+                                    u'scale': 1.0,
+                                    u'size': 3,
+                                    u'units': u'ly'}],
+                    u'data': 0,
+                    u'learning_results': {},
+                    u'metadata': {
+                        u'General': {
+                            u'title': u''},
+                        u'Signal': {
+                            u'binned': False,
+                            u'record_by': u'',
+                            u'signal_origin': u'',
+                            u'signal_type': u''},
+                        u'_HyperSpy': {
+                            u'Folding': {
+                                u'original_axes_manager': None,
+                                u'original_shape': None,
+                                u'unfolded': False,
+                                u'signal_unfolded': False}}},
+                    u'original_metadata': {},
+                    u'tmp_parameters': {}}},
             d)

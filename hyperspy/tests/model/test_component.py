@@ -4,14 +4,14 @@ from hyperspy.component import Component
 from hyperspy.axes import AxesManager
 
 
-class TestMultidimensionalActive:
+class TestMultidimensionalActive(object):
 
     def setUp(self):
-        self.c = Component(["parameter"])
-        self.c._axes_manager = AxesManager([{"size": 3,
-                                             "navigate": True},
-                                            {"size": 2,
-                                             "navigate": True}])
+        self.c = Component([u"parameter"])
+        self.c._axes_manager = AxesManager([{u"size": 3,
+                                             u"navigate": True},
+                                            {u"size": 2,
+                                             u"navigate": True}])
 
     def test_enable_pixel_switching_current_on(self):
         c = self.c

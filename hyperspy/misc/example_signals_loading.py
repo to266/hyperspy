@@ -20,7 +20,7 @@ import os
 
 
 def load_1D_EDS_SEM_spectrum():
-    """
+    u"""
     Load an EDS-SEM spectrum
 
     - Sample: EDS-TM002 provided by BAM (www.webshop.bam.de)
@@ -28,13 +28,13 @@ def load_1D_EDS_SEM_spectrum():
     - EDS Detector: X-max 80 from Oxford Instrument
     """
     from hyperspy.io import load
-    file_path = os.sep.join([os.path.dirname(__file__), 'eds',
-                             'example_signals', '1D_EDS_SEM_Spectrum.hdf5'])
+    file_path = os.sep.join([os.path.dirname(__file__), u'eds',
+                             u'example_signals', u'1D_EDS_SEM_Spectrum.hdf5'])
     return load(file_path)
 
 
 def load_1D_EDS_TEM_spectrum():
-    """
+    u"""
     Load an EDS-TEM spectrum
 
     - Sample: FePt bimetallic nanoparticles
@@ -42,6 +42,6 @@ def load_1D_EDS_TEM_spectrum():
     - EDS Detector: Super-X 4 detectors Brucker
     """
     from hyperspy.io import load
-    file_path = os.sep.join([os.path.dirname(__file__), 'eds',
-                             'example_signals', '1D_EDS_TEM_Spectrum.hdf5'])
+    file_path = os.sep.join([os.path.dirname(__file__), u'eds',
+                             u'example_signals', u'1D_EDS_TEM_Spectrum.hdf5'])
     return load(file_path)

@@ -23,6 +23,7 @@ from hyperspy._signals.spectrum import Spectrum
 from hyperspy.component import Parameter, Component
 from hyperspy.hspy import create_model
 from hyperspy.components import Gaussian, Lorentzian, ScalableFixedPattern
+from itertools import izip
 
 
 def remove_empty_numpy_strings(dic):
@@ -34,13 +35,13 @@ def remove_empty_numpy_strings(dic):
                 if isinstance(vv, dict):
                     remove_empty_numpy_strings(vv)
                 elif isinstance(vv, np.string_) and len(vv) == 0:
-                    vv = ''
+                    vv = u''
         elif isinstance(v, np.string_) and len(v) == 0:
             del dic[k]
-            dic[k] = ''
+            dic[k] = u''
 
 
-class DummyAxesManager:
+class DummyAxesManager(object):
     navigation_shape = [1, ]
     navigation_size = 2
     indices = ()
@@ -50,12 +51,12 @@ class DummyAxesManager:
         return self.navigation_shape[::-1]
 
 
-class TestParameterDictionary:
+class TestParameterDictionary(object):
 
     def setUp(self):
         self.par = Parameter()
-        self.par.name = 'asd'
-        self.par._id_name = 'newone'
+        self.par.name = u'asd'
+        self.par._id_name = u'newone'
 
         def ft(x):
             return x * x
@@ -75,32 +76,32 @@ class TestParameterDictionary:
     def test_to_dictionary(self):
         d = self.par.as_dictionary()
 
-        nt.assert_true(d['name'] == self.par.name)
-        nt.assert_true(d['_id_name'] == self.par._id_name)
-        nt.assert_true(d['map']['values'][0] == 1)
-        nt.assert_true(d['map']['std'][0] == 0.1)
-        nt.assert_true(d['map']['is_set'][0])
-        nt.assert_true(d['value'] == self.par.value)
-        nt.assert_true(d['std'] == self.par.std)
-        nt.assert_true(d['free'] == self.par.free)
-        nt.assert_true(d['self'] == id(self.par))
-        nt.assert_true(d['_bounds'] == self.par._bounds)
-        nt.assert_true(d['ext_bounded'] == self.par.ext_bounded)
+        nt.assert_true(d[u'name'] == self.par.name)
+        nt.assert_true(d[u'_id_name'] == self.par._id_name)
+        nt.assert_true(d[u'map'][u'values'][0] == 1)
+        nt.assert_true(d[u'map'][u'std'][0] == 0.1)
+        nt.assert_true(d[u'map'][u'is_set'][0])
+        nt.assert_true(d[u'value'] == self.par.value)
+        nt.assert_true(d[u'std'] == self.par.std)
+        nt.assert_true(d[u'free'] == self.par.free)
+        nt.assert_true(d[u'self'] == id(self.par))
+        nt.assert_true(d[u'_bounds'] == self.par._bounds)
+        nt.assert_true(d[u'ext_bounded'] == self.par.ext_bounded)
         nt.assert_true(
-            d['ext_force_positive'] == self.par.ext_force_positive)
+            d[u'ext_force_positive'] == self.par.ext_force_positive)
 
     def test_load_dictionary(self):
         d = self.par.as_dictionary()
         p = Parameter()
-        p._id_name = 'newone'
+        p._id_name = u'newone'
         _id = p._load_dictionary(d)
 
         nt.assert_equal(_id, id(self.par))
         nt.assert_true(p.name == self.par.name)
         nt.assert_true(p._id_name == self.par._id_name)
-        nt.assert_true(p.map['values'][0] == 1)
-        nt.assert_true(p.map['std'][0] == 0.1)
-        nt.assert_true(p.map['is_set'][0])
+        nt.assert_true(p.map[u'values'][0] == 1)
+        nt.assert_true(p.map[u'std'][0] == 0.1)
+        nt.assert_true(p.map[u'is_set'][0])
         nt.assert_true(p.value == self.par.value)
         nt.assert_true(p.std == self.par.std)
         nt.assert_true(p.free == self.par.free)
@@ -115,19 +116,19 @@ class TestParameterDictionary:
     @nt.raises(ValueError)
     def test_invalid_name(self):
         d = self.par.as_dictionary()
-        d['_id_name'] = 'otherone'
+        d[u'_id_name'] = u'otherone'
         p = Parameter()
-        p._id_name = 'newone'
+        p._id_name = u'newone'
         _id = p._load_dictionary(d)
 
 
-class TestComponentDictionary:
+class TestComponentDictionary(object):
 
     def setUp(self):
-        self.parameter_names = ['par1', 'par2']
+        self.parameter_names = [u'par1', u'par2']
         self.comp = Component(self.parameter_names)
-        self.comp.name = 'newname!'
-        self.comp._id_name = 'dummy names yay!'
+        self.comp.name = u'newname!'
+        self.comp._id_name = u'dummy names yay!'
         self.comp._axes_manager = DummyAxesManager()
         self.comp._create_arrays()
         self.comp.par1.value = 2.
@@ -140,25 +141,25 @@ class TestComponentDictionary:
         d = self.comp.as_dictionary()
         c = self.comp
 
-        nt.assert_equal(c.name, d['name'])
-        nt.assert_equal(c._id_name, d['_id_name'])
-        nt.assert_false(d['active_is_multidimensional'])
-        nt.assert_true(d['active'])
-        nt.assert_is_none(d['_active_array'])
+        nt.assert_equal(c.name, d[u'name'])
+        nt.assert_equal(c._id_name, d[u'_id_name'])
+        nt.assert_false(d[u'active_is_multidimensional'])
+        nt.assert_true(d[u'active'])
+        nt.assert_is_none(d[u'_active_array'])
         for ip, p in enumerate(c.parameters):
-            nt.assert_equal(p.as_dictionary(), d['parameters'][ip])
+            nt.assert_equal(p.as_dictionary(), d[u'parameters'][ip])
 
         c.active_is_multidimensional = True
         d1 = c.as_dictionary()
-        nt.assert_true(d1['active_is_multidimensional'])
-        nt.assert_true(np.all(d1['_active_array'] == c._active_array))
+        nt.assert_true(d1[u'active_is_multidimensional'])
+        nt.assert_true(np.all(d1[u'_active_array'] == c._active_array))
 
     def test_load_dictionary(self):
         c = self.comp
         d = c.as_dictionary(True)
         n = Component(self.parameter_names)
 
-        n._id_name = 'dummy names yay!'
+        n._id_name = u'dummy names yay!'
         _ = n._load_dictionary(d)
         nt.assert_equal(c.name, n.name)
         nt.assert_equal(c.active, n.active)
@@ -166,22 +167,22 @@ class TestComponentDictionary:
             c.active_is_multidimensional,
             n.active_is_multidimensional)
 
-        for pn, pc in zip(n.parameters, c.parameters):
+        for pn, pc in izip(n.parameters, c.parameters):
             rn = np.random.random()
             nt.assert_equal(pn.twin_function(rn), pc.twin_function(rn))
             nt.assert_equal(
                 pn.twin_inverse_function(rn),
                 pc.twin_inverse_function(rn))
             dn = pn.as_dictionary()
-            del dn['self']
-            del dn['twin_function']
-            del dn['twin_inverse_function']
+            del dn[u'self']
+            del dn[u'twin_function']
+            del dn[u'twin_inverse_function']
             dc = pc.as_dictionary()
-            del dc['self']
-            del dc['twin_function']
-            del dc['twin_inverse_function']
-            print(list(dn.keys()))
-            print(list(dc.keys()))
+            del dc[u'self']
+            del dc[u'twin_function']
+            del dc[u'twin_inverse_function']
+            print list(dn.keys())
+            print list(dc.keys())
             nt.assert_dict_equal(dn, dc)
 
     @nt.raises(ValueError)
@@ -195,12 +196,12 @@ class TestComponentDictionary:
     def test_invalid_parameter_name(self):
         c = self.comp
         d = c.as_dictionary()
-        n = Component([a + 's' for a in self.parameter_names])
-        n._id_name = 'dummy names yay!'
+        n = Component([a + u's' for a in self.parameter_names])
+        n._id_name = u'dummy names yay!'
         id_dict = n._load_dictionary(d)
 
 
-class TestModelDictionary:
+class TestModelDictionary(object):
 
     def setUp(self):
         s = Spectrum(np.array([1.0, 2, 4, 7, 12, 7, 4, 2, 1]))
@@ -219,21 +220,21 @@ class TestModelDictionary:
         m = self.model
         d = m.as_dictionary()
 
-        nt.assert_equal(m.low_loss, d['low_loss'])
-        nt.assert_true(np.all(m.chisq.data == d['chisq.data']))
-        nt.assert_true(np.all(m.dof.data == d['dof.data']))
+        nt.assert_equal(m.low_loss, d[u'low_loss'])
+        nt.assert_true(np.all(m.chisq.data == d[u'chisq.data']))
+        nt.assert_true(np.all(m.dof.data == d[u'dof.data']))
         nt.assert_equal(
-            d['free_parameters_boundaries'],
+            d[u'free_parameters_boundaries'],
             m.free_parameters_boundaries)
-        nt.assert_equal(d['convolved'], m.convolved)
+        nt.assert_equal(d[u'convolved'], m.convolved)
 
         for num, c in enumerate(m):
             tmp = c.as_dictionary()
             remove_empty_numpy_strings(tmp)
-            nt.assert_equal(d['components'][num]['name'], tmp['name'])
-            nt.assert_equal(d['components'][num]['_id_name'], tmp['_id_name'])
+            nt.assert_equal(d[u'components'][num][u'name'], tmp[u'name'])
+            nt.assert_equal(d[u'components'][num][u'_id_name'], tmp[u'_id_name'])
         nt.assert_equal(
-            d['components'][-1]['_whitelist']['spectrum'][1], m.spectrum * 0.3)
+            d[u'components'][-1][u'_whitelist'][u'spectrum'][1], m.spectrum * 0.3)
 
     def test_load_dictionary(self):
         d = self.model.as_dictionary()
@@ -252,10 +253,10 @@ class TestModelDictionary:
             mn.free_parameters_boundaries,
             mo.free_parameters_boundaries)
         nt.assert_equal(mn.convolved, mo.convolved)
-        for i in range(len(mn)):
+        for i in xrange(len(mn)):
             nt.assert_equal(mn[i]._id_name, mo[i]._id_name)
-            for po, pn in zip(mo[i].parameters, mn[i].parameters):
-                nt.assert_true(np.allclose(po.map['values'], pn.map['values']))
-                nt.assert_true(np.allclose(po.map['is_set'], pn.map['is_set']))
+            for po, pn in izip(mo[i].parameters, mn[i].parameters):
+                nt.assert_true(np.allclose(po.map[u'values'], pn.map[u'values']))
+                nt.assert_true(np.allclose(po.map[u'is_set'], pn.map[u'is_set']))
 
         nt.assert_true(mn[0].A.twin is mn[1].A)

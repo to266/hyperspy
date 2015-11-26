@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 
 
@@ -14,7 +15,7 @@ def orthomax(A, gamma=1, reltol=1.4901e-07, maxit=256):
         while converged is False:
             # Use Lawley and Maxwell's fast version
             D = 0
-            for k in range(1, maxit + 1):
+            for k in xrange(1, maxit + 1):
                 Dold = D
                 tmp11 = np.sum(np.power(B, 2), axis=0)
                 tmp1 = np.matrix(np.diag(np.array(tmp11).flatten()))
@@ -30,11 +31,11 @@ def orthomax(A, gamma=1, reltol=1.4901e-07, maxit=256):
                     break
     else:
         # Use a sequence of bivariate rotations
-        for iter in range(1, maxit + 1):
-            print(iter)
+        for iter in xrange(1, maxit + 1):
+            print iter
             maxTheta = 0
-            for i in range(0, m - 1):
-                for j in range(i, m):
+            for i in xrange(0, m - 1):
+                for j in xrange(i, m):
                     Bi = B[:, i]
                     Bj = B[:, j]
                     u = np.multiply(Bi, Bi) - np.multiply(Bj, Bj)

@@ -21,7 +21,7 @@ from hyperspy.drawing.marker import MarkerBase
 
 class Point(MarkerBase):
 
-    """Point marker that can be added to the signal figure
+    u"""Point marker that can be added to the signal figure
 
     Parameters
     ---------
@@ -58,7 +58,7 @@ class Point(MarkerBase):
 
     def __init__(self, x, y, size=20, **kwargs):
         MarkerBase.__init__(self)
-        lp = {'color': 'black', 'linewidth': None}
+        lp = {u'color': u'black', u'linewidth': None}
         self.marker_properties = lp
         self.set_data(x1=x, y1=y, size=size)
         self.set_marker_properties(**kwargs)
@@ -66,20 +66,20 @@ class Point(MarkerBase):
     def update(self):
         if self.auto_update is False:
             return
-        self.marker.set_offsets([self.get_data_position('x1'),
-                                 self.get_data_position('y1')])
-        self.marker._sizes = [self.get_data_position('size')]
+        self.marker.set_offsets([self.get_data_position(u'x1'),
+                                 self.get_data_position(u'y1')])
+        self.marker._sizes = [self.get_data_position(u'size')]
 
     def plot(self):
         if self.ax is None:
             raise AttributeError(
-                "To use this method the marker needs to be first add to a " +
-                "figure using `s._plot.signal_plot.add_marker(m)` or " +
-                "`s._plot.navigator_plot.add_marker(m)`")
-        self.marker = self.ax.scatter(self.get_data_position('x1'),
-                                      self.get_data_position('y1'),
+                u"To use this method the marker needs to be first add to a " +
+                u"figure using `s._plot.signal_plot.add_marker(m)` or " +
+                u"`s._plot.navigator_plot.add_marker(m)`")
+        self.marker = self.ax.scatter(self.get_data_position(u'x1'),
+                                      self.get_data_position(u'y1'),
                                       **self.marker_properties)
-        self.marker._sizes = [self.get_data_position('size')]
+        self.marker._sizes = [self.get_data_position(u'size')]
         self.marker.set_animated(True)
         try:
             self.ax.hspy_fig._draw_animated()

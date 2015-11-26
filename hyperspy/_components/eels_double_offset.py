@@ -24,13 +24,13 @@ from hyperspy.component import Component
 
 class DoubleOffset(Component):
 
-    """
+    u"""
     Given an array of the same shape as Spectrum energy_axis, returns it as
     a component that can be added to a model.
     """
 
     def __init__(self):
-        Component.__init__(self, ('offset', 'step'))
+        Component.__init__(self, (u'offset', u'step'))
         self.isbackground = True
         self.convolved = False
 

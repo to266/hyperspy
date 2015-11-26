@@ -18,6 +18,7 @@
 
 
 
+from __future__ import division
 import matplotlib.pyplot as plt
 import matplotlib.widgets
 import matplotlib.transforms as transforms
@@ -30,18 +31,18 @@ from hyperspy.misc.math_tools import closest_nice_number
 
 class DraggablePatch(object):
 
-    """
+    u"""
     """
 
     def __init__(self, axes_manager=None):
-        """
+        u"""
         Add a cursor to ax.
         """
         self.axes_manager = axes_manager
         self.ax = None
         self.picked = False
         self.size = 1.
-        self.color = 'red'
+        self.color = u'red'
         self.__is_on = True
         self.patch = None
         self.cids = list()
@@ -80,7 +81,7 @@ class DraggablePatch(object):
     def _add_patch_to(self, ax):
         self._set_patch()
         ax.add_artist(self.patch)
-        self.patch.set_animated(hasattr(ax, 'hspy_fig'))
+        self.patch.set_animated(hasattr(ax, u'hspy_fig'))
 
     def set_mpl_ax(self, ax):
         self.ax = ax
@@ -93,10 +94,10 @@ class DraggablePatch(object):
     def connect(self, ax):
         canvas = ax.figure.canvas
         self.cids.append(
-            canvas.mpl_connect('motion_notify_event', self._onmousemove))
-        self.cids.append(canvas.mpl_connect('pick_event', self.onpick))
+            canvas.mpl_connect(u'motion_notify_event', self._onmousemove))
+        self.cids.append(canvas.mpl_connect(u'pick_event', self.onpick))
         self.cids.append(canvas.mpl_connect(
-            'button_release_event', self.button_release))
+            u'button_release_event', self.button_release))
         self.axes_manager.connect(self._update_patch_position)
         on_figure_window_close(ax.figure, self.close)
 
@@ -115,22 +116,22 @@ class DraggablePatch(object):
         self.picked = (event.artist is self.patch)
 
     def _onmousemove(self, event):
-        """This method must be provided by the subclass"""
+        u"""This method must be provided by the subclass"""
         pass
 
     def _update_patch_position(self):
-        """This method must be provided by the subclass"""
+        u"""This method must be provided by the subclass"""
         pass
 
     def button_release(self, event):
-        """whenever a mouse button is released"""
+        u"""whenever a mouse button is released"""
         if event.button != 1:
             return
         if self.picked is True:
             self.picked = False
 
     def draw_patch(self, *args):
-        if hasattr(self.ax, 'hspy_fig'):
+        if hasattr(self.ax, u'hspy_fig'):
             self.ax.hspy_fig._draw_animated()
         else:
             self.ax.figure.canvas.draw_idle()
@@ -154,19 +155,19 @@ class ResizebleDraggablePatch(DraggablePatch):
             self.set_size(self.size - 1)
 
     def _update_patch_size(self):
-        """This method must be provided by the subclass"""
+        u"""This method must be provided by the subclass"""
         pass
 
     def on_key_press(self, event):
-        if event.key == "+":
+        if event.key == u"+":
             self.increase_size()
-        if event.key == "-":
+        if event.key == u"-":
             self.decrease_size()
 
     def connect(self, ax):
         DraggablePatch.connect(self, ax)
         canvas = ax.figure.canvas
-        self.cids.append(canvas.mpl_connect('key_press_event',
+        self.cids.append(canvas.mpl_connect(u'key_press_event',
                                             self.on_key_press))
 
 
@@ -209,7 +210,7 @@ class DraggableSquare(ResizebleDraggablePatch):
         self.draw_patch()
 
     def _onmousemove(self, event):
-        """on mouse motion draw the cursor if picked"""
+        u"""on mouse motion draw the cursor if picked"""
         if self.picked is True and event.inaxes:
             xaxis = self.axes_manager.navigation_axes[0]
             yaxis = self.axes_manager.navigation_axes[1]
@@ -252,7 +253,7 @@ class DraggableHorizontalLine(DraggablePatch):
             picker=5)
 
     def _onmousemove(self, event):
-        """on mouse motion draw the cursor if picked"""
+        u"""on mouse motion draw the cursor if picked"""
         if self.picked is True and event.inaxes:
             try:
                 self.axes_manager.navigation_axes[0].value = event.ydata
@@ -278,7 +279,7 @@ class DraggableVerticalLine(DraggablePatch):
                                 picker=5)
 
     def _onmousemove(self, event):
-        """on mouse motion draw the cursor if picked"""
+        u"""on mouse motion draw the cursor if picked"""
         if self.picked is True and event.inaxes:
             try:
                 self.axes_manager.navigation_axes[0].value = event.xdata
@@ -291,9 +292,9 @@ class DraggableLabel(DraggablePatch):
 
     def __init__(self, axes_manager):
         DraggablePatch.__init__(self, axes_manager)
-        self.string = ''
+        self.string = u''
         self.y = 0.9
-        self.text_color = 'black'
+        self.text_color = u'black'
         self.bbox = None
 
     def _update_patch_position(self):
@@ -312,17 +313,17 @@ class DraggableLabel(DraggablePatch):
             color=self.text_color,
             picker=5,
             transform=trans,
-            horizontalalignment='right',
+            horizontalalignment=u'right',
             bbox=self.bbox,
             animated=self.blit)
 
 
-class Scale_Bar:
+class Scale_Bar(object):
 
-    def __init__(self, ax, units, pixel_size=None, color='white',
+    def __init__(self, ax, units, pixel_size=None, color=u'white',
                  position=None, max_size_ratio=0.25, lw=2, length=None,
                  animated=False):
-        """Add a scale bar to an image.
+        u"""Add a scale bar to an image.
 
         Parameteres
         -----------
@@ -369,14 +370,14 @@ class Scale_Bar:
 
     def get_units_string(self):
         if self.tex_bold is True:
-            if (self.units[0] and self.units[-1]) == '$':
-                return r'$\mathbf{%g\,%s}$' % \
+            if (self.units[0] and self.units[-1]) == u'$':
+                return ur'$\mathbf{%g\,%s}$' % \
                     (self.length, self.units[1:-1])
             else:
-                return r'$\mathbf{%g\,}$\textbf{%s}' % \
+                return ur'$\mathbf{%g\,}$\textbf{%s}' % \
                     (self.length, self.units)
         else:
-            return r'$%g\,$%s' % (self.length, self.units)
+            return ur'$%g\,$%s' % (self.length, self.units)
 
     def calculate_line_position(self, pad=0.05):
         return ((1 - pad) * self.xmin + pad * self.xmax,
@@ -408,13 +409,13 @@ class Scale_Bar:
         x1, y1 = self.position
         x2, y2 = x1 + self.length / ps, y1
         self.line, = self.ax.plot([x1, x2], [y1, y2],
-                                  linestyle='-',
+                                  linestyle=u'-',
                                   lw=line_width,
                                   animated=self.animated)
         self.text = self.ax.text(*self.text_position,
                                  s=self.get_units_string(),
-                                 ha='center',
-                                 size='medium',
+                                 ha=u'center',
+                                 size=u'medium',
                                  animated=self.animated)
         self.ax.set_xlim(self.xmin, self.xmax)
         self.ax.set_ylim(self.ymin, self.ymax)
@@ -454,9 +455,9 @@ def in_interval(number, interval):
 class ModifiableSpanSelector(matplotlib.widgets.SpanSelector):
 
     def __init__(self, ax, **kwargs):
-        onsel = kwargs.pop('onselect', self.dummy)
+        onsel = kwargs.pop(u'onselect', self.dummy)
         matplotlib.widgets.SpanSelector.__init__(
-            self, ax, onsel, direction='horizontal', useblit=False, **kwargs)
+            self, ax, onsel, direction=u'horizontal', useblit=False, **kwargs)
         # The tolerance in points to pick the rectangle sizes
         self.tolerance = 1
         self.on_move_cid = None
@@ -466,7 +467,7 @@ class ModifiableSpanSelector(matplotlib.widgets.SpanSelector):
         pass
 
     def release(self, event):
-        """When the button is realeased, the span stays in the screen and the
+        u"""When the button is realeased, the span stays in the screen and the
         iteractivity machinery passes to modify mode"""
         if self.pressv is None or (self.ignore(event) and not self.buttonDown):
             return
@@ -479,13 +480,13 @@ class ModifiableSpanSelector(matplotlib.widgets.SpanSelector):
 
         # And connect to the new ones
         self.cids.append(
-            self.canvas.mpl_connect('button_press_event', self.mm_on_press))
+            self.canvas.mpl_connect(u'button_press_event', self.mm_on_press))
         self.cids.append(
             self.canvas.mpl_connect(
-                'button_release_event',
+                u'button_release_event',
                 self.mm_on_release))
         self.cids.append(
-            self.canvas.mpl_connect('draw_event', self.update_background))
+            self.canvas.mpl_connect(u'draw_event', self.update_background))
 
     def mm_on_press(self, event):
         if self.ignore(event) and not self.buttonDown:
@@ -506,16 +507,16 @@ class ModifiableSpanSelector(matplotlib.widgets.SpanSelector):
 
         if in_interval(event.xdata, left_region) is True:
             self.on_move_cid = \
-                self.canvas.mpl_connect('motion_notify_event',
+                self.canvas.mpl_connect(u'motion_notify_event',
                                         self.move_left)
         elif in_interval(event.xdata, right_region):
             self.on_move_cid = \
-                self.canvas.mpl_connect('motion_notify_event',
+                self.canvas.mpl_connect(u'motion_notify_event',
                                         self.move_right)
         elif in_interval(event.xdata, middle_region):
             self.pressv = event.xdata
             self.on_move_cid = \
-                self.canvas.mpl_connect('motion_notify_event',
+                self.canvas.mpl_connect(u'motion_notify_event',
                                         self.move_rect)
         else:
             return

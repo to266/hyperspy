@@ -21,6 +21,7 @@
 #  and
 #  http://www.nist.gov/lispix/doc/image-file-formats/raw-file-format.htm
 
+from __future__ import with_statement
 import codecs
 import os.path
 from io import StringIO
@@ -33,98 +34,98 @@ from hyperspy.misc.utils import DictionaryTreeBrowser
 
 # Plugin characteristics
 # ----------------------
-format_name = 'Ripple'
-description = 'RPL file contains the information on how to read\n'
-description += 'the RAW file with the same name.'
-description += '\nThis format may not provide information on the calibration.'
-description += '\nIf so, you should add that after loading the file.'
+format_name = u'Ripple'
+description = u'RPL file contains the information on how to read\n'
+description += u'the RAW file with the same name.'
+description += u'\nThis format may not provide information on the calibration.'
+description += u'\nIf so, you should add that after loading the file.'
 full_support = False  # but maybe True
 # Recognised file extension
-file_extensions = ['rpl', 'RPL']
+file_extensions = [u'rpl', u'RPL']
 default_extension = 0
 # Writing capabilities
 writes = [(1, 0), (1, 1), (1, 2), (2, 0), (2, 1), ]
 # ----------------------
 
 # The format only support the followng data types
-newline = ('\n', '\r\n')
-comment = ';'
-sep = '\t'
+newline = (u'\n', u'\r\n')
+comment = u';'
+sep = u'\t'
 
 dtype2keys = {
-    'float64': ('float', 8),
-    'float32': ('float', 4),
-    'uint8': ('unsigned', 1),
-    'uint16': ('unsigned', 2),
-    'int32': ('signed', 4),
-    'int64': ('signed', 8), }
+    u'float64': (u'float', 8),
+    u'float32': (u'float', 4),
+    u'uint8': (u'unsigned', 1),
+    u'uint16': (u'unsigned', 2),
+    u'int32': (u'signed', 4),
+    u'int64': (u'signed', 8), }
 
 endianess2rpl = {
-    '=': 'dont-care',
-    '<': 'little-endian',
-    '>': 'big-endian'}
+    u'=': u'dont-care',
+    u'<': u'little-endian',
+    u'>': u'big-endian'}
 
 rpl_keys = {
     # spectrum/image keys
-    'width': int,
-    'height': int,
-    'depth': int,
-    'offset': int,
-    'data-length': ['1', '2', '4', '8'],
-    'data-type': ['signed', 'unsigned', 'float'],
-    'byte-order': ['little-endian', 'big-endian', 'dont-care'],
-    'record-by': ['image', 'vector', 'dont-care'],
+    u'width': int,
+    u'height': int,
+    u'depth': int,
+    u'offset': int,
+    u'data-length': [u'1', u'2', u'4', u'8'],
+    u'data-type': [u'signed', u'unsigned', u'float'],
+    u'byte-order': [u'little-endian', u'big-endian', u'dont-care'],
+    u'record-by': [u'image', u'vector', u'dont-care'],
     # X-ray keys
-    'ev-per-chan': float,    # usually 5 or 10 eV
-    'detector-peak-width-ev': float,  # usually 150 eV
+    u'ev-per-chan': float,    # usually 5 or 10 eV
+    u'detector-peak-width-ev': float,  # usually 150 eV
     # HyperSpy-specific keys
-    'depth-origin': float,
-    'depth-scale': float,
-    'depth-units': str,
-    'width-origin': float,
-    'width-scale': float,
-    'width-units': str,
-    'height-origin': float,
-    'height-scale': float,
-    'height-units': str,
-    'signal': str,
+    u'depth-origin': float,
+    u'depth-scale': float,
+    u'depth-units': unicode,
+    u'width-origin': float,
+    u'width-scale': float,
+    u'width-units': unicode,
+    u'height-origin': float,
+    u'height-scale': float,
+    u'height-units': unicode,
+    u'signal': unicode,
     # EELS HyperSpy keys
-    'collection-angle': float,
+    u'collection-angle': float,
     # TEM Hyperespy keys
-    'convergence-angle': float,
-    'beam-energy': float,
+    u'convergence-angle': float,
+    u'beam-energy': float,
     # EDS Hyperespy keys
-    'elevation-angle': float,
-    'azimuth-angle': float,
-    'live-time': float,
-    'energy-resolution': float,
-    'tilt-stage': float,
+    u'elevation-angle': float,
+    u'azimuth-angle': float,
+    u'live-time': float,
+    u'energy-resolution': float,
+    u'tilt-stage': float,
 }
 
 
 def correct_INCA_format(fp):
     fp_list = list()
     fp.seek(0)
-    if '(' in fp.readline():
+    if u'(' in fp.readline():
         for line in fp:
             line = line.replace(
-                "(MLX::",
-                "").replace(
-                " : ",
-                "\t").replace(
-                " :",
-                "\t").replace(
-                " ",
-                "\t").lower().strip().replace(
-                ")",
-                "\n")
-            if "record-by" in line:
-                if "image" in line:
-                    line = "record-by\timage"
-                if "vector" in line:
-                    line = "record-by\tvector"
-                if "dont-care" in line:
-                    line = "record-by\tdont-care"
+                u"(MLX::",
+                u"").replace(
+                u" : ",
+                u"\t").replace(
+                u" :",
+                u"\t").replace(
+                u" ",
+                u"\t").lower().strip().replace(
+                u")",
+                u"\n")
+            if u"record-by" in line:
+                if u"image" in line:
+                    line = u"record-by\timage"
+                if u"vector" in line:
+                    line = u"record-by\tvector"
+                if u"dont-care" in line:
+                    line = u"record-by\tdont-care"
             fp_list.append(line)
         fp = StringIO()
         fp.writelines(fp_list)
@@ -133,7 +134,7 @@ def correct_INCA_format(fp):
 
 
 def parse_ripple(fp):
-    """Parse information from ripple (.rpl) file.
+    u"""Parse information from ripple (.rpl) file.
     Accepts file object 'fp. Returns dictionary rpl_info.
     """
 
@@ -141,27 +142,27 @@ def parse_ripple(fp):
 
     rpl_info = {}
     for line in fp.readlines():
-        line = line.replace(' ', '')
+        line = line.replace(u' ', u'')
         # correct_brucker_format
-        line = line.replace('data-Length', 'data-length')
+        line = line.replace(u'data-Length', u'data-length')
         if line[:2] not in newline and line[0] != comment:
-            line = line.strip('\r\n')
+            line = line.strip(u'\r\n')
             if comment in line:
                 line = line[:line.find(comment)]
             if sep not in line:
-                err = 'Separator in line "%s" is wrong, ' % line
-                err += 'it should be a <TAB> ("\\t")'
+                err = u'Separator in line "%s" is wrong, ' % line
+                err += u'it should be a <TAB> ("\\t")'
                 raise IOError(err)
             line = line.split(sep)  # now it's a list
             if (line[0] in rpl_keys) is True:
                 # is rpl_keys[line[0]] an iterable?
-                if hasattr(rpl_keys[line[0]], '__iter__'):
+                if hasattr(rpl_keys[line[0]], u'__iter__'):
                     if line[1] not in rpl_keys[line[0]]:
                         err = \
-                            'Wrong value for key %s.\n' \
-                            'Value read is %s'  \
-                            ' but it should be one of %s' % \
-                            (line[0], line[1], str(rpl_keys[line[0]]))
+                            u'Wrong value for key %s.\n' \
+                            u'Value read is %s'  \
+                            u' but it should be one of %s' % \
+                            (line[0], line[1], unicode(rpl_keys[line[0]]))
                         raise IOError(err)
                 else:
                     # rpl_keys[line[0]] must then be a type
@@ -169,28 +170,28 @@ def parse_ripple(fp):
 
             rpl_info[line[0]] = line[1]
 
-    if rpl_info['depth'] == 1 and rpl_info['record-by'] != 'dont-care':
-        err = '"depth" and "record-by" keys mismatch.\n'
-        err += '"depth" cannot be "1" if "record-by" is "dont-care" '
-        err += 'and vice versa.'
-        err += 'Check %s' % fp.name
+    if rpl_info[u'depth'] == 1 and rpl_info[u'record-by'] != u'dont-care':
+        err = u'"depth" and "record-by" keys mismatch.\n'
+        err += u'"depth" cannot be "1" if "record-by" is "dont-care" '
+        err += u'and vice versa.'
+        err += u'Check %s' % fp.name
         raise IOError(err)
-    if rpl_info['data-type'] == 'float' and int(rpl_info['data-length']) < 4:
-        err = '"data-length" for float "data-type" must be "4" or "8".\n'
-        err += 'Check %s' % fp.name
+    if rpl_info[u'data-type'] == u'float' and int(rpl_info[u'data-length']) < 4:
+        err = u'"data-length" for float "data-type" must be "4" or "8".\n'
+        err += u'Check %s' % fp.name
         raise IOError(err)
-    if (rpl_info['data-length'] == '1' and
-            rpl_info['byte-order'] != 'dont-care'):
-        err = '"data-length" and "byte-order" mismatch.\n'
-        err += '"data-length" cannot be "1" if "byte-order" is not "dont-care"'
-        err += ' and vice versa.'
-        err += 'Check %s' % fp.name
+    if (rpl_info[u'data-length'] == u'1' and
+            rpl_info[u'byte-order'] != u'dont-care'):
+        err = u'"data-length" and "byte-order" mismatch.\n'
+        err += u'"data-length" cannot be "1" if "byte-order" is not "dont-care"'
+        err += u' and vice versa.'
+        err += u'Check %s' % fp.name
         raise IOError(err)
     return rpl_info
 
 
-def read_raw(rpl_info, fp, mmap_mode='c'):
-    """Read the raw file object 'fp' based on the information given in the
+def read_raw(rpl_info, fp, mmap_mode=u'c'):
+    u"""Read the raw file object 'fp' based on the information given in the
     'rpl_info' dictionary.
 
     Parameters
@@ -210,32 +211,32 @@ def read_raw(rpl_info, fp, mmap_mode='c'):
 
 
     """
-    width = rpl_info['width']
-    height = rpl_info['height']
-    depth = rpl_info['depth']
-    offset = rpl_info['offset']
-    data_length = rpl_info['data-length']
-    data_type = rpl_info['data-type']
-    endian = rpl_info['byte-order']
-    record_by = rpl_info['record-by']
+    width = rpl_info[u'width']
+    height = rpl_info[u'height']
+    depth = rpl_info[u'depth']
+    offset = rpl_info[u'offset']
+    data_length = rpl_info[u'data-length']
+    data_type = rpl_info[u'data-type']
+    endian = rpl_info[u'byte-order']
+    record_by = rpl_info[u'record-by']
 
-    if data_type == 'signed':
-        data_type = 'int'
-    elif data_type == 'unsigned':
-        data_type = 'uint'
-    elif data_type == 'float':
+    if data_type == u'signed':
+        data_type = u'int'
+    elif data_type == u'unsigned':
+        data_type = u'uint'
+    elif data_type == u'float':
         pass
     else:
-        raise TypeError('Unknown "data-type" string.')
+        raise TypeError(u'Unknown "data-type" string.')
 
-    if endian == 'big-endian':
-        endian = '>'
-    elif endian == 'little-endian':
-        endian = '<'
+    if endian == u'big-endian':
+        endian = u'>'
+    elif endian == u'little-endian':
+        endian = u'<'
     else:
-        endian = '='
+        endian = u'='
 
-    data_type += str(int(data_length) * 8)
+    data_type += unicode(int(data_length) * 8)
     data_type = np.dtype(data_type)
     data_type = data_type.newbyteorder(endian)
 
@@ -244,21 +245,21 @@ def read_raw(rpl_info, fp, mmap_mode='c'):
                      dtype=data_type,
                      mode=mmap_mode)
 
-    if record_by == 'vector':   # spectral image
+    if record_by == u'vector':   # spectral image
         size = (height, width, depth)
         data = data.reshape(size)
-    elif record_by == 'image':  # stack of images
+    elif record_by == u'image':  # stack of images
         size = (depth, height, width)
         data = data.reshape(size)
-    elif record_by == 'dont-care':  # stack of images
+    elif record_by == u'dont-care':  # stack of images
         size = (height, width)
         data = data.reshape(size)
     return data
 
 
-def file_reader(filename, rpl_info=None, encoding="latin-1",
-                mmap_mode='c', *args, **kwds):
-    """Parses a Lispix (http://www.nist.gov/lispix/) ripple (.rpl) file
+def file_reader(filename, rpl_info=None, encoding=u"latin-1",
+                mmap_mode=u'c', *args, **kwds):
+    u"""Parses a Lispix (http://www.nist.gov/lispix/) ripple (.rpl) file
     and reads the data from the corresponding raw (.raw) file;
     or, read a raw file if the dictionary rpl_info is provided.
 
@@ -361,152 +362,152 @@ def file_reader(filename, rpl_info=None, encoding="latin-1",
     if not rpl_info:
         if filename[-3:] in file_extensions:
             with codecs.open(filename, encoding=encoding,
-                             errors='replace') as f:
+                             errors=u'replace') as f:
                 rpl_info = parse_ripple(f)
         else:
-            raise IOError('File has wrong extension: "%s"' % filename[-3:])
-    for ext in ['raw', 'RAW']:
+            raise IOError(u'File has wrong extension: "%s"' % filename[-3:])
+    for ext in [u'raw', u'RAW']:
         rawfname = filename[:-3] + ext
         if os.path.exists(rawfname):
             break
         else:
-            rawfname = ''
+            rawfname = u''
     if not rawfname:
-        raise IOError('RAW file "%s" does not exists' % rawfname)
+        raise IOError(u'RAW file "%s" does not exists' % rawfname)
     else:
         data = read_raw(rpl_info, rawfname, mmap_mode=mmap_mode)
 
-    if rpl_info['record-by'] == 'vector':
-        print('Loading as spectrum')
-        record_by = 'spectrum'
-    elif rpl_info['record-by'] == 'image':
-        print('Loading as Image')
-        record_by = 'image'
+    if rpl_info[u'record-by'] == u'vector':
+        print u'Loading as spectrum'
+        record_by = u'spectrum'
+    elif rpl_info[u'record-by'] == u'image':
+        print u'Loading as Image'
+        record_by = u'image'
     else:
         if len(data.shape) == 1:
-            print('Loading as spectrum')
-            record_by = 'spectrum'
+            print u'Loading as spectrum'
+            record_by = u'spectrum'
         else:
-            print('Loading as image')
-            record_by = 'image'
+            print u'Loading as image'
+            record_by = u'image'
 
-    if rpl_info['record-by'] == 'vector':
+    if rpl_info[u'record-by'] == u'vector':
         idepth, iheight, iwidth = 2, 0, 1
-        names = ['height', 'width', 'depth', ]
+        names = [u'height', u'width', u'depth', ]
     else:
         idepth, iheight, iwidth = 0, 1, 2
-        names = ['depth', 'height', 'width']
+        names = [u'depth', u'height', u'width']
 
     scales = [1, 1, 1]
     origins = [0, 0, 0]
-    units = ['', '', '']
-    sizes = [rpl_info[names[i]] for i in range(3)]
+    units = [u'', u'', u'']
+    sizes = [rpl_info[names[i]] for i in xrange(3)]
 
-    if 'signal' not in rpl_info:
-        rpl_info['signal'] = ""
+    if u'signal' not in rpl_info:
+        rpl_info[u'signal'] = u""
 
-    if 'detector-peak-width-ev' in rpl_info:
-        original_metadata['detector-peak-width-ev'] = \
-            rpl_info['detector-peak-width-ev']
+    if u'detector-peak-width-ev' in rpl_info:
+        original_metadata[u'detector-peak-width-ev'] = \
+            rpl_info[u'detector-peak-width-ev']
 
-    if 'depth-scale' in rpl_info:
-        scales[idepth] = rpl_info['depth-scale']
+    if u'depth-scale' in rpl_info:
+        scales[idepth] = rpl_info[u'depth-scale']
     # ev-per-chan is the only calibration supported by the original ripple
     # format
-    elif 'ev-per-chan' in rpl_info:
-        scales[idepth] = rpl_info['ev-per-chan']
+    elif u'ev-per-chan' in rpl_info:
+        scales[idepth] = rpl_info[u'ev-per-chan']
 
-    if 'depth-origin' in rpl_info:
-        origins[idepth] = rpl_info['depth-origin']
+    if u'depth-origin' in rpl_info:
+        origins[idepth] = rpl_info[u'depth-origin']
 
-    if 'depth-units' in rpl_info:
-        units[idepth] = rpl_info['depth-units']
+    if u'depth-units' in rpl_info:
+        units[idepth] = rpl_info[u'depth-units']
 
-    if 'depth-name' in rpl_info:
-        names[idepth] = rpl_info['depth-name']
+    if u'depth-name' in rpl_info:
+        names[idepth] = rpl_info[u'depth-name']
 
-    if 'width-origin' in rpl_info:
-        origins[iwidth] = rpl_info['width-origin']
+    if u'width-origin' in rpl_info:
+        origins[iwidth] = rpl_info[u'width-origin']
 
-    if 'width-scale' in rpl_info:
-        scales[iwidth] = rpl_info['width-scale']
+    if u'width-scale' in rpl_info:
+        scales[iwidth] = rpl_info[u'width-scale']
 
-    if 'width-units' in rpl_info:
-        units[iwidth] = rpl_info['width-units']
+    if u'width-units' in rpl_info:
+        units[iwidth] = rpl_info[u'width-units']
 
-    if 'width-name' in rpl_info:
-        names[iwidth] = rpl_info['width-name']
+    if u'width-name' in rpl_info:
+        names[iwidth] = rpl_info[u'width-name']
 
-    if 'height-origin' in rpl_info:
-        origins[iheight] = rpl_info['height-origin']
+    if u'height-origin' in rpl_info:
+        origins[iheight] = rpl_info[u'height-origin']
 
-    if 'height-scale' in rpl_info:
-        scales[iheight] = rpl_info['height-scale']
+    if u'height-scale' in rpl_info:
+        scales[iheight] = rpl_info[u'height-scale']
 
-    if 'height-units' in rpl_info:
-        units[iheight] = rpl_info['height-units']
+    if u'height-units' in rpl_info:
+        units[iheight] = rpl_info[u'height-units']
 
-    if 'height-name' in rpl_info:
-        names[iheight] = rpl_info['height-name']
+    if u'height-name' in rpl_info:
+        names[iheight] = rpl_info[u'height-name']
 
     mp = DictionaryTreeBrowser({
 
-        'General': {'original_filename': os.path.split(filename)[1]},
-        "Signal": {'signal_type': rpl_info['signal'],
-                   'record_by': record_by, },
+        u'General': {u'original_filename': os.path.split(filename)[1]},
+        u"Signal": {u'signal_type': rpl_info[u'signal'],
+                   u'record_by': record_by, },
     })
 
-    if 'convergence-angle' in rpl_info:
-        mp.set_item('Acquisition_instrument.TEM.convergence_angle',
-                    rpl_info['convergence-angle'])
-    if 'tilt-stage' in rpl_info:
-        mp.set_item('Acquisition_instrument.TEM.tilt_stage',
-                    rpl_info['tilt-stage'])
-    if 'collection-angle' in rpl_info:
-        mp.set_item('Acquisition_instrument.TEM.Detector.EELS.' +
-                    'collection_angle',
-                    rpl_info['collection-angle'])
-    if 'beam-energy' in rpl_info:
-        mp.set_item('Acquisition_instrument.TEM.beam_energy',
-                    rpl_info['beam-energy'])
-    if 'elevation-angle' in rpl_info:
-        mp.set_item('Acquisition_instrument.TEM.Detector.EDS.elevation_angle',
-                    rpl_info['elevation-angle'])
-    if 'azimuth-angle' in rpl_info:
-        mp.set_item('Acquisition_instrument.TEM.Detector.EDS.azimuth_angle',
-                    rpl_info['azimuth-angle'])
-    if 'energy-resolution' in rpl_info:
-        mp.set_item('Acquisition_instrument.TEM.Detector.EDS.' +
-                    'energy_resolution_MnKa',
-                    rpl_info['energy-resolution'])
-    if 'live-time' in rpl_info:
-        mp.set_item('Acquisition_instrument.TEM.Detector.EDS.live_time',
-                    rpl_info['live-time'])
+    if u'convergence-angle' in rpl_info:
+        mp.set_item(u'Acquisition_instrument.TEM.convergence_angle',
+                    rpl_info[u'convergence-angle'])
+    if u'tilt-stage' in rpl_info:
+        mp.set_item(u'Acquisition_instrument.TEM.tilt_stage',
+                    rpl_info[u'tilt-stage'])
+    if u'collection-angle' in rpl_info:
+        mp.set_item(u'Acquisition_instrument.TEM.Detector.EELS.' +
+                    u'collection_angle',
+                    rpl_info[u'collection-angle'])
+    if u'beam-energy' in rpl_info:
+        mp.set_item(u'Acquisition_instrument.TEM.beam_energy',
+                    rpl_info[u'beam-energy'])
+    if u'elevation-angle' in rpl_info:
+        mp.set_item(u'Acquisition_instrument.TEM.Detector.EDS.elevation_angle',
+                    rpl_info[u'elevation-angle'])
+    if u'azimuth-angle' in rpl_info:
+        mp.set_item(u'Acquisition_instrument.TEM.Detector.EDS.azimuth_angle',
+                    rpl_info[u'azimuth-angle'])
+    if u'energy-resolution' in rpl_info:
+        mp.set_item(u'Acquisition_instrument.TEM.Detector.EDS.' +
+                    u'energy_resolution_MnKa',
+                    rpl_info[u'energy-resolution'])
+    if u'live-time' in rpl_info:
+        mp.set_item(u'Acquisition_instrument.TEM.Detector.EDS.live_time',
+                    rpl_info[u'live-time'])
 
     axes = []
     index_in_array = 0
-    for i in range(3):
+    for i in xrange(3):
         if sizes[i] > 1:
             axes.append({
-                'size': sizes[i],
-                'index_in_array': index_in_array,
-                'name': names[i],
-                'scale': scales[i],
-                'offset': origins[i],
-                'units': units[i],
+                u'size': sizes[i],
+                u'index_in_array': index_in_array,
+                u'name': names[i],
+                u'scale': scales[i],
+                u'offset': origins[i],
+                u'units': units[i],
             })
             index_in_array += 1
 
     dictionary = {
-        'data': data.squeeze(),
-        'axes': axes,
-        'metadata': mp.as_dictionary(),
-        'original_metadata': rpl_info
+        u'data': data.squeeze(),
+        u'axes': axes,
+        u'metadata': mp.as_dictionary(),
+        u'original_metadata': rpl_info
     }
     return [dictionary, ]
 
 
-def file_writer(filename, signal, encoding='latin-1', *args, **kwds):
+def file_writer(filename, signal, encoding=u'latin-1', *args, **kwds):
 
     # Set the optional keys to None
     ev_per_chan = None
@@ -515,26 +516,26 @@ def file_writer(filename, signal, encoding='latin-1', *args, **kwds):
     dc = signal.data
     dtype_name = signal.data.dtype.name
     if dtype_name not in dtype2keys.keys():
-        err = 'The ripple format does not support writting data of %s type' % (
+        err = u'The ripple format does not support writting data of %s type' % (
             dtype_name)
         raise IOError(err)
     # Check if the dimensions are supported
     dimension = len(signal.data.shape)
     if dimension > 3:
-        err = 'This file format does not support %i dimension data' % (
+        err = u'This file format does not support %i dimension data' % (
             dimension)
         raise IOError(err)
 
     # Gather the information to write the rpl
     data_type, data_length = dtype2keys[dc.dtype.name]
-    byte_order = endianess2rpl[dc.dtype.byteorder.replace('|', '=')]
+    byte_order = endianess2rpl[dc.dtype.byteorder.replace(u'|', u'=')]
     offset = 0
-    if signal.metadata.has_item("Signal.signal_type"):
+    if signal.metadata.has_item(u"Signal.signal_type"):
         signal_type = signal.metadata.Signal.signal_type
     else:
-        signal_type = ""
+        signal_type = u""
     if signal.axes_manager.signal_dimension == 1:
-        record_by = 'vector'
+        record_by = u'vector'
         depth_axis = signal.axes_manager.signal_axes[0]
         ev_per_chan = int(round(depth_axis.scale))
         if dimension == 3:
@@ -546,7 +547,7 @@ def file_writer(filename, signal, encoding='latin-1', *args, **kwds):
             width_axis = signal.axes_manager.navigation_axes[0]
             depth, width, height = depth_axis.size, width_axis.size, 1
         elif dimension == 1:
-            record_by == 'dont-care'
+            record_by == u'dont-care'
             depth, width, height = depth_axis.size, 1, 1
 
     elif signal.axes_manager.signal_dimension == 2:
@@ -554,92 +555,92 @@ def file_writer(filename, signal, encoding='latin-1', *args, **kwds):
         height_axis = signal.axes_manager.signal_axes[1]
         if dimension == 3:
             depth_axis = signal.axes_manager.navigation_axes[0]
-            record_by = 'image'
+            record_by = u'image'
             depth, width, height =  \
                 depth_axis.size, width_axis.size, height_axis.size
         elif dimension == 2:
-            record_by = 'dont-care'
+            record_by = u'dont-care'
             width, height, depth = width_axis.size, height_axis.size, 1
         elif dimension == 1:
-            record_by = 'dont-care'
+            record_by = u'dont-care'
             depth, width, height = width_axis.size, 1, 1
     else:
-        print("Only Spectrum and Image objects can be saved")
+        print u"Only Spectrum and Image objects can be saved"
         return
 
     # Fill the keys dictionary
     keys_dictionary = {
-        'width': width,
-        'height': height,
-        'depth': depth,
-        'offset': offset,
-        'data-type': data_type,
-        'data-length': data_length,
-        'byte-order': byte_order,
-        'record-by': record_by,
-        'signal': signal_type
+        u'width': width,
+        u'height': height,
+        u'depth': depth,
+        u'offset': offset,
+        u'data-type': data_type,
+        u'data-length': data_length,
+        u'byte-order': byte_order,
+        u'record-by': record_by,
+        u'signal': signal_type
     }
     if ev_per_chan is not None:
-        keys_dictionary['ev-per-chan'] = ev_per_chan
-    keys = ['depth', 'height', 'width']
+        keys_dictionary[u'ev-per-chan'] = ev_per_chan
+    keys = [u'depth', u'height', u'width']
     for key in keys:
         if eval(key) > 1:
-            keys_dictionary['%s-scale' % key] = eval(
-                '%s_axis.scale' % key)
-            keys_dictionary['%s-origin' % key] = eval(
-                '%s_axis.offset' % key)
-            keys_dictionary['%s-units' % key] = eval(
-                '%s_axis.units' % key)
-            keys_dictionary['%s-name' % key] = eval(
-                '%s_axis.name' % key)
+            keys_dictionary[u'%s-scale' % key] = eval(
+                u'%s_axis.scale' % key)
+            keys_dictionary[u'%s-origin' % key] = eval(
+                u'%s_axis.offset' % key)
+            keys_dictionary[u'%s-units' % key] = eval(
+                u'%s_axis.units' % key)
+            keys_dictionary[u'%s-name' % key] = eval(
+                u'%s_axis.name' % key)
 
-    if "EDS" in signal.metadata.Signal.signal_type:
-        if signal.metadata.Signal.signal_type == "EDS_SEM":
+    if u"EDS" in signal.metadata.Signal.signal_type:
+        if signal.metadata.Signal.signal_type == u"EDS_SEM":
             mp = signal.metadata.Acquisition_instrument.SEM
-        elif signal.metadata.Signal.signal_type == "EDS_TEM":
+        elif signal.metadata.Signal.signal_type == u"EDS_TEM":
             mp = signal.metadata.Acquisition_instrument.TEM
 
-        if mp.has_item('beam_energy'):
-            keys_dictionary['beam-energy'] = mp.beam_energy
-        if mp.has_item('convergence_angle'):
-            keys_dictionary['convergence-angle'] = mp.convergence_angle
-        if mp.has_item('Detector.EELS.collection_angle'):
+        if mp.has_item(u'beam_energy'):
+            keys_dictionary[u'beam-energy'] = mp.beam_energy
+        if mp.has_item(u'convergence_angle'):
+            keys_dictionary[u'convergence-angle'] = mp.convergence_angle
+        if mp.has_item(u'Detector.EELS.collection_angle'):
             keys_dictionary[
-                'collection-angle'] = mp.Detector.EELS.collection_angle
+                u'collection-angle'] = mp.Detector.EELS.collection_angle
 
-        if mp.has_item('Detector.EDS.elevation_angle'):
+        if mp.has_item(u'Detector.EDS.elevation_angle'):
             keys_dictionary[
-                'elevation-angle'] = mp.Detector.EDS.elevation_angle
-        if mp.has_item('tilt_stage'):
-            keys_dictionary['tilt-stage'] = mp.tilt_stage
-        if mp.has_item('Detector.EDS.azimuth_angle'):
-            keys_dictionary['azimuth-angle'] = mp.Detector.EDS.azimuth_angle
-        if mp.has_item('Detector.EDS.live_time'):
-            keys_dictionary['live-time'] = mp.Detector.EDS.live_time
-        if mp.has_item('Detector.EDS.energy_resolution_MnKa'):
+                u'elevation-angle'] = mp.Detector.EDS.elevation_angle
+        if mp.has_item(u'tilt_stage'):
+            keys_dictionary[u'tilt-stage'] = mp.tilt_stage
+        if mp.has_item(u'Detector.EDS.azimuth_angle'):
+            keys_dictionary[u'azimuth-angle'] = mp.Detector.EDS.azimuth_angle
+        if mp.has_item(u'Detector.EDS.live_time'):
+            keys_dictionary[u'live-time'] = mp.Detector.EDS.live_time
+        if mp.has_item(u'Detector.EDS.energy_resolution_MnKa'):
             keys_dictionary[
-                'energy-resolution'] = mp.Detector.EDS.energy_resolution_MnKa
+                u'energy-resolution'] = mp.Detector.EDS.energy_resolution_MnKa
 
     write_rpl(filename, keys_dictionary, encoding)
     write_raw(filename, signal, record_by)
 
 
-def write_rpl(filename, keys_dictionary, encoding='ascii'):
-    f = codecs.open(filename, 'w', encoding=encoding,
-                    errors='ignore')
-    f.write(';File created by HyperSpy version %s\n' % Release.version)
-    f.write('key\tvalue\n')
+def write_rpl(filename, keys_dictionary, encoding=u'ascii'):
+    f = codecs.open(filename, u'w', encoding=encoding,
+                    errors=u'ignore')
+    f.write(u';File created by HyperSpy version %s\n' % Release.version)
+    f.write(u'key\tvalue\n')
     # Even if it is not necessary, we sort the keywords when writing
     # to make the rpl file more human friendly
     for key, value in iter(sorted(keys_dictionary.items())):
-        if not isinstance(value, str):
-            value = str(value)
-        f.write(key + '\t' + value + '\n')
+        if not isinstance(value, unicode):
+            value = unicode(value)
+        f.write(key + u'\t' + value + u'\n')
     f.close()
 
 
 def write_raw(filename, signal, record_by):
-    """Writes the raw file object
+    u"""Writes the raw file object
 
     Parameters:
     -----------
@@ -649,24 +650,24 @@ def write_raw(filename, signal, record_by):
      'vector' or 'image'
 
         """
-    filename = os.path.splitext(filename)[0] + '.raw'
+    filename = os.path.splitext(filename)[0] + u'.raw'
     dshape = signal.data.shape
     data = signal.data
     if len(dshape) == 3:
-        if record_by == 'vector':
+        if record_by == u'vector':
             np.rollaxis(
                 data, signal.axes_manager.signal_axes[0].index_in_array, 3
             ).ravel().tofile(filename)
-        elif record_by == 'image':
+        elif record_by == u'image':
             data = np.rollaxis(
                 data, signal.axes_manager.navigation_axes[0].index_in_array, 0
             ).ravel().tofile(filename)
     elif len(dshape) == 2:
-        if record_by == 'vector':
+        if record_by == u'vector':
             np.rollaxis(
                 data, signal.axes_manager.signal_axes[0].index_in_array, 2
             ).ravel().tofile(filename)
-        elif record_by in ('image', 'dont-care'):
+        elif record_by in (u'image', u'dont-care'):
             data.ravel().tofile(filename)
     elif len(dshape) == 1:
         data.ravel().tofile(filename)

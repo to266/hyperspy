@@ -35,14 +35,14 @@ try:
     from hyperspy.io_plugins import hdf5
     io_plugins.append(hdf5)
 except ImportError:
-    messages.warning('The HDF5 IO features are not available. '
-                     'It is highly reccomended to install h5py')
+    messages.warning(u'The HDF5 IO features are not available. '
+                     u'It is highly reccomended to install h5py')
 
 try:
     from hyperspy.io_plugins import image
     io_plugins.append(image)
 except ImportError:
-    messages.information('The Image (PIL) IO features are not available')
+    messages.information(u'The Image (PIL) IO features are not available')
 
 default_write_ext = set()
 for plugin in io_plugins:

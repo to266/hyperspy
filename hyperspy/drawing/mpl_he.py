@@ -23,7 +23,7 @@ from hyperspy.gui.axes import navigation_sliders
 
 class MPL_HyperExplorer(object):
 
-    """
+    u"""
 
     """
 
@@ -31,8 +31,8 @@ class MPL_HyperExplorer(object):
         self.signal_data_function = None
         self.navigator_data_function = None
         self.axes_manager = None
-        self.signal_title = ''
-        self.navigator_title = ''
+        self.signal_title = u''
+        self.navigator_title = u''
         self.signal_plot = None
         self.navigator_plot = None
         self.axis = None
@@ -50,24 +50,24 @@ class MPL_HyperExplorer(object):
             return
         if self.navigator_data_function is None:
             return
-        if self.navigator_data_function is "slider":
+        if self.navigator_data_function is u"slider":
             navigation_sliders(
                 self.axes_manager.navigation_axes,
-                title=self.signal_title + " navigation sliders")
+                title=self.signal_title + u" navigation sliders")
             return
         if self.navigator_plot is not None:
             self.navigator_plot.plot()
             return
         elif len(self.navigator_data_function().shape) == 1:
             # Create the figure
-            sf = spectrum.SpectrumFigure(title=self.signal_title + ' Navigator'
+            sf = spectrum.SpectrumFigure(title=self.signal_title + u' Navigator'
                                          if self.signal_title
-                                         else "")
+                                         else u"")
             axis = self.axes_manager.navigation_axes[0]
-            sf.xlabel = '%s' % str(axis)
+            sf.xlabel = u'%s' % unicode(axis)
             if axis.units is not Undefined:
-                sf.xlabel += ' (%s)' % axis.units
-            sf.ylabel = r'$\Sigma\mathrm{data\,over\,all\,other\,axes}$'
+                sf.xlabel += u' (%s)' % axis.units
+            sf.ylabel = ur'$\Sigma\mathrm{data\,over\,all\,other\,axes}$'
             sf.axis = axis.axis
             sf.axes_manager = self.axes_manager
             self.navigator_plot = sf
@@ -75,8 +75,8 @@ class MPL_HyperExplorer(object):
             # indices
             sl = spectrum.SpectrumLine()
             sl.data_function = self.navigator_data_function
-            sl.set_line_properties(color='blue',
-                                   type='step')
+            sl.set_line_properties(color=u'blue',
+                                   type=u'step')
             # Add the line to the figure
             sf.add_line(sl)
             sf.plot()
@@ -84,7 +84,7 @@ class MPL_HyperExplorer(object):
             if self.axes_manager.navigation_dimension > 1:
                 navigation_sliders(
                     self.axes_manager.navigation_axes,
-                    title=self.signal_title + " navigation sliders")
+                    title=self.signal_title + u" navigation sliders")
                 for axis in self.axes_manager.navigation_axes[:-2]:
                     axis.connect(sf.update)
             self.navigator_plot = sf
@@ -101,11 +101,11 @@ class MPL_HyperExplorer(object):
                 if self.axes_manager.navigation_dimension > 2:
                     navigation_sliders(
                         self.axes_manager.navigation_axes,
-                        title=self.signal_title + " navigation sliders")
+                        title=self.signal_title + u" navigation sliders")
                     for axis in self.axes_manager.navigation_axes[2:]:
                         axis.connect(imf._update)
 
-            imf.title = self.signal_title + ' Navigator'
+            imf.title = self.signal_title + u' Navigator'
             imf.plot()
             self.pointer.set_mpl_ax(imf.ax)
             self.navigator_plot = imf
@@ -122,14 +122,14 @@ class MPL_HyperExplorer(object):
             pointer = self.assign_pointer()
             if pointer is not None:
                 self.pointer = pointer(self.axes_manager)
-                self.pointer.color = 'red'
+                self.pointer.color = u'red'
             self.plot_navigator()
         self.plot_signal(**kwargs)
 
     def assign_pointer(self):
         if self.navigator_data_function is None:
             nav_dim = 0
-        elif self.navigator_data_function is "slider":
+        elif self.navigator_data_function is u"slider":
             nav_dim = 0
         else:
             nav_dim = len(self.navigator_data_function().shape)

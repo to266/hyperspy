@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 
 from hyperspy.component import Component, Parameter
@@ -23,7 +24,7 @@ from hyperspy.component import Component, Parameter
 
 class Bleasdale(Component):
 
-    """Bleasdale function component.
+    u"""Bleasdale function component.
 
     f(x) = (a+b*x)^(-1/c)
 
@@ -37,11 +38,11 @@ class Bleasdale(Component):
 
     def __init__(self):
         # Define the parameters
-        Component.__init__(self, ('a', 'b', 'c'))
+        Component.__init__(self, (u'a', u'b', u'c'))
         # Define the name of the component
 
     def function(self, x):
-        """
+        u"""
         """
         a = self.a.value
         b = self.b.value
@@ -50,7 +51,7 @@ class Bleasdale(Component):
         return np.where(abx > 0., abx ** (-1 / c), 0.)
 
     def grad_a(self, x):
-        """
+        u"""
         Returns d(function)/d(parameter_1)
         """
         a = self.a.value
@@ -60,7 +61,7 @@ class Bleasdale(Component):
         return -(b * x + a) ** (-1. / c - 1.) / c
 
     def grad_b(self, x):
-        """
+        u"""
         Returns d(function)/d(parameter_1)
         """
         a = self.a.value
@@ -70,7 +71,7 @@ class Bleasdale(Component):
         return -(x * (b * x + a) ** (-1 / c - 1)) / c
 
     def grad_c(self, x):
-        """
+        u"""
         Returns d(function)/d(parameter_1)
         """
         a = self.a.value

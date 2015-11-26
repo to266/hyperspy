@@ -1,3 +1,5 @@
+from __future__ import with_statement
+from __future__ import division
 import math
 import numbers
 
@@ -61,11 +63,11 @@ def _estimate_gain(ns, cs,
     if plot_results is True:
         plt.figure()
         plt.scatter(average.squeeze(), variance.squeeze())
-        plt.xlabel('Counts')
-        plt.ylabel('Variance')
-        plt.plot(average2fit, np.polyval(fit, average2fit), color='red')
-    results = {'fit': fit, 'variance': variance.squeeze(),
-               'counts': average.squeeze()}
+        plt.xlabel(u'Counts')
+        plt.ylabel(u'Variance')
+        plt.plot(average2fit, np.polyval(fit, average2fit), color=u'red')
+    results = {u'fit': fit, u'variance': variance.squeeze(),
+               u'counts': average.squeeze()}
 
     return results
 
@@ -86,7 +88,7 @@ def estimate_variance_parameters(
         return_results=False,
         plot_results=True,
         weighted=False):
-    """Find the scale and offset of the Poissonian noise
+    u"""Find the scale and offset of the Poissonian noise
 
     By comparing an SI with its denoised version (i.e. by PCA),
     this plots an
@@ -140,33 +142,33 @@ def estimate_variance_parameters(
             ns, cs, weighted=weighted, higher_than=higher_than,
             plot_results=False, binning=2, pol_order=pol_order)
 
-        c = _estimate_correlation_factor(results0['fit'][0],
-                                         results2['fit'][0], 4)
+        c = _estimate_correlation_factor(results0[u'fit'][0],
+                                         results2[u'fit'][0], 4)
 
-        message = ("Gain factor: %.2f\n" % results0['fit'][0] +
-                   "Gain offset: %.2f\n" % results0['fit'][1] +
-                   "Correlation factor: %.2f\n" % c)
+        message = (u"Gain factor: %.2f\n" % results0[u'fit'][0] +
+                   u"Gain offset: %.2f\n" % results0[u'fit'][1] +
+                   u"Correlation factor: %.2f\n" % c)
         is_ok = True
         if hyperspy.defaults_parser.preferences.General.interactive is True:
             is_ok = messagesui.information(
-                message + "Would you like to store the results?")
+                message + u"Would you like to store the results?")
         else:
-            print(message)
+            print message
         if is_ok:
             noisy_signal.metadata.set_item(
-                "Signal.Noise_properties.Variance_linear_model.gain_factor",
-                results0['fit'][0])
+                u"Signal.Noise_properties.Variance_linear_model.gain_factor",
+                results0[u'fit'][0])
             noisy_signal.metadata.set_item(
-                "Signal.Noise_properties.Variance_linear_model.gain_offset",
-                results0['fit'][1])
+                u"Signal.Noise_properties.Variance_linear_model.gain_offset",
+                results0[u'fit'][1])
             noisy_signal.metadata.set_item(
-                "Signal.Noise_properties.Variance_linear_model."
-                "correlation_factor",
+                u"Signal.Noise_properties.Variance_linear_model."
+                u"correlation_factor",
                 c)
             noisy_signal.metadata.set_item(
-                "Signal.Noise_properties.Variance_linear_model." +
-                "parameters_estimation_method",
-                'HyperSpy')
+                u"Signal.Noise_properties.Variance_linear_model." +
+                u"parameters_estimation_method",
+                u'HyperSpy')
 
     if return_results is True:
         return results0
@@ -193,16 +195,16 @@ def ratio(edge_A, edge_B):
     std_b = edge_B.intensity.std
     ratio = a / b
     ratio_std = ratio * rel_std_of_fraction(a, std_a, b, std_b)
-    print("Ratio %s/%s %1.3f +- %1.3f " % (
+    print u"Ratio %s/%s %1.3f +- %1.3f " % (
         edge_A.name,
         edge_B.name,
         a / b,
-        1.96 * ratio_std))
+        1.96 * ratio_std)
     return ratio, ratio_std
 
 
 def eels_constant(s, zlp, t):
-    """Calculate the constant of proportionality (k) in the relationship
+    u"""Calculate the constant of proportionality (k) in the relationship
     between the EELS signal and the dielectric function.
     dielectric function from a single scattering distribution (SSD) using
     the Kramers-Kronig relations.
@@ -236,22 +238,22 @@ def eels_constant(s, zlp, t):
 
     # Constants and units
     me = constants.value(
-        'electron mass energy equivalent in MeV') * 1e3  # keV
+        u'electron mass energy equivalent in MeV') * 1e3  # keV
 
     # Mapped parameters
     try:
         e0 = s.metadata.Acquisition_instrument.TEM.beam_energy
     except:
-        raise AttributeError("Please define the beam energy."
-                             "You can do this e.g. by using the "
-                             "set_microscope_parameters method")
+        raise AttributeError(u"Please define the beam energy."
+                             u"You can do this e.g. by using the "
+                             u"set_microscope_parameters method")
     try:
         beta = s.metadata.Acquisition_instrument.\
             TEM.Detector.EELS.collection_angle
     except:
-        raise AttributeError("Please define the collection angle."
-                             "You can do this e.g. by using the "
-                             "set_microscope_parameters method")
+        raise AttributeError(u"Please define the collection angle."
+                             u"You can do this e.g. by using the "
+                             u"set_microscope_parameters method")
 
     axis = s.axes_manager.signal_axes[0]
     eaxis = axis.axis.copy()
@@ -267,15 +269,15 @@ def eels_constant(s, zlp, t):
             else:
                 i0 = zlp.data.sum(axis.index_in_array)
         else:
-            raise ValueError('The ZLP signal dimensions are not '
-                             'compatible with the dimensions of the '
-                             'low-loss signal')
+            raise ValueError(u'The ZLP signal dimensions are not '
+                             u'compatible with the dimensions of the '
+                             u'low-loss signal')
         i0 = i0.reshape(
             np.insert(i0.shape, axis.index_in_array, 1))
     elif isinstance(zlp, numbers.Number):
         i0 = zlp
     else:
-        raise ValueError('The zero-loss peak input is not valid.')
+        raise ValueError(u'The zero-loss peak input is not valid.')
 
     if isinstance(t, hyperspy.signal.Signal):
         if (t.axes_manager.navigation_dimension ==
@@ -285,14 +287,14 @@ def eels_constant(s, zlp, t):
             t = t.reshape(
                 np.insert(t.shape, axis.index_in_array, 1))
         else:
-            raise ValueError('The thickness signal dimensions are not '
-                             'compatible with the dimensions of the '
-                             'low-loss signal')
+            raise ValueError(u'The thickness signal dimensions are not '
+                             u'compatible with the dimensions of the '
+                             u'low-loss signal')
 
     # Kinetic definitions
     ke = e0 * (1 + e0 / 2. / me) / (1 + e0 / me) ** 2
     tgt = e0 * (2 * me + e0) / (me + e0)
     k = s.__class__(
         data=(t * i0 / (332.5 * ke)) * np.log(1 + (beta * tgt / eaxis) ** 2))
-    k.metadata.General.title = "EELS proportionality constant K"
+    k.metadata.General.title = u"EELS proportionality constant K"
     return k

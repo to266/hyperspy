@@ -16,6 +16,7 @@
 # dataou should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 import scipy.linalg
 
@@ -25,7 +26,7 @@ from hyperspy import messages
 
 def svd_pca(data, fast=False, output_dimension=None, centre=None,
             auto_transpose=True):
-    """Perform PCA using SVD.
+    u"""Perform PCA using SVD.
 
     Parameters
     ----------
@@ -53,26 +54,26 @@ def svd_pca(data, fast=False, output_dimension=None, centre=None,
     """
     N, M = data.shape
     if centre is not None:
-        if centre == 'variables':
+        if centre == u'variables':
             mean = data.mean(1)[:, np.newaxis]
-        elif centre == 'trials':
+        elif centre == u'trials':
             mean = data.mean(0)[np.newaxis, :]
         else:
             raise AttributeError(
-                'centre must be one of: None, variables, trials')
+                u'centre must be one of: None, variables, trials')
         data -= mean
     else:
         mean = None
     if auto_transpose is True:
         if N < M:
-            print("Auto transposing the data")
+            print u"Auto transposing the data"
             data = data.T
         else:
             auto_transpose = False
     if fast is True and sklearn_installed is True:
         if output_dimension is None:
-            messages.warning_exit('When using fast_svd it is necessary to '
-                                  'define the output_dimension')
+            messages.warning_exit(u'When using fast_svd it is necessary to '
+                                  u'define the output_dimension')
         U, S, V = fast_svd(data, output_dimension)
     else:
         U, S, V = scipy.linalg.svd(data, full_matrices=False)

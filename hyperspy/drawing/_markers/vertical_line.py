@@ -21,7 +21,7 @@ from hyperspy.drawing.marker import MarkerBase
 
 class VerticalLine(MarkerBase):
 
-    """Vertical line marker that can be added to the signal figure
+    u"""Vertical line marker that can be added to the signal figure
 
     Parameters
     ---------
@@ -44,7 +44,7 @@ class VerticalLine(MarkerBase):
 
     def __init__(self, x, **kwargs):
         MarkerBase.__init__(self)
-        lp = {'linewidth': 1, 'color': 'black'}
+        lp = {u'linewidth': 1, u'color': u'black'}
         self.marker_properties = lp
         self.set_data(x1=x)
         self.set_marker_properties(**kwargs)
@@ -52,15 +52,15 @@ class VerticalLine(MarkerBase):
     def update(self):
         if self.auto_update is False:
             return
-        self.marker.set_xdata(self.get_data_position('x1'))
+        self.marker.set_xdata(self.get_data_position(u'x1'))
 
     def plot(self):
         if self.ax is None:
             raise AttributeError(
-                "To use this method the marker needs to be first add to a " +
-                "figure using `s._plot.signal_plot.add_marker(m)` or " +
-                "`s._plot.navigator_plot.add_marker(m)`")
-        self.marker = self.ax.axvline(self.get_data_position('x1'),
+                u"To use this method the marker needs to be first add to a " +
+                u"figure using `s._plot.signal_plot.add_marker(m)` or " +
+                u"`s._plot.navigator_plot.add_marker(m)`")
+        self.marker = self.ax.axvline(self.get_data_position(u'x1'),
                                       **self.marker_properties)
         self.marker.set_animated(True)
         try:

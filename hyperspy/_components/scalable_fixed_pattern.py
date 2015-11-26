@@ -17,13 +17,14 @@
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import division
 from hyperspy.component import Component
 from scipy.interpolate import interp1d
 
 
 class ScalableFixedPattern(Component):
 
-    """Fixed pattern component with interpolation support.
+    u"""Fixed pattern component with interpolation support.
 
         f(x) = a*s(b*x-x0) + c
 
@@ -64,10 +65,10 @@ class ScalableFixedPattern(Component):
 
     def __init__(self, spectrum):
 
-        Component.__init__(self, ['yscale', 'xscale', 'shift'])
+        Component.__init__(self, [u'yscale', u'xscale', u'shift'])
 
         self._position = self.shift
-        self._whitelist['spectrum'] = ('init,sig', spectrum)
+        self._whitelist[u'spectrum'] = (u'init,sig', spectrum)
         self.spectrum = spectrum
         self.yscale.free = True
         self.yscale.value = 1.
@@ -80,8 +81,8 @@ class ScalableFixedPattern(Component):
         self.convolved = False
         self.interpolate = True
 
-    def prepare_interpolator(self, kind='linear', fill_value=0, **kwargs):
-        """Prepare interpolation.
+    def prepare_interpolator(self, kind=u'linear', fill_value=0, **kwargs):
+        u"""Prepare interpolation.
 
         Parameters
         ----------

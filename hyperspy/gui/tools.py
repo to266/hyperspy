@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with  HyperSpy.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
@@ -30,23 +31,23 @@ from hyperspy.axes import AxesManager
 from hyperspy.drawing.widgets import DraggableVerticalLine
 
 
-OurOKButton = tu.Action(name="OK",
-                        action="OK",)
+OurOKButton = tu.Action(name=u"OK",
+                        action=u"OK",)
 
-OurApplyButton = tu.Action(name="Apply",
-                           action="apply")
+OurApplyButton = tu.Action(name=u"Apply",
+                           action=u"apply")
 
-OurResetButton = tu.Action(name="Reset",
-                           action="reset")
+OurResetButton = tu.Action(name=u"Reset",
+                           action=u"reset")
 
-OurCloseButton = tu.Action(name="Close",
-                           action="close_directly")
+OurCloseButton = tu.Action(name=u"Close",
+                           action=u"close_directly")
 
-OurFindButton = tu.Action(name="Find next",
-                          action="find",)
+OurFindButton = tu.Action(name=u"Find next",
+                          action=u"find",)
 
-OurPreviousButton = tu.Action(name="Find previous",
-                              action="back",)
+OurPreviousButton = tu.Action(name=u"Find previous",
+                              action=u"back",)
 
 
 class SmoothingHandler(tu.Handler):
@@ -75,24 +76,24 @@ class SpanSelectorInSpectrumHandler(tu.Handler):
             info.ui.owner.close()
 
     def apply(self, info, *args, **kwargs):
-        """Handles the **Apply** button being clicked.
+        u"""Handles the **Apply** button being clicked.
 
         """
         obj = info.object
         obj.is_ok = True
-        if hasattr(obj, 'apply'):
+        if hasattr(obj, u'apply'):
             obj.apply()
 
         return
 
     def next(self, info, *args, **kwargs):
-        """Handles the **Next** button being clicked.
+        u"""Handles the **Next** button being clicked.
 
         """
         obj = info.object
         obj.is_ok = True
-        if hasattr(obj, 'next'):
-            next(obj)
+        if hasattr(obj, u'next'):
+            obj.next()
         return
 
 
@@ -106,7 +107,7 @@ class SpectrumRangeSelectorHandler(tu.Handler):
         return True
 
     def apply(self, info, *args, **kwargs):
-        """Handles the **Apply** button being clicked.
+        u"""Handles the **Apply** button being clicked.
 
         """
         obj = info.object
@@ -124,7 +125,7 @@ class SpectrumRangeSelectorHandler(tu.Handler):
 class CalibrationHandler(SpanSelectorInSpectrumHandler):
 
     def apply(self, info, *args, **kwargs):
-        """Handles the **Apply** button being clicked.
+        u"""Handles the **Apply** button being clicked.
         """
         if info.object.signal is None:
             return
@@ -190,7 +191,7 @@ class SpanSelectorInSpectrum(t.HasTraits):
 
 class LineInSpectrum(t.HasTraits):
 
-    """Adds a vertical draggable line to a spectrum that reports its
+    u"""Adds a vertical draggable line to a spectrum that reports its
     position to the position attribute of the class.
 
     Attributes:
@@ -207,7 +208,7 @@ class LineInSpectrum(t.HasTraits):
     position = t.Float()
     is_ok = t.Bool(False)
     on = t.Bool(False)
-    color = t.Color("black")
+    color = t.Color(u"black")
 
     def __init__(self, signal):
         if signal.axes_manager.signal_dimension != 1:
@@ -224,7 +225,7 @@ class LineInSpectrum(t.HasTraits):
         am._axes[0].index = int(round(am._axes[0].size / 2))
         self.axes_manager = am
         self.axes_manager.connect(self.update_position)
-        self.on_trait_change(self.switch_on_off, 'on')
+        self.on_trait_change(self.switch_on_off, u'on')
 
     def draw(self):
         self.signal._plot.signal_plot.figure.canvas.draw()
@@ -237,7 +238,7 @@ class LineInSpectrum(t.HasTraits):
             self._line = DraggableVerticalLine(self.axes_manager)
             self._line.set_mpl_ax(self.signal._plot.signal_plot.ax)
             self._line.patch.set_linewidth(2)
-            self._color_changed("black", "black")
+            self._color_changed(u"black", u"black")
             # There is not need to call draw because setting the
             # color calls it.
 
@@ -262,30 +263,30 @@ class LineInSpectrum(t.HasTraits):
 
 
 class SpectrumCalibration(SpanSelectorInSpectrum):
-    left_value = t.Float(label='New left value')
-    right_value = t.Float(label='New right value')
+    left_value = t.Float(label=u'New left value')
+    right_value = t.Float(label=u'New right value')
     offset = t.Float()
     scale = t.Float()
     units = t.Unicode()
     view = tu.View(
         tu.Group(
-            'left_value',
-            'right_value',
-            tu.Item('ss_left_value',
-                    label='Left',
-                    style='readonly'),
-            tu.Item('ss_right_value',
-                    label='Right',
-                    style='readonly'),
-            tu.Item(name='offset',
-                    style='readonly'),
-            tu.Item(name='scale',
-                    style='readonly'),
-            'units',),
+            u'left_value',
+            u'right_value',
+            tu.Item(u'ss_left_value',
+                    label=u'Left',
+                    style=u'readonly'),
+            tu.Item(u'ss_right_value',
+                    label=u'Right',
+                    style=u'readonly'),
+            tu.Item(name=u'offset',
+                    style=u'readonly'),
+            tu.Item(name=u'scale',
+                    style=u'readonly'),
+            u'units',),
         handler=CalibrationHandler,
         buttons=[OKButton, OurApplyButton, CancelButton],
-        kind='live',
-        title='Calibration parameters')
+        kind=u'live',
+        title=u'Calibration parameters')
 
     def __init__(self, signal):
         super(SpectrumCalibration, self).__init__(signal)
@@ -299,8 +300,8 @@ class SpectrumCalibration(SpanSelectorInSpectrum):
         if self.span_selector is not None and \
                 self.span_selector.range is None:
             messages.information(
-                'Please select a range in the spectrum figure'
-                'by dragging the mouse over it')
+                u'Please select a range in the spectrum figure'
+                u'by dragging the mouse over it')
             return
         else:
             self._update_calibration()
@@ -308,8 +309,8 @@ class SpectrumCalibration(SpanSelectorInSpectrum):
     def _right_value_changed(self, old, new):
         if self.span_selector.range is None:
             messages.information(
-                'Please select a range in the spectrum figure'
-                'by dragging the mouse over it')
+                u'Please select a range in the spectrum figure'
+                u'by dragging the mouse over it')
             return
         else:
             self._update_calibration()
@@ -328,14 +329,14 @@ class SpectrumRangeSelector(SpanSelectorInSpectrum):
     on_close = t.List()
 
     view = tu.View(
-        tu.Item('ss_left_value', label='Left', style='readonly'),
-        tu.Item('ss_right_value', label='Right', style='readonly'),
+        tu.Item(u'ss_left_value', label=u'Left', style=u'readonly'),
+        tu.Item(u'ss_right_value', label=u'Right', style=u'readonly'),
         handler=SpectrumRangeSelectorHandler,
         buttons=[OKButton, OurApplyButton, CancelButton],)
 
 
 class Smoothing(t.HasTraits):
-    line_color = t.Color('blue')
+    line_color = t.Color(u'blue')
     differential_order = t.Int(0)
 
     @property
@@ -367,13 +368,13 @@ class Smoothing(t.HasTraits):
         l1 = hse.signal_plot.ax_lines[0]
         self.original_color = l1.line.get_color()
         l1.set_line_properties(color=self.original_color,
-                               type='scatter')
+                               type=u'scatter')
         l2 = drawing.spectrum.SpectrumLine()
         l2.data_function = self.model2plot
 
         l2.set_line_properties(
             color=np.array(self.line_color_rgb) / 255.,
-            type='line')
+            type=u'line')
         # Add the line to the figure
         hse.signal_plot.add_line(l2)
         l2.plot()
@@ -393,9 +394,9 @@ class Smoothing(t.HasTraits):
         self.smooth_diff_line.data_function = self.diff_model2plot
         self.smooth_diff_line.set_line_properties(
             color=np.array(self.line_color_rgb) / 255.,
-            type='line')
+            type=u'line')
         self.signal._plot.signal_plot.add_line(self.smooth_diff_line,
-                                               ax='right')
+                                               ax=u'right')
         self.smooth_diff_line.axes_manager = self.signal.axes_manager
 
     def turn_diff_line_off(self):
@@ -415,10 +416,10 @@ class Smoothing(t.HasTraits):
 
     def _line_color_changed(self, old, new):
         self.smooth_line.line_properties = {
-            'color': np.array(self.line_color_rgb) / 255.}
+            u'color': np.array(self.line_color_rgb) / 255.}
         if self.smooth_diff_line is not None:
             self.smooth_diff_line.line_properties = {
-                'color': np.array(self.line_color_rgb) / 255.}
+                u'color': np.array(self.line_color_rgb) / 255.}
         self.update_lines()
 
     def diff_model2plot(self, axes_manager=None):
@@ -433,46 +434,46 @@ class Smoothing(t.HasTraits):
             self.smooth_line.close()
             self.data_line.set_line_properties(
                 color=self.original_color,
-                type='line')
+                type=u'line')
 
 
 class SmoothingSavitzkyGolay(Smoothing):
 
     polynomial_order = t.Int(
         3,
-        desc="The order of the polynomial used to fit the samples."
-             "`polyorder` must be less than `window_length`.")
+        desc=u"The order of the polynomial used to fit the samples."
+             u"`polyorder` must be less than `window_length`.")
 
     window_length = t.Int(
         5,
-        desc="`window_length` must be a positive odd integer.")
+        desc=u"`window_length` must be a positive odd integer.")
 
-    increase_window_length = t.Button(orientation="horizontal", label="+")
-    decrease_window_length = t.Button(orientation="horizontal", label="-")
+    increase_window_length = t.Button(orientation=u"horizontal", label=u"+")
+    decrease_window_length = t.Button(orientation=u"horizontal", label=u"-")
 
     view = tu.View(
         tu.Group(
             tu.Group(
-                'window_length',
+                u'window_length',
                 tu.Item(
-                    'decrease_window_length',
+                    u'decrease_window_length',
                     show_label=False),
                 tu.Item(
-                    'increase_window_length',
+                    u'increase_window_length',
                     show_label=False),
-                orientation="horizontal"),
-            'polynomial_order',
+                orientation=u"horizontal"),
+            u'polynomial_order',
             tu.Item(
-                name='differential_order',
-                tooltip='The order of the derivative to compute. This must '
-                        'be a nonnegative integer. The default is 0, which '
-                        'means to filter the data without differentiating.',
+                name=u'differential_order',
+                tooltip=u'The order of the derivative to compute. This must '
+                        u'be a nonnegative integer. The default is 0, which '
+                        u'means to filter the data without differentiating.',
             ),
-            'line_color'),
-        kind='live',
+            u'line_color'),
+        kind=u'live',
         handler=SmoothingHandler,
         buttons=OKCancelButtons,
-        title='Savitzky-Golay Smoothing',
+        title=u'Savitzky-Golay Smoothing',
     )
 
     def _increase_window_length_fired(self):
@@ -491,14 +492,13 @@ class SmoothingSavitzkyGolay(Smoothing):
         if nwl > self.polynomial_order:
             self.window_length = nwl
         else:
-            print(
-                "The window length must be greated than the polynomial order")
+            print u"The window length must be greated than the polynomial order"
 
     def _polynomial_order_changed(self, old, new):
         if self.window_length <= new:
             self.window_length = new + 2 if new % 2 else new + 1
-            print("Polynomial order must be < window length. "
-                  "Window length set to %i." % self.window_length)
+            print u"Polynomial order must be < window length. "
+                  u"Window length set to %i." % self.window_length
         self.update_lines()
 
     def _window_length_changed(self, old, new):
@@ -507,8 +507,8 @@ class SmoothingSavitzkyGolay(Smoothing):
     def _differential_order_changed(self, old, new):
         if new > self.polynomial_order:
             self.polynomial_order += 1
-            print("Differential order must be <= polynomial order. "
-                  "Polynomial order set to %i." % self.polynomial_order)
+            print u"Differential order must be <= polynomial order. "
+                  u"Polynomial order set to %i." % self.polynomial_order
         super(
             SmoothingSavitzkyGolay,
             self)._differential_order_changed(
@@ -548,13 +548,13 @@ class SmoothingLowess(Smoothing):
                                    value=1)
     view = tu.View(
         tu.Group(
-            'smoothing_parameter',
-            'number_of_iterations',
-            'line_color'),
-        kind='live',
+            u'smoothing_parameter',
+            u'number_of_iterations',
+            u'line_color'),
+        kind=u'live',
         handler=SmoothingHandler,
         buttons=OKCancelButtons,
-        title='Lowess Smoothing',)
+        title=u'Lowess Smoothing',)
 
     def __init__(self, *args, **kwargs):
         super(SmoothingLowess, self).__init__(*args, **kwargs)
@@ -589,12 +589,12 @@ class SmoothingTV(Smoothing):
 
     view = tu.View(
         tu.Group(
-            'smoothing_parameter',
-            'line_color'),
-        kind='live',
+            u'smoothing_parameter',
+            u'line_color'),
+        kind=u'live',
         handler=SmoothingHandler,
         buttons=OKCancelButtons,
-        title='Total Variation Smoothing',)
+        title=u'Total Variation Smoothing',)
 
     def _smoothing_parameter_changed(self, old, new):
         self.update_lines()
@@ -613,18 +613,18 @@ class SmoothingTV(Smoothing):
 
 class ButterworthFilter(Smoothing):
     cutoff_frequency_ratio = t.Range(0., 1., 0.05)
-    type = t.Enum('low', 'high')
+    type = t.Enum(u'low', u'high')
     order = t.Int(2)
 
     view = tu.View(
         tu.Group(
-            'cutoff_frequency_ratio',
-            'order',
-            'type'),
-        kind='live',
+            u'cutoff_frequency_ratio',
+            u'order',
+            u'type'),
+        kind=u'live',
         handler=SmoothingHandler,
         buttons=OKCancelButtons,
-        title='Butterworth filter',)
+        title=u'Butterworth filter',)
 
     def _cutoff_frequency_ratio_changed(self, old, new):
         self.update_lines()
@@ -645,10 +645,10 @@ class ButterworthFilter(Smoothing):
 class Load(t.HasTraits):
     filename = t.File
     traits_view = tu.View(
-        tu.Group('filename'),
-        kind='livemodal',
+        tu.Group(u'filename'),
+        kind=u'livemodal',
         buttons=[OKButton, CancelButton],
-        title='Load file')
+        title=u'Load file')
 
 
 class ImageContrastHandler(tu.Handler):
@@ -664,7 +664,7 @@ class ImageContrastHandler(tu.Handler):
         return True
 
     def apply(self, info):
-        """Handles the **Apply** button being clicked.
+        u"""Handles the **Apply** button being clicked.
 
         """
         obj = info.object
@@ -674,7 +674,7 @@ class ImageContrastHandler(tu.Handler):
 
     @staticmethod
     def reset(info):
-        """Handles the **Apply** button being clicked.
+        u"""Handles the **Apply** button being clicked.
 
         """
         obj = info.object
@@ -683,7 +683,7 @@ class ImageContrastHandler(tu.Handler):
 
     @staticmethod
     def our_help(info):
-        """Handles the **Apply** button being clicked.
+        u"""Handles the **Apply** button being clicked.
 
         """
         info.object._help()
@@ -693,20 +693,20 @@ class ImageContrastEditor(t.HasTraits):
     ss_left_value = t.Float()
     ss_right_value = t.Float()
 
-    view = tu.View(tu.Item('ss_left_value',
-                           label='vmin',
+    view = tu.View(tu.Item(u'ss_left_value',
+                           label=u'vmin',
                            show_label=True,
-                           style='readonly',),
-                   tu.Item('ss_right_value',
-                           label='vmax',
+                           style=u'readonly',),
+                   tu.Item(u'ss_right_value',
+                           label=u'vmax',
                            show_label=True,
-                           style='readonly'),
+                           style=u'readonly'),
                    handler=ImageContrastHandler,
                    buttons=[OKButton,
                             OurApplyButton,
                             OurResetButton,
                             CancelButton, ],
-                   title='Constrast adjustment tool',
+                   title=u'Constrast adjustment tool',
                    )
 
     def __init__(self, image):
@@ -747,7 +747,7 @@ class ImageContrastEditor(t.HasTraits):
         vmax += pad
         data = self.image.data_function().ravel()
         self.patches = self.ax.hist(data, 100, range=(vmin, vmax),
-                                    color='blue')[2]
+                                    color=u'blue')[2]
         self.ax.set_xticks([])
         self.ax.set_yticks([])
         self.ax.set_xlim(vmin, vmax)
@@ -781,11 +781,11 @@ class ComponentFit(SpanSelectorInSpectrum):
     only_current = t.List(t.Bool(True))
 
     view = tu.View(
-        tu.Item('fit', show_label=False),
-        tu.Item('only_current', show_label=False, style='custom',
-                editor=tu.CheckListEditor(values=[(True, 'Only current')])),
+        tu.Item(u'fit', show_label=False),
+        tu.Item(u'only_current', show_label=False, style=u'custom',
+                editor=tu.CheckListEditor(values=[(True, u'Only current')])),
         buttons=[OurCloseButton],
-        title='Fit single component',
+        title=u'Fit single component',
         handler=SpanSelectorInSpectrumHandler,
     )
 
@@ -806,8 +806,8 @@ class ComponentFit(SpanSelectorInSpectrum):
         self.estimate_parameters = estimate_parameters
         self.fit_independent = fit_independent
         self.fit_kwargs = kwargs
-        if signal_range == "interactive":
-            if not hasattr(self.model, '_plot'):
+        if signal_range == u"interactive":
+            if not hasattr(self.model, u'_plot'):
                 self.model.plot()
             elif self.model._plot is None:
                 self.model.plot()
@@ -816,10 +816,10 @@ class ComponentFit(SpanSelectorInSpectrum):
             self.span_selector_switch(on=True)
 
     def _fit_fired(self):
-        if (self.signal_range != "interactive" and
+        if (self.signal_range != u"interactive" and
                 self.signal_range is not None):
             self.model.set_signal_range(*self.signal_range)
-        elif self.signal_range == "interactive":
+        elif self.signal_range == u"interactive":
             self.model.set_signal_range(self.ss_left_value,
                                         self.ss_right_value)
 
@@ -845,15 +845,15 @@ class ComponentFit(SpanSelectorInSpectrum):
         # the components estimate_parameters function (if it has one)
         only_current = len(self.only_current) > 0   # CheckListEditor
         if self.estimate_parameters:
-            if hasattr(self.component, 'estimate_parameters'):
-                if (self.signal_range != "interactive" and
+            if hasattr(self.component, u'estimate_parameters'):
+                if (self.signal_range != u"interactive" and
                         self.signal_range is not None):
                     self.component.estimate_parameters(
                         self.signal,
                         self.signal_range[0],
                         self.signal_range[1],
                         only_current=only_current)
-                elif self.signal_range == "interactive":
+                elif self.signal_range == u"interactive":
                     self.component.estimate_parameters(
                         self.signal,
                         self.ss_left_value,
@@ -890,7 +890,7 @@ class IntegrateArea(SpanSelectorInSpectrum):
 
     view = tu.View(
         buttons=[OKButton, CancelButton],
-        title='Integrate in range',
+        title=u'Integrate in range',
         handler=SpanSelectorInSpectrumHandler,
     )
 
@@ -901,7 +901,7 @@ class IntegrateArea(SpanSelectorInSpectrum):
 
         self.signal = signal
         self.span_selector = None
-        if not hasattr(self.signal, '_plot'):
+        if not hasattr(self.signal, u'_plot'):
             self.signal.plot()
         elif self.signal._plot is None:
             self.signal.plot()

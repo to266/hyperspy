@@ -23,7 +23,7 @@ from hyperspy.drawing.marker import MarkerBase
 
 class HorizontalLineSegment(MarkerBase):
 
-    """Horizontal line segment marker that can be added to the signal figure
+    u"""Horizontal line segment marker that can be added to the signal figure
 
     Parameters
     ---------
@@ -53,7 +53,7 @@ class HorizontalLineSegment(MarkerBase):
 
     def __init__(self, x1, x2, y, **kwargs):
         MarkerBase.__init__(self)
-        lp = {'color': 'black', 'linewidth': 1}
+        lp = {u'color': u'black', u'linewidth': 1}
         self.marker_properties = lp
         self.set_data(x1=x1, x2=x2, y1=y)
         self.set_marker_properties(**kwargs)
@@ -66,9 +66,9 @@ class HorizontalLineSegment(MarkerBase):
     def plot(self):
         if self.ax is None:
             raise AttributeError(
-                "To use this method the marker needs to be first add to a " +
-                "figure using `s._plot.signal_plot.add_marker(m)` or " +
-                "`s._plot.navigator_plot.add_marker(m)`")
+                u"To use this method the marker needs to be first add to a " +
+                u"figure using `s._plot.signal_plot.add_marker(m)` or " +
+                u"`s._plot.navigator_plot.add_marker(m)`")
         self.marker = self.ax.vlines(0, 0, 1, **self.marker_properties)
         self._update_segment()
         self.marker.set_animated(True)
@@ -79,14 +79,14 @@ class HorizontalLineSegment(MarkerBase):
 
     def _update_segment(self):
         segments = self.marker.get_segments()
-        segments[0][0, 1] = self.get_data_position('y1')
+        segments[0][0, 1] = self.get_data_position(u'y1')
         segments[0][1, 1] = segments[0][0, 1]
-        if self.get_data_position('x1') is None:
-            segments[0][0, 0] = plt.getp(self.marker.axes, 'xlim')[0]
+        if self.get_data_position(u'x1') is None:
+            segments[0][0, 0] = plt.getp(self.marker.axes, u'xlim')[0]
         else:
-            segments[0][0, 0] = self.get_data_position('x1')
-        if self.get_data_position('x2') is None:
-            segments[0][1, 0] = plt.getp(self.marker.axes, 'xlim')[1]
+            segments[0][0, 0] = self.get_data_position(u'x1')
+        if self.get_data_position(u'x2') is None:
+            segments[0][1, 0] = plt.getp(self.marker.axes, u'xlim')[1]
         else:
-            segments[0][1, 0] = self.get_data_position('x2')
+            segments[0][1, 0] = self.get_data_position(u'x2')
         self.marker.set_segments(segments)

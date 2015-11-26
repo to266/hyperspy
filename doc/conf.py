@@ -13,9 +13,9 @@
 
 import sys
 import os
-sys.path.append('../')
+sys.path.append(u'../')
 from hyperspy import Release
-sys.path.append(os.path.abspath('sphinxext'))
+sys.path.append(os.path.abspath(u'sphinxext'))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -30,33 +30,33 @@ sys.path.append(os.path.abspath('sphinxext'))
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinxcontrib.napoleon',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.pngmath',
-    'sphinx.ext.autosummary',
+    u'sphinx.ext.autodoc',
+    u'sphinxcontrib.napoleon',
+    u'sphinx.ext.intersphinx',
+    u'sphinx.ext.pngmath',
+    u'sphinx.ext.autosummary',
 ]
 
 try:
     import sphinxcontrib.spelling
-    extensions.append('sphinxcontrib.spelling')
+    extensions.append(u'sphinxcontrib.spelling')
 except:
     pass
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = [u'_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = u'.rst'
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = u'index'
 
 # General information about the project.
-project = 'HyperSpy'
-copyright = '2011-2015, The HyperSpy development team'
+project = u'HyperSpy'
+copyright = u'2011-2015, The HyperSpy development team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -79,7 +79,7 @@ release = Release.version
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = [u'_build']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
@@ -96,7 +96,7 @@ exclude_patterns = ['_build']
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = u'sphinx'
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
@@ -106,7 +106,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinx_rtd_theme'
+html_theme = u'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -125,17 +125,17 @@ html_theme = 'sphinx_rtd_theme'
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = '_static/hyperspy_logo.png'
+html_logo = u'_static/hyperspy_logo.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = 'hyperspy_logo.ico'
+html_favicon = u'hyperspy_logo.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = [u'_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -179,7 +179,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'HyperSpydoc'
+htmlhelp_basename = u'HyperSpydoc'
 
 
 # -- Options for LaTeX output --------------------------------------------
@@ -193,8 +193,8 @@ htmlhelp_basename = 'HyperSpydoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index', 'HyperSpy.tex', 'HyperSpy Documentation',
-     'The HyperSpy Developers', 'manual'),
+    (u'index', u'HyperSpy.tex', u'HyperSpy Documentation',
+     u'The HyperSpy Developers', u'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -226,13 +226,13 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'hyperspy', 'HyperSpy Documentation',
-     ['The HyperSpy developers'], 1)
+    (u'index', u'hyperspy', u'HyperSpy Documentation',
+     [u'The HyperSpy developers'], 1)
 ]
 
 # Add the hyperspy website to the intersphinx domains
-intersphinx_mapping = {'hyperspyweb': ('http://hyperspy.org/', None)}
+intersphinx_mapping = {u'hyperspyweb': (u'http://hyperspy.org/', None)}
 
 
 def setup(app):
-    app.add_javascript('copybutton.js')
+    app.add_javascript(u'copybutton.js')

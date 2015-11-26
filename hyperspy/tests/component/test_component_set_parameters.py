@@ -20,7 +20,7 @@ import nose.tools
 from hyperspy.components import Gaussian
 
 
-class TestSetParameters:
+class TestSetParameters(object):
 
     def setUp(self):
         self.gaussian = Gaussian()
@@ -33,7 +33,7 @@ class TestSetParameters:
 
     def test_set_parameters_not_free2(self):
         g = self.gaussian
-        g.set_parameters_not_free(parameter_name_list=['A'])
+        g.set_parameters_not_free(parameter_name_list=[u'A'])
         free_parameters = len(g.free_parameters)
         parameters = len(g.parameters) - 1
         nose.tools.assert_equal(free_parameters, parameters)
@@ -51,7 +51,7 @@ class TestSetParameters:
         g.A.free = False
         g.centre.free = False
         g.sigma.free = False
-        g.set_parameters_free(parameter_name_list=['A'])
+        g.set_parameters_free(parameter_name_list=[u'A'])
         free_parameters = len(g.free_parameters)
         parameters = len(g.parameters) - 2
         nose.tools.assert_equal(free_parameters, parameters)

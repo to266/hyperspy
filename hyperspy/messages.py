@@ -20,19 +20,19 @@ import sys
 
 
 def warning_exit(text):
-    sys.exit("\nWarning!\n" + text)
+    sys.exit(u"\nWarning!\n" + text)
 
 
 def warning(text):
-    print()
-    print("Warning! " + text)
+    print
+    print u"Warning! " + text
 
 
 def information(text):
-    print()
-    print(text)
+    print
+    print text
 
 
 def alert(text):
-    print()
-    print("** %s **" % text)
+    print
+    print u"** %s **" % text

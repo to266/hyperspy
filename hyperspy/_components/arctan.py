@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with HyperSpy. If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import math
 
 import numpy as np
@@ -25,7 +26,7 @@ from hyperspy.component import Component
 
 class Arctan(Component):
 
-    """Arctan function components
+    u"""Arctan function components
 
     f(x) = A*arctan{k*(x-x0)}
 
@@ -45,7 +46,7 @@ class Arctan(Component):
     """
 
     def __init__(self, A=1., k=1., x0=1., minimum_at_zero=False):
-        Component.__init__(self, ['A', 'k', 'x0'])
+        Component.__init__(self, [u'A', u'k', u'x0'])
         self.A.value = A
         self.A.grad = self.grad_A
 
@@ -56,7 +57,7 @@ class Arctan(Component):
         self.x0.grad = self.grad_x0
 
         self.minimum_at_zero = minimum_at_zero
-        self._whitelist['minimum_at_zero'] = ('init', minimum_at_zero)
+        self._whitelist[u'minimum_at_zero'] = (u'init', minimum_at_zero)
 
         self.isbackground = False
         self.isconvolved = False

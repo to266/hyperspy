@@ -25,9 +25,9 @@ from nose.tools import (
 from hyperspy.signal import Signal
 
 
-class TestBinaryOperatorsCase1:
+class TestBinaryOperatorsCase1(object):
 
-    """The signals are not aligned but can be aligned because their
+    u"""The signals are not aligned but can be aligned because their
     shapes are as follows:
 
     +---------+------------------+-------------+
@@ -67,9 +67,9 @@ class TestBinaryOperatorsCase1:
         self.s3 + self.s1
 
 
-class TestBinaryOperatorsCase2:
+class TestBinaryOperatorsCase2(object):
 
-    """The signals are not aligned but can be aligned because their
+    u"""The signals are not aligned but can be aligned because their
     shapes are as follows:
 
     +---------+------------------+-------------+
@@ -110,9 +110,9 @@ class TestBinaryOperatorsCase2:
             assert_equal(size, n.axes_manager._axes[i].size)
 
 
-class TestBinaryOperatorsCase3:
+class TestBinaryOperatorsCase3(object):
 
-    """The signals are not aligned but can be aligned because their
+    u"""The signals are not aligned but can be aligned because their
     shapes are as follows:
 
     +---------+------------------+-------------+
@@ -150,9 +150,9 @@ class TestBinaryOperatorsCase3:
         assert_equal(n.axes_manager.signal_dimension, 1)
 
 
-class TestBinaryOperatorsCase4:
+class TestBinaryOperatorsCase4(object):
 
-    """Signal and number.
+    u"""Signal and number.
 
     """
 
@@ -167,7 +167,7 @@ class TestBinaryOperatorsCase4:
         assert_true(((2 + self.s1).data == self.s1.data + 2).all())
 
 
-class TestUnaryOperators:
+class TestUnaryOperators(object):
 
     def setUp(self):
         self.s1 = Signal(np.array((1, -1, 4, -3)))

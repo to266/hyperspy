@@ -25,17 +25,17 @@ class MPL_HyperImage_Explorer(MPL_HyperExplorer):
     def plot_signal(self,
                     colorbar=True,
                     scalebar=True,
-                    scalebar_color="white",
+                    scalebar_color=u"white",
                     axes_ticks=None,
                     auto_contrast=True,
                     saturated_pixels=0.2,
                     vmin=None,
                     vmax=None,
                     no_nans=False,
-                    centre_colormap="auto",
+                    centre_colormap=u"auto",
                     **kwargs
                     ):
-        """Plot image.
+        u"""Plot image.
 
         Parameters
         ----------
@@ -72,7 +72,7 @@ class MPL_HyperImage_Explorer(MPL_HyperExplorer):
         imf = image.ImagePlot()
         imf.axes_manager = self.axes_manager
         imf.data_function = self.signal_data_function
-        imf.title = self.signal_title + " Signal"
+        imf.title = self.signal_title + u" Signal"
         imf.xaxis, imf.yaxis = self.axes_manager.signal_axes
         imf.colorbar = colorbar
         imf.scalebar = scalebar
@@ -93,7 +93,7 @@ class MPL_HyperImage_Explorer(MPL_HyperExplorer):
                 imf.figure, self.close_navigator_plot)
             self._key_nav_cid = \
                 self.signal_plot.figure.canvas.mpl_connect(
-                    'key_press_event', self.axes_manager.key_navigator)
+                    u'key_press_event', self.axes_manager.key_navigator)
             self._key_nav_cid = \
                 self.navigator_plot.figure.canvas.mpl_connect(
-                    'key_press_event', self.axes_manager.key_navigator)
+                    u'key_press_event', self.axes_manager.key_navigator)
