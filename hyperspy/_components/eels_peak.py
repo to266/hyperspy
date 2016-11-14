@@ -155,8 +155,8 @@ class EELS_peak(Component):
         self.v.free = False
 
         self.v.units = 'm/s'
-        self.radius.units = 'm'
-        self.b.units = 'm'
+        self.radius.units = 'nm'
+        self.b.units = 'nm'
 
         self.epsilon = None
         self._eps_file = ''
@@ -218,8 +218,8 @@ class EELS_peak(Component):
         if self.epsilon is None:
             return np.nan
 
-        r = self.radius.value
-        b = self.b.value
+        r = self.radius.value * 1e-9
+        b = self.b.value * 1e-9
         x0 = self.x0.value
         width = self.width.value
         area = self.area.value
