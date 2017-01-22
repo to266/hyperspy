@@ -435,8 +435,6 @@ class BaseModel(list):
         >>> s2 = m.as_signal(component_list=[l1])
 
         """
-        if parallel is None:
-            parallel = preferences.General.parallel
         if out is None:
             data = np.empty(self.signal.data.shape, dtype='float')
             data.fill(np.nan)
@@ -450,6 +448,8 @@ class BaseModel(list):
             signal = out
             data = signal.data
 
+        if parallel is None:
+            parallel = preferences.General.parallel
         if parallel is True:
             from os import cpu_count
             parallel = cpu_count()
@@ -462,29 +462,17 @@ class BaseModel(list):
                                  out_of_range_to_nan=out_of_range_to_nan,
                                  show_progressbar=show_progressbar, data=data)
         else:
-            am = self.axes_manager
-            nav_shape = am.navigation_shape
-            if len(nav_shape):
-                ind = np.argmax(nav_shape)
-                size = nav_shape[ind]
-            if not len(nav_shape) or size < 4:
-                # no or not enough navigation, just run without threads
+            canslice, slices = self._split_slices(parallel=parallel)
+            if not canslice:
                 return self.as_signal(component_list=component_list,
                                       out_of_range_to_nan=out_of_range_to_nan,
                                       show_progressbar=show_progressbar,
                                       out=signal, parallel=False)
-            parallel = min(parallel, size / 2)
-            splits = [len(sp) for sp in np.array_split(np.arange(size),
-                                                       parallel)]
             models = []
             data_slices = []
-            slices = [slice(None), ] * len(nav_shape)
-            for sp, csm in zip(splits, np.cumsum(splits)):
-                slices[ind] = slice(csm - sp, csm)
-                models.append(self.inav[tuple(slices)])
-                array_slices = self.signal._get_array_slices(tuple(slices),
-                                                             True)
-                data_slices.append(data[array_slices])
+            for _s, _as in slices:
+                models.append(self.inav[_s])
+                data_slices.append(data[_as])
             from concurrent.futures import ThreadPoolExecutor
             with ThreadPoolExecutor(max_workers=parallel) as exe:
                 _map = exe.map(
@@ -496,6 +484,32 @@ class BaseModel(list):
                     zip(models, data_slices, range(int(parallel))))
             _ = next(_map)
         return signal
+
+    def _split_slices(self, parallel=None):
+        if not isinstance(parallel, int):
+            raise ValueError('parallel has to be int')
+
+        am = self.axes_manager
+        nav_shape = am.navigation_shape
+        if len(nav_shape):
+            ind = np.argmax(nav_shape)
+            size = nav_shape[ind]
+        if not len(nav_shape) or size < 4:
+            # no or not enough navigation, just run without threads
+            return False, ()
+        parallel = min(parallel, size / 2)
+        splits = [len(sp) for sp in np.array_split(np.arange(size),
+                                                   parallel)]
+        slices = [slice(None), ] * len(nav_shape)
+        res = []
+        for sp, csm in zip(splits, np.cumsum(splits)):
+            slices[ind] = slice(csm - sp, csm)
+            _s = tuple(slices)
+            array_slices = self.signal._get_array_slices(_s,
+                                                         True)
+            res.append((_s, array_slices))
+        return True, res
+
 
     def _as_signal_iter(self, component_list=None, out_of_range_to_nan=True,
                         show_progressbar=None, data=None):
@@ -1200,6 +1214,7 @@ class BaseModel(list):
 
     def multifit(self, mask=None, fetch_only_fixed=False,
                  autosave=False, autosave_every=10, show_progressbar=None,
+                 parallel=None,
                  interactive_plot=False, **kwargs):
         """Fit the data to the model at all the positions of the
         navigation dimensions.
@@ -1241,54 +1256,85 @@ class BaseModel(list):
         if show_progressbar is None:
             show_progressbar = preferences.General.show_progressbar
 
-        if autosave is not False:
-            fd, autosave_fn = tempfile.mkstemp(
-                prefix='hyperspy_autosave-',
-                dir='.', suffix='.npz')
-            os.close(fd)
-            autosave_fn = autosave_fn[:-4]
-            _logger.info(
-                "Autosaving each %s pixels to %s.npz" % (autosave_every,
-                                                         autosave_fn))
-            _logger.info(
-                "When multifit finishes its job the file will be deleted")
-        if mask is not None and (
-            mask.shape != tuple(
-                self.axes_manager._navigation_shape_in_array)):
-            raise ValueError(
-                "The mask must be a numpy array of boolean type with "
-                " shape: %s" +
-                str(self.axes_manager._navigation_shape_in_array))
-        masked_elements = 0 if mask is None else mask.sum()
-        maxval = self.axes_manager.navigation_size - masked_elements
-        show_progressbar = show_progressbar and (maxval > 0)
-        i = 0
-        with self.axes_manager.events.indices_changed.suppress_callback(
-                self.fetch_stored_values):
-            if interactive_plot:
-                outer = dummy_context_manager
-                inner = self.suspend_update
-            else:
-                outer = self.suspend_update
-                inner = dummy_context_manager
-            with outer(update_on_resume=True):
-                with progressbar(total=maxval, disable=not show_progressbar,
-                                 leave=True) as pbar:
-                    for index in self.axes_manager:
-                        with inner(update_on_resume=True):
-                            if mask is None or not mask[index[::-1]]:
-                                self.fetch_stored_values(
-                                    only_fixed=fetch_only_fixed)
-                                self.fit(**kwargs)
-                                i += 1
-                                pbar.update(1)
-                            if autosave is True and i % autosave_every == 0:
-                                self.save_parameters2file(autosave_fn)
-        if autosave is True:
-            _logger.info(
-                'Deleting the temporary file %s pixels' % (
-                    autosave_fn + 'npz'))
-            os.remove(autosave_fn + '.npz')
+        if parallel is None:
+            parallel = preferences.General.parallel
+        if parallel is True:
+            from os import cpu_count
+            parallel = cpu_count()
+        if parallel is not False:
+            if not isinstance(parallel, int):
+                parallel = int(parallel)
+
+            canslice, slices = self._split_slices(parallel=parallel)
+            if parallel < 2 or not canslice:
+                parallel = False
+        if parallel is False:
+            if autosave is not False:
+                fd, autosave_fn = tempfile.mkstemp(
+                    prefix='hyperspy_autosave-',
+                    dir='.', suffix='.npz')
+                os.close(fd)
+                autosave_fn = autosave_fn[:-4]
+                _logger.info(
+                    "Autosaving each %s pixels to %s.npz" % (autosave_every,
+                                                             autosave_fn))
+                _logger.info(
+                    "When multifit finishes its job the file will be deleted")
+            if mask is not None and (
+                mask.shape != tuple(
+                    self.axes_manager._navigation_shape_in_array)):
+                raise ValueError(
+                    "The mask must be a numpy array of boolean type with "
+                    " shape: %s" +
+                    str(self.axes_manager._navigation_shape_in_array))
+            masked_elements = 0 if mask is None else mask.sum()
+            maxval = self.axes_manager.navigation_size - masked_elements
+            enabled = show_progressbar and (maxval > 0)
+            i = 0
+            with self.axes_manager.events.indices_changed.suppress_callback(
+                    self.fetch_stored_values):
+                if interactive_plot:
+                    outer = dummy_context_manager
+                    inner = self.suspend_update
+                else:
+                    outer = self.suspend_update
+                    inner = dummy_context_manager
+                with outer(update_on_resume=True):
+                    with progressbar(total=maxval, disable=not enabled,
+                                     position=show_progressbar,
+                                     leave=True) as pbar:
+                        for index in self.axes_manager:
+                            with inner(update_on_resume=True):
+                                if mask is None or not mask[index[::-1]]:
+                                    self.fetch_stored_values(
+                                        only_fixed=fetch_only_fixed)
+                                    self.fit(**kwargs)
+                                    i += 1
+                                    pbar.update(1)
+                                if autosave is True and i % autosave_every == 0:
+                                    self.save_parameters2file(autosave_fn)
+            if autosave is True:
+                _logger.info(
+                    'Deleting the temporary file %s pixels' % (
+                        autosave_fn + 'npz'))
+                os.remove(autosave_fn + '.npz')
+        else:
+            models = []
+            masks = []
+            for _s, _as in slices:
+                models.append(self.inav[_s])
+                masks.append(None if mask is None else mask[_as])
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=parallel) as exe:
+                _map = exe.map(
+                    lambda thing: thing[0].multifit(mask=thing[1],
+                                                    autosave=False,
+                                                    parallel=False,
+                                                    show_progressbar=thing[2]+1,
+                                                    interactive_plot=False,),
+                    zip(models, masks, range(int(parallel))))
+            _ = next(_map)
+
 
     def save_parameters2file(self, filename):
         """Save the parameters array in binary format.
