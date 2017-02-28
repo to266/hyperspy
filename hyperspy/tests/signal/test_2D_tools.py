@@ -18,8 +18,8 @@
 
 import sys
 from unittest import mock
-import nose
-import nose.tools as nt
+
+
 import numpy.testing as npt
 import numpy as np
 from scipy.misc import face, ascent
@@ -32,7 +32,7 @@ from hyperspy.decorators import lazifyTestClass
 @lazifyTestClass
 class TestSubPixelAlign:
 
-    def setUp(self):
+    def setup_method(self, method):
         ref_image = ascent()
         center = np.array((256, 256))
         shifts = np.array([(0.0, 0.0), (4.3, 2.13), (1.65, 3.58),
@@ -70,7 +70,7 @@ class TestSubPixelAlign:
 @lazifyTestClass
 class TestAlignTools:
 
-    def setUp(self):
+    def setup_method(self, method):
         im = face(gray=True)
         self.ascent_offset = np.array((256, 256))
         s = hs.signals.Signal2D(np.zeros((10, 100, 100)))
@@ -106,7 +106,7 @@ class TestAlignTools:
         shifts = s.estimate_shift2D()
         print(shifts)
         print(self.ishifts)
-        nt.assert_true(np.allclose(shifts, self.ishifts))
+        assert np.allclose(shifts, self.ishifts)
 
     def test_align(self):
         # Align signal
@@ -115,8 +115,8 @@ class TestAlignTools:
         s.events.data_changed.connect(m.data_changed)
         s.align2D()
         # Compare by broadcasting
-        nt.assert_true(np.all(s.data == self.aligned))
-        nt.assert_true(m.data_changed.called)
+        assert np.all(s.data == self.aligned)
+        assert m.data_changed.called
 
     def test_align_expand(self):
         s = self.signal
@@ -128,17 +128,17 @@ class TestAlignTools:
         Nnan_data = np.sum(1 * np.isnan(s.data), axis=(1, 2))
         # Due to interpolation, the number of NaNs in the data might
         # be 2 higher (left and right side) than expected
-        nt.assert_true(np.all(Nnan_data - Nnan <= 2))
+        assert np.all(Nnan_data - Nnan <= 2)
 
         # Check alignment is correct
         d_al = s.data[:, ds[0]:-ds[0], ds[1]:-ds[1]]
-        nt.assert_true(np.all(d_al == self.aligned))
+        assert np.all(d_al == self.aligned)
 
 
 def test_add_ramp():
     s = hs.signals.Signal2D(np.indices((3, 3)).sum(axis=0) + 4)
     s.add_ramp(-1, -1, -4)
-    npt.assert_almost_equal(s.data, 0)
+    npt.assert_allclose(s.data, 0)
 
 
 def test_add_ramp_lazy():
@@ -147,5 +147,5 @@ def test_add_ramp_lazy():
     npt.assert_almost_equal(s.data.compute(), 0)
 
 if __name__ == '__main__':
-    import nose
-    nose.run(defaultTest=__name__)
+    import pytest
+    pytest.main(__name__)

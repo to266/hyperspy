@@ -23,6 +23,10 @@ from itertools import combinations, product
 from queue import Empty
 import dill
 import numpy as np
+import matplotlib
+
+matplotlib.rcParams['backend'] = 'Agg'
+
 from hyperspy.signal import BaseSignal
 from hyperspy.utils.model_selection import AICc
 
@@ -204,9 +208,6 @@ class Worker:
             self.best_values = self._collect_values()
             self.best_AICc = new_AICc
             self.best_dof = len(self.model.p0)
-            # self.best_chisq = self.model.chisq.data[0]
-            # if hasattr(self.model, 'corr'):
-            #     self.best_corr = self.model.corr.data[0]
             for k in self.parameters.keys():
                 self.parameters[k] = getattr(self.model, k).data[0]
 
@@ -215,22 +216,12 @@ class Worker:
             self.best_values = self._collect_values()
             for k in self.parameters.keys():
                 self.parameters[k] = getattr(self.model, k).data[0]
-            # self.best_dof = len(self.model.p0)
-            # self.best_chisq = self.model.chisq.data[0] 
-            # if hasattr(self.model, 'corr'):
-            #     self.best_corr = self.model.corr.data[0]
         if len(self.best_values):  # i.e. we have a good result
             _logger.debug('we have a good result in worker '
                           '{}'.format(self.identity))
             result = {k+'.data': np.array(v) for k, v in
                       self.parameters.items()}
             result['components'] = self.best_values
-            # result = {'dof.data': np.array(self.best_dof),
-            #           'components': self.best_values,
-            #           'chisq.data': np.array(self.best_chisq)
-            #           }
-            # if hasattr(self.model, 'corr'):
-            #     result['corr.data'] = np.array(self.best_corr)
             found_solution = True
         else:
             _logger.debug("we don't have a good result in worker "

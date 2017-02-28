@@ -1005,8 +1005,8 @@ class Line2DROI(BaseInteractiveROI):
         # (in contrast to standard numpy indexing)
         line_col = np.linspace(src_col, dst_col, length)
         line_row = np.linspace(src_row, dst_row, length)
-
-        data = np.zeros((2, length, int(linewidth)))
+        linewidth = int(linewidth)
+        data = np.zeros((2, length, linewidth))
         data[0, :, :] = np.tile(line_col, [linewidth, 1]).T
         data[1, :, :] = np.tile(line_row, [linewidth, 1]).T
 
@@ -1095,7 +1095,7 @@ class Line2DROI(BaseInteractiveROI):
             orig_shape = img.shape
             img = np.reshape(img, orig_shape[0:2] +
                              (np.product(orig_shape[2:]),))
-            pixels = [nd.map_coordinates(img[..., i], perp_lines,
+            pixels = [nd.map_coordinates(img[..., i].T, perp_lines,
                                          order=order, mode=mode, cval=cval)
                       for i in range(img.shape[2])]
             i0 = min(axes[0].index_in_array, axes[1].index_in_array)
@@ -1164,9 +1164,9 @@ class Line2DROI(BaseInteractiveROI):
             from hyperspy.signals import BaseSignal
             roi = BaseSignal(profile, axes=axm._get_axes_dicts(),
                              metadata=signal.metadata.deepcopy(
-                             ).as_dictionary(),
-                             original_metadata=signal.original_metadata.
-                             deepcopy().as_dictionary())
+            ).as_dictionary(),
+                original_metadata=signal.original_metadata.
+                deepcopy().as_dictionary())
             return roi
         else:
             out.data = profile
