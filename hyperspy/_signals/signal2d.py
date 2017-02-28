@@ -97,8 +97,8 @@ def fft_correlation(in1, in2, normalize=False):
     size = s1 + s2 - 1
     # Use 2**n-sized FFT
     fsize = (2 ** np.ceil(np.log2(size))).astype("int")
-    IN1 = fftn(in1, fsize)
-    IN1 *= fftn(in2, fsize).conjugate()
+    fprod = fftn(in1, fsize)
+    fprod *= fftn(in2, fsize).conjugate()
     if normalize is True:
         fprod = np.nan_to_num(fprod / np.absolute(fprod))
     ret = ifftn(fprod).real.copy()
@@ -159,6 +159,7 @@ def estimate_image_shift(ref, image, roi=None, sobel=True,
         The maximum value of the correlation
 
     """
+
     ref, image = da.compute(ref, image)
     # Make a copy of the images to avoid modifying them
     ref = ref.copy().astype(dtype)
@@ -528,6 +529,7 @@ class Signal2D(BaseSignal, CommonSignal2D):
                 correlation_threshold=None,
                 chunk_size=30,
                 interpolation_order=1,
+                sub_pixel_factor=1,
                 show_progressbar=None,
                 parallel=None):
         """Align the images in place using user provided shifts or by
@@ -591,7 +593,7 @@ class Signal2D(BaseSignal, CommonSignal2D):
                 correlation_threshold=correlation_threshold,
                 normalize_corr=normalize_corr,
                 chunk_size=chunk_size,
-                sub_pixel_factor=sub_pixel_factor, 
+                sub_pixel_factor=sub_pixel_factor,
                 show_progressbar=show_progressbar)
             return_shifts = True
         else:
