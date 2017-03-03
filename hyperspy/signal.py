@@ -3323,7 +3323,7 @@ class BaseSignal(FancySlicing,
         # iterate over the coordinates.
         try:
             fargs = inspect.signature(function).parameters.keys()
-        except TypeError:
+        except ValueError:
             # This is probably a Cython function that is not supported by
             # inspect.
             fargs = []

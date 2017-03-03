@@ -407,6 +407,7 @@ class SamfirePool(ParallelPool):
         listening to the results and updating SAMFire as needed. Stops when
         timed out or no pixels are left to run.
         """
+        self._last_time = time.time() # for the first time
         while self._not_too_long and (self.samf.pixels_left or
                                       len(self.samf.running_pixels)):
             # bool if got something
