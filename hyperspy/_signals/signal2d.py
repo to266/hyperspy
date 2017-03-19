@@ -720,7 +720,13 @@ class Signal2D(BaseSignal, CommonSignal2D):
                each cell contains an array with dimensions (npeaks, 2) that
                contains the x, y pixel coordinates of peaks found in each image.
         """
-        from hyperspy.utils.peakfinders2D import *
+        from hyperspy.utils.peakfinders2D import (peak_local_max,
+                                                  find_peaks_max,
+                                                  find_peaks_minmax,
+                                                  find_peaks_zaefferer,
+                                                  find_peaks_stat,
+                                                  find_peaks_log,
+                                                  find_peaks_dog)
         method_dict = {
             'skimage': peak_local_max,
             'max': find_peaks_max,
