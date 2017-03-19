@@ -19,7 +19,7 @@
 import numpy as np
 
 from hyperspy.samfire_utils.goodness_of_fit_tests.test_general import goodness_test
-from hyperspy._signals.signal2d import fft_correlation
+from hyperspy.misc.math_tools import fft_correlation
 
 
 class correlation(goodness_test):

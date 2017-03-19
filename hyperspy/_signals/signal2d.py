@@ -21,12 +21,12 @@ import numpy as np
 import numpy.ma as ma
 import dask.array as da
 import logging
-from scipy.fftpack import fftn, ifftn
 from skimage.feature.register_translation import _upsampled_dft
 
 from hyperspy.defaults_parser import preferences
 from hyperspy.external.progressbar import progressbar
-from hyperspy.misc.math_tools import symmetrize, antisymmetrize
+from hyperspy.misc.math_tools import (symmetrize, antisymmetrize,
+                                      fft_correlation)
 from hyperspy.signal import BaseSignal
 from hyperspy._signals.lazy import LazySignal
 from hyperspy._signals.common_signal2d import CommonSignal2D
@@ -79,29 +79,6 @@ def sobel_filter(im):
     return sob
 
 
-def fft_correlation(in1, in2, normalize=False):
-    """Correlation of two N-dimensional arrays using FFT.
-
-    Adapted from scipy's fftconvolve.
-
-    Parameters
-    ----------
-    in1, in2 : array
-    normalize: bool
-        If True performs phase correlation
-
-    """
-    s1 = np.array(in1.shape)
-    s2 = np.array(in2.shape)
-    size = s1 + s2 - 1
-    # Use 2**n-sized FFT
-    fsize = (2 ** np.ceil(np.log2(size))).astype("int")
-    fprod = fftn(in1, fsize)
-    fprod *= fftn(in2, fsize).conjugate()
-    if normalize is True:
-        fprod = np.nan_to_num(fprod / np.absolute(fprod))
-    ret = ifftn(fprod).real.copy()
-    return ret, fprod
 
 
 def estimate_image_shift(ref, image, roi=None, sobel=True,

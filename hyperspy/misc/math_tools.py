@@ -61,3 +61,29 @@ def isfloat(number):
         return np.issubdtype(number, np.float)
     else:
         return isinstance(number, float)
+
+
+def fft_correlation(in1, in2, normalize=False):
+    """Correlation of two N-dimensional arrays using FFT.
+
+    Adapted from scipy's fftconvolve.
+
+    Parameters
+    ----------
+    in1, in2 : array
+    normalize: bool
+        If True performs phase correlation
+
+    """
+    from scipy.fftpack import fftn, ifftn
+    s1 = np.array(in1.shape)
+    s2 = np.array(in2.shape)
+    size = s1 + s2 - 1
+    # Use 2**n-sized FFT
+    fsize = (2 ** np.ceil(np.log2(size))).astype("int")
+    fprod = fftn(in1, fsize)
+    fprod *= fftn(in2, fsize).conjugate()
+    if normalize is True:
+        fprod = np.nan_to_num(fprod / np.absolute(fprod))
+    ret = ifftn(fprod).real.copy()
+    return ret, fprod
