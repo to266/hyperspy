@@ -32,7 +32,6 @@ from hyperspy._signals.lazy import LazySignal
 from hyperspy._signals.common_signal2d import CommonSignal2D
 from hyperspy.docstrings.plot import (
     BASE_PLOT_DOCSTRING, PLOT2D_DOCSTRING, KWARGS_DOCSTRING)
-from hyperspy.utils.peakfinders2D import *
 
 _logger = logging.getLogger(__name__)
 
@@ -721,6 +720,7 @@ class Signal2D(BaseSignal, CommonSignal2D):
                each cell contains an array with dimensions (npeaks, 2) that
                contains the x, y pixel coordinates of peaks found in each image.
         """
+        from hyperspy.utils.peakfinders2D import *
         method_dict = {
             'skimage': peak_local_max,
             'max': find_peaks_max,
