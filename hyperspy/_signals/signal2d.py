@@ -37,6 +37,7 @@ _logger = logging.getLogger(__name__)
 
 
 def shift_image(im, shift=0, interpolation_order=1, fill_value=np.nan):
+    from scipy import ndimage
     if np.any(shift):
         fractional, integral = np.modf(shift)
         if fractional.any():
@@ -44,7 +45,7 @@ def shift_image(im, shift=0, interpolation_order=1, fill_value=np.nan):
         else:
             # Disable interpolation
             order = 0
-        return sp.ndimage.shift(im, shift, cval=fill_value, order=order)
+        return ndimage.shift(im, shift, cval=fill_value, order=order)
     else:
         return im
 
