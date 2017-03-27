@@ -253,7 +253,8 @@ class Samfire:
         try:
             while True:
                 self._run_active_strategy()
-                self.plot()
+                if self.plot_every > 0:
+                    self.plot()
                 if self.pixels_done == self.model.axes_manager.navigation_size:
                     # all pixels are done, no need to go to the next strategy
                     break
