@@ -274,7 +274,10 @@ def file_writer(filename, signal, **kwds):
                                         ('ID', endianess + 'u4')])
         dp_head['MAGIC'] = 0x55AA
         # Write by loop:
+        _lazy = signal._lazy
         for img in signal._iterate_signal():
             dp_head.tofile(f)
+            if _lazy:
+                img = img.compute()
             img.astype(endianess + 'u1').tofile(f)
             dp_head['ID'] += 1
