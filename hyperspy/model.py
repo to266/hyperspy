@@ -1159,7 +1159,7 @@ class BaseModel(list):
                     fprime = grad_ls
                 elif method == 'custom':
                     tominimize = min_function
-                    fprime = None
+                    fprime = False
 
                 # OPTIMIZERS
                 # Derivative-free methods
